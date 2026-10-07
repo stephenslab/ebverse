@@ -1,3 +1,5 @@
-# ebverse
+ebverse
+=======
 
-The "ebverse" is a flexible framework and interface for empirical Bayes linear models.
+The "ebverse" is a flexible modeling framework and interface for
+empirical Bayes linear models.
