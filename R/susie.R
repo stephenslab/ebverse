@@ -236,21 +236,45 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
   return(list(s = s,s0 = s0,pip = pip,b1 = b1,b2 = b2,s1 = s1,elbo = elbo))
 }
 
-#' @title My simple implementation of EM for the SuSiE model with an
-#'   NIG prior.
+#' @rdname fit_susie
+#'  
+#' @title Title goes here.
+#'
+#' @param dat Describe "dat" here. (This should be a "prepared" data
+#'   set.)
+#' 
+#' @param prior Describe "prior" here.
+#'
+#' @param L Describe "L" here.
+#' 
+#' @return Description of the output goes here.
+#' 
+#' @export
+#' 
+init_susie_model <- function (dat, prior, L = 10) {
+  fit <- list()
+  class(fit) <- c("susie","list")
+  return(fit)
+}
+
+#' @title Title goes here.
 #'
 #' @description Description goes here.
 #'
+#' @param dat An object
+#'
+#' @seealso \code{\link{prepare_mlm_data}},
+#'   \code{\link{prepare_mlm_summary_data}}
+#'
+#' @examples
+#' # TO DO: Add example(s) here.
+#' 
 #' @export
 #'
 #' @keywords internal
 #' 
 fit_susie <- function (X, y, L = 10, s0 = rep(1,L), numiter = 10, 
                        a0 = 0.01, b0 = 0.01, verbose = TRUE) {
-
-  # Center X and y which is needed to account for an intercept.  
-  X <- scale(X,center = TRUE,scale = FALSE)
-  y <- drop(scale(y,center = TRUE,scale = FALSE))
 
   # Initialize the posterior mean estimates of b, and initialize
   # storage for the PIPs and other quantities.
