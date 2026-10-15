@@ -2,13 +2,13 @@
 % Please edit documentation in R/susie.R
 \name{init_susie_model}
 \alias{init_susie_model}
-\alias{fit_susie}
+\alias{fit_susie_model}
 \alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
 init_susie_model(dat, prior, L = 10)
 
-fit_susie(
+fit_susie_model(
   X,
   y,
   L = 10,

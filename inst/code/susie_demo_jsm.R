@@ -7,7 +7,7 @@ set.seed(1)
 load("../datasets/jsm_data.RData")
 X <- scale(X,center = TRUE,scale = FALSE)
 y <- drop(scale(y,center = TRUE,scale = FALSE))
-fit <- fit_susie(X,y,L = 2,numiter = 10,verbose = TRUE)
+fit <- fit_susie_model(X,y,L = 2,numiter = 10,verbose = TRUE)
 plot(fit$PIP[,1],pch = 20,col = "dodgerblue",ylim = c(0,1),
      xlab = "SNP",ylab = "PIP")
 points(fit$PIP[,2],pch = 20,col = "red")
