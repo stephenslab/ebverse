@@ -1,8 +1,8 @@
 Encoding: UTF-8
 Type: Package
 Package: ebverse
-Version: 0.0-1
-Date: 2026-10-07
+Version: 0.0-2
+Date: 2026-10-15
 Title: Empirical Bayes Linear Models in R
 Authors@R: c(person("Peter","Carbonetto",role=c("aut","cre"),
                     email="peter.carbonetto@gmail.com"),
@@ -15,3 +15,4 @@ License: MIT + file LICENSE
 LazyData: true
 LazyDataCompression: xz
 NeedsCompilation: no
+RoxygenNote: 7.3.1
