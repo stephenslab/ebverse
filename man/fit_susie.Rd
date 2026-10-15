@@ -3,6 +3,7 @@
 \name{init_susie_model}
 \alias{init_susie_model}
 \alias{fit_susie}
+\alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
 init_susie_model(dat, prior, L = 10)
@@ -15,8 +16,11 @@ fit_susie(
   numiter = 10,
   a0 = 0.01,
   b0 = 0.01,
-  verbose = TRUE
+  verbose = TRUE,
+  control = list()
 )
+
+fit_susie_control_default()
 }
 \arguments{
 \item{dat}{An object}

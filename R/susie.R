@@ -274,7 +274,8 @@ init_susie_model <- function (dat, prior, L = 10) {
 #' @keywords internal
 #' 
 fit_susie <- function (X, y, L = 10, s0 = rep(1,L), numiter = 10, 
-                       a0 = 0.01, b0 = 0.01, verbose = TRUE) {
+                       a0 = 0.01, b0 = 0.01, verbose = TRUE,
+                       control = list()) {
 
   # Initialize the posterior mean estimates of b, and initialize
   # storage for the PIPs and other quantities.
@@ -316,3 +317,10 @@ fit_susie <- function (X, y, L = 10, s0 = rep(1,L), numiter = 10,
 
   return(list(PIP = PIP,B = B,s0 = s0,elbo = elbo,delta = delta))
 }
+
+#' @rdname fit_susie
+#' 
+#' @export
+#' 
+fit_susie_control_default <- function ()
+  list(verbose = "detailed")
