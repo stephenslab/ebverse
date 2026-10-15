@@ -242,6 +242,8 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' @description Description goes here.
 #'
 #' @export
+#'
+#' @keywords internal
 #' 
 fit_susie <- function (X, y, L = 10, s0 = rep(1,L), numiter = 10, 
                        a0 = 0.01, b0 = 0.01, verbose = TRUE) {

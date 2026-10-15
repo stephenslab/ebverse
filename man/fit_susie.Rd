@@ -19,3 +19,4 @@ fit_susie(
 \description{
 Description goes here.
 }
+\keyword{internal}
