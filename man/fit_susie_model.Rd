@@ -3,12 +3,15 @@
 \name{init_susie_model}
 \alias{init_susie_model}
 \alias{fit_susie_model}
+\alias{susie_model_fitting_core}
 \alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
-init_susie_model(dat, prior, L = 10)
+init_susie_model(dat, prior, L = 10, sigma = 1)
 
-fit_susie_model(
+fit_susie_model(dat, fit)
+
+susie_model_fitting_core(
   X,
   y,
   L = 10,
@@ -28,12 +31,16 @@ fit_susie_control_default()
 \item{prior}{Describe "prior" here.}
 
 \item{L}{Describe "L" here.}
+
+\item{sigma}{Describe "sigma" here.}
 }
 \value{
 Description of the output goes here.
 }
 \description{
 Description goes here.
+
+Add description here.
 }
 \examples{
 # TO DO: Add example(s) here.
@@ -41,6 +48,7 @@ Description goes here.
 }
 \seealso{
 \code{\link{prepare_mlm_data}},
-  \code{\link{prepare_mlm_summary_data}}
+  \code{\link{prepare_mlm_summary_data}},
+  \code{\link{susie_model_fitting_core}}
 }
 \keyword{internal}

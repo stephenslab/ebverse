@@ -3,11 +3,14 @@
 \name{init_susie_prior_normal}
 \alias{init_susie_prior_normal}
 \alias{init_susie_prior_laplace}
+\alias{init_susie_prior_XXX}
 \title{Title goes here.}
 \usage{
 init_susie_prior_normal()
 
 init_susie_prior_laplace()
+
+init_susie_prior_XXX()
 }
 \description{
 Description goes here.

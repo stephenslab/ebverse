@@ -246,12 +246,14 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' @param prior Describe "prior" here.
 #'
 #' @param L Describe "L" here.
+#'
+#' @param sigma Describe "sigma" here.
 #' 
 #' @return Description of the output goes here.
 #' 
 #' @export
 #' 
-init_susie_model <- function (dat, prior, L = 10) {
+init_susie_model <- function (dat, prior, L = 10, sigma = 1) {
   fit <- list()
   class(fit) <- c("susie","list")
   return(fit)
@@ -264,18 +266,31 @@ init_susie_model <- function (dat, prior, L = 10) {
 #' @param dat An object
 #'
 #' @seealso \code{\link{prepare_mlm_data}},
-#'   \code{\link{prepare_mlm_summary_data}}
+#'   \code{\link{prepare_mlm_summary_data}},
+#'   \code{\link{susie_model_fitting_core}}
 #'
 #' @examples
 #' # TO DO: Add example(s) here.
 #' 
 #' @export
 #'
-#' @keywords internal
+fit_susie_model <- function (dat, fit) {
+  return(fit)
+}
+ 
+#' @rdname fit_susie_model
+#'
+#' @title Add Title Here.
+#'
+#' @description Add description here.
 #' 
-fit_susie_model <- function (X, y, L = 10, s0 = rep(1,L), numiter = 10, 
-                             a0 = 0.01, b0 = 0.01, verbose = TRUE,
-                             control = list()) {
+#' @export
+#' 
+#' @keywords internal
+#'
+susie_model_fitting_core <- function (X, y, L = 10, s0 = rep(1,L), 
+                                      numiter = 10, a0 = 0.01, b0 = 0.01, 
+                                      verbose = TRUE, control = list()) {
 
   # Initialize the posterior mean estimates of b, and initialize
   # storage for the PIPs and other quantities.

@@ -1,7 +1,7 @@
 Encoding: UTF-8
 Type: Packageglmn
 Package: ebverse
-Version: 0.1-3
+Version: 0.1-4
 Date: 2026-10-15
 Title: Empirical Bayes Linear Models in R
 Authors@R: c(person("Peter","Carbonetto",role=c("aut","cre"),

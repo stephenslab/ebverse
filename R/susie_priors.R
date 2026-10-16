@@ -8,7 +8,7 @@
 #' 
 init_susie_prior_normal <- function () {
   out <- list()
-  class(out) <- c("susie_prior_normal","susie_prior","eb_prior","list")
+  class(out) <- c("susie_prior_normal","susie_prior","list")
   return(out)
 }
 
@@ -21,5 +21,13 @@ init_susie_prior_normal <- function () {
 #' @export
 #' 
 init_susie_prior_laplace <- function () {
+
+}
+
+#' @rdname susie_priors
+#' 
+#' @export
+#' 
+init_susie_prior_XXX <- function () {
 
 }

@@ -6,7 +6,7 @@
 #' 
 prepare_mlm_data <- function () {
   out <- list()
-  class(out) <- c("prepared_data_mlm","prepared_data","list")
+  class(out) <- c("prepared_data_mlm","list")
   return(out)
 }
 
@@ -20,6 +20,6 @@ prepare_mlm_data <- function () {
 #' 
 prepare_mlm_summary_data <- function () {
   out <- list()
-  class(out) <- c("prepared_summary_data_mlm","prepared_data","list")
+  class(out) <- c("prepared_data_mlm","list")
   return(out)
 }
