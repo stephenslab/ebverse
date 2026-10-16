@@ -12,6 +12,7 @@ BugReports: https://github.com/stephenslab/ebverse/issues
 Description: The "ebverse" is a flexible modeling framework and
     interface for empirical Bayes linear models.
 License: MIT + file LICENSE
+Imports: Matrix
 Suggests: glmnet
 LazyData: true
 LazyDataCompression: xz

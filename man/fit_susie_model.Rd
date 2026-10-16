@@ -7,9 +7,9 @@
 \alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
-init_susie_model(dat, prior, L = 10, sigma = 1)
+init_susie_model(dat, prior, L = 10, sigma = 1, return_dat = FALSE)
 
-fit_susie_model(dat, fit)
+fit_susie_model(fit, dat)
 
 susie_model_fitting_core(
   X,
@@ -33,6 +33,8 @@ fit_susie_control_default()
 \item{L}{Describe "L" here.}
 
 \item{sigma}{Describe "sigma" here.}
+
+\item{return_dat}{Describe "return_dat" here.}
 }
 \value{
 Description of the output goes here.
