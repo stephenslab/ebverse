@@ -6,8 +6,8 @@ set.seed(1)
 # same as the likelihood under bhat ~ N(b,s^2) up to a constant of
 # proportionality; (ii) the two expressions for the likelihood ratios
 # are the same.
-n <- 100
-sigma <- 0.5
+n <- 20
+sigma <- 0.3
 b <- 0.5
 x <- rnorm(n)
 x <- x - mean(x)
@@ -30,7 +30,7 @@ for (i in 1:ns) {
   ll[i] <- sum(dnorm(y,x*b[i],sqrt(sigma),log = TRUE))
   lbf[i] <- ll[i] - sum(dnorm(y,0,sqrt(sigma),log = TRUE))
   ll_nm[i] <- dnorm(bhat,b[i],s,log = TRUE)
-  lbf_nm[i] <- ll_nm[i] + z^2/2 + log(2*pi*s^2)/2
+  lbf_nm[i] <- ll_nm[i] - dnorm(bhat,0,s,log = TRUE)
 }
 d <- max(ll - ll_nm)
 par(mfrow = c(1,2))
@@ -38,3 +38,4 @@ plot(b,ll,type = "l",col = "magenta",xlab = "b",ylab = "loglik")
 lines(b,ll_nm + d,col = "black",lty = "dotted")
 plot(b,lbf,type = "l",col = "magenta",xlab = "b",ylab = "logBF")
 lines(b,lbf_nm,col = "black",lty = "dotted")
+print(range(lbf - lbf_nm))
