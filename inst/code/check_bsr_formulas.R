@@ -3,10 +3,11 @@
 set.seed(1)
 
 # Check that: (i) likelihood under model y ~ N(xb,sigma^2*I) is the
-# same as the likelihood under bhat ~ N(b,s^2) up to a constant of
-# proportionality; (ii) the two expressions for the likelihood ratios
-# are the same.
+# same as the likelihood under the EBNM model, bhat ~ N(b,s^2), up to
+# a constant of proportionality; and (ii) the two expressions for the
+# likelihood ratios are the same.
 n <- 20
+s0 <- 2
 sigma <- 0.3
 b <- 0.5
 x <- rnorm(n)
@@ -33,9 +34,24 @@ for (i in 1:ns) {
   lbf_nm[i] <- ll_nm[i] - dnorm(bhat,0,s,log = TRUE)
 }
 d <- max(ll - ll_nm)
-par(mfrow = c(1,2))
+par(mfrow = c(1,3))
 plot(b,ll,type = "l",col = "magenta",xlab = "b",ylab = "loglik")
 lines(b,ll_nm + d,col = "black",lty = "dotted")
 plot(b,lbf,type = "l",col = "magenta",xlab = "b",ylab = "logBF")
 lines(b,lbf_nm,col = "black",lty = "dotted")
 print(range(lbf - lbf_nm))
+
+# Check my expression for the Bayes factor for the EBNM model with a
+# zero-centered normal prior and the expression (A.3) in the susie
+# paper (Wang et al, 2020).
+n   <- 1000
+bhat <- rnorm(n)
+s0   <- abs(rnorm(n))
+s    <- abs(rnorm(n))
+z    <- bhat/sqrt(s)
+lbf <- dnorm(bhat,0,sqrt(s + s0),log = TRUE) - 
+              dnorm(bhat,0,sqrt(s),log = TRUE)
+lbf_wang <- log(s/(s0 + s))/2 + z^2*s0/(s0 + s)/2
+plot(lbf,lbf_wang,pch = 20)
+abline(a = 0,b = 1,col = "magenta",lty = "dotted")
+print(range(lbf - lbf_wang))
