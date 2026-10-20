@@ -2,6 +2,7 @@
 
 export(fit_susie_control_default)
 export(fit_susie_model)
+export(hello_world)
 export(init_susie_model)
 export(init_susie_prior_XXX)
 export(init_susie_prior_laplace)
@@ -9,3 +10,4 @@ export(init_susie_prior_normal)
 export(prepare_mlm_data)
 export(prepare_mlm_summary_data)
 export(susie_model_fitting_core)
+useDynLib(ebverse)
