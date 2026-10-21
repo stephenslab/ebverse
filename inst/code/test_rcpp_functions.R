@@ -1,2 +1,8 @@
 devtools::load_all()
 hello_world()
+f1 <- putFunPtrInXPtr("fun1")
+f2 <- putFunPtrInXPtr("fun2")
+out1 <- drop(callViaXPtr(1:4,f1))
+out2 <- drop(callViaXPtr(1:4,f2))
+print(out1)
+print(out2)

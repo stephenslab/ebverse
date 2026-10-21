@@ -5,3 +5,11 @@ rcpp_hello_world <- function() {
     .Call('_ebverse_rcpp_hello_world', PACKAGE = 'ebverse')
 }
 
+putFunPtrInXPtr <- function(fstr) {
+    .Call('_ebverse_putFunPtrInXPtr', PACKAGE = 'ebverse', fstr)
+}
+
+callViaXPtr <- function(x, xpsexp) {
+    .Call('_ebverse_callViaXPtr', PACKAGE = 'ebverse', x, xpsexp)
+}
+
