@@ -1,0 +1,9 @@
+> methods(class="lm")
+ [1] add1           alias          anova          case.names     coerce
+ [6] confint        cooks.distance deviance       dfbeta         dfbetas
+[11] drop1          dummy.coef     effects        extractAIC     family
+[16] formula        hatvalues      influence      initialize     kappa
+[21] labels         logLik         model.frame    model.matrix   nobs
+[26] plot           predict        print          proj           qr
+[31] residuals      rstandard      rstudent       show           simulate
+[36] slotsFromS3    summary        variable.names vcov

@@ -94,6 +94,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # - Implement Laplace prior ("ser_laplace").
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
+  # - Run R CMD check ...
   w <- fit$prior$prob
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
