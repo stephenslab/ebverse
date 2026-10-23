@@ -11,9 +11,9 @@ init_ser_model(nvar, prior_family, prior, control)
 
 ser_normal_control_default()
 
-fit_ser_model(fit, dat)
+fit_ser_model(fit, dat, return_data = FALSE)
 
-\method{fit_ser_model}{ser_normal}(fit, dat)
+\method{fit_ser_model}{ser_normal}(fit, dat, return_data = FALSE)
 }
 \arguments{
 \item{nvar}{Describe the "nvar" input here.}

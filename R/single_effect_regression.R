@@ -68,7 +68,7 @@ ser_normal_control_default <- function()
 #'
 #' @export
 #'
-fit_ser_model <- function (fit, dat) {
+fit_ser_model <- function (fit, dat, return_data = FALSE) {
    UseMethod("fit_ser_model")
 }
 
@@ -78,8 +78,9 @@ fit_ser_model <- function (fit, dat) {
 #' 
 #' @export
 #' 
-fit_ser_model.ser_normal <- function (fit, dat) {
+fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # TO DO: 
+  # - Implement return_data option.
   # - Implement estimation of the prior variance.
   # - Create a "simulate" S3 method.
   # - Write a function to simulate different X matrices---
