@@ -1,13 +1,8 @@
-# normalizelogweights takes as input an array of unnormalized
-# log-probabilities logw and returns normalized probabilities such
-# that the sum is equal to 1.
-normalizelogweights <- function (logw) {
-
-  # Guard against underflow or overflow by adjusting the
-  # log-probabilities so that the largest probability is 1.
-  c <- max(logw)
-  w <- exp(logw - c)
-
-  # Normalize the probabilities.
-  return(w/sum(w))
+# Given a vector of log-weights (lw), compute the following in a
+# numerically stafe way: (1) weight_sum = sum(w), and (2) probs =
+# w/sum(w), where w = exp(lw).
+normalizelogweights <- function (lw) {
+  a <- max(lw)
+  w <- exp(lw - a)
+  return(list(weight_sum = log(sum(w)) + a,probs = w/sum(w)))
 }

@@ -5,13 +5,6 @@
 inv_gamma_factor <- function (a, b)
   a*log(b) - lgamma(a)
 
-# Safely compute probabilities from log-weights.
-normalizelogweights <- function (logw) {
-  x <- max(logw)
-  w <- exp(logw - x)
-  return(w/sum(w))
-}
-
 # For each column of X, compute the least-squares estimate of the
 # regression coefficient (bhat) and its variance (shat). Here, s is
 # the residual variance.

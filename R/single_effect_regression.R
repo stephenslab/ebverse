@@ -44,7 +44,7 @@ init_ser_model_normal <- function (nvar,
                         control,keep.null = TRUE)
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
-  prob <- prob/sum(prob)
+  prior$prob <- prior$prob/sum(prior$prob)
   fit <- list(prior = prior,posterior = as.numeric(NA),control = control)
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
@@ -75,10 +75,15 @@ fit_ser_model <- function (fit, dat) {
 #' @export
 #' 
 fit_ser_model.ser_normal <- function (fit, dat) {
-  res <- compute_posterior_ebnm_normal(dat$bhat,dat$s,prior$prior_variance)
-  pip <- normalizelogweights(res$lbf)
+  # TO DO: Implement estimation of the prior variance.
+  w <- fit$prior$prob
+  res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
+                                       fit$prior$prior_variance)
+  ans <- normalizelogweights(log(w) + res$lbf)
+  pip <- ans$probs
   b1 <- pip * res$b1
   fit$posterior <- cbind(lbf = res$lbf,pip = pip,b1 = b1)
+  fit$lbf <- ans$weight_sum
   return(fit)
 }
 
