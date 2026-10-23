@@ -45,7 +45,10 @@ init_ser_model_normal <- function (nvar,
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
   prior$prob <- prior$prob/sum(prior$prob)
-  fit <- list(prior = prior,posterior = as.numeric(NA),control = control)
+  fit <- list(prior = prior,
+              posterior = as.numeric(NA),
+              progress = as.numeric(NA),
+              control = control)
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
@@ -58,6 +61,7 @@ ser_normal_control_default <- function()
   list(estimate_prior_variance = TRUE,
        tol = 1e-6,
        maxiter = 10,
+       version = "R",
        verbose = "none")
 
 #' @rdname single_effect_regression
@@ -75,7 +79,13 @@ fit_ser_model <- function (fit, dat) {
 #' @export
 #' 
 fit_ser_model.ser_normal <- function (fit, dat) {
-  # TO DO: Implement estimation of the prior variance.
+  # TO DO: 
+  # - Implement estimation of the prior variance.
+  # - Add a "progress" output.
+  # - Implement "verbose" option.
+  # - Test the ability to "refit".
+  # - Implement an Rcpp version of this.
+  # - Add some simple unit tests.
   w <- fit$prior$prob
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
