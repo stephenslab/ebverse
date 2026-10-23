@@ -4,9 +4,9 @@
 #' 
 #' @export
 #' 
-prepare_mlm_data <- function () {
+prepare_susie_data <- function () {
   out <- list()
-  class(out) <- c("prepared_data_mlm","list")
+  class(out) <- c("susie_data","list")
   return(out)
 }
 
@@ -18,8 +18,8 @@ prepare_mlm_data <- function () {
 #' 
 #' @export
 #' 
-prepare_mlm_summary_data <- function () {
+prepare_susie_summary_data <- function () {
   out <- list()
-  class(out) <- c("prepared_data_mlm","list")
+  class(out) <- c("susie_data","list")
   return(out)
 }

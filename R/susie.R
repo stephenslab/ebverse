@@ -291,9 +291,8 @@ fit_susie_model <- function (fit, dat) {
 #' 
 #' @keywords internal
 #'
-susie_model_fitting_core <- function (X, y, L = 10, s0 = rep(1,L), 
-                                      numiter = 10, a0 = 0.01, b0 = 0.01, 
-                                      verbose = TRUE, control = list()) {
+susie_model_fitting_core <- function (dat, prior, L = 10, control = list()) {
+# numiter = 10, a0 = 0.01, b0 = 0.01,  verbose = TRUE)
 
   # Initialize the posterior mean estimates of b, and initialize
   # storage for the PIPs and other quantities.
@@ -303,10 +302,7 @@ susie_model_fitting_core <- function (X, y, L = 10, s0 = rep(1,L),
   PIP  <- matrix(0,p,L)
   elbo <- rep(0,L)
 
-  # Initialize the expected residuals.
-  r <- y
-
-  # Iterate the SER updates.
+  # Iterate the co-ordinate ascent updates.
   delta <- rep(0,numiter)
   for (i in 1:numiter) {
     if (verbose)

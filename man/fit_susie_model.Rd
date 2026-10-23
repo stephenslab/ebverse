@@ -11,17 +11,7 @@ init_susie_model(dat, prior, L = 10, sigma = 1, return_dat = FALSE)
 
 fit_susie_model(fit, dat)
 
-susie_model_fitting_core(
-  X,
-  y,
-  L = 10,
-  s0 = rep(1, L),
-  numiter = 10,
-  a0 = 0.01,
-  b0 = 0.01,
-  verbose = TRUE,
-  control = list()
-)
+susie_model_fitting_core(dat, prior, L = 10, control = list())
 
 fit_susie_control_default()
 }
