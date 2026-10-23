@@ -81,6 +81,9 @@ fit_ser_model <- function (fit, dat) {
 fit_ser_model.ser_normal <- function (fit, dat) {
   # TO DO: 
   # - Implement estimation of the prior variance.
+  # - Create a "simulate" S3 method.
+  # - Write a function to simulate different X matrices---
+  #   see https://github.com/stephenslab/dsc-linreg.
   # - Add a "progress" output.
   # - Implement "verbose" option.
   # - Test the ability to "refit".
