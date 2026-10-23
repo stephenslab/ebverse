@@ -1,8 +1,8 @@
 Encoding: UTF-8
 Type: Packageglmn
 Package: ebverse
-Version: 0.1-9
-Date: 2026-10-22
+Version: 0.1-10
+Date: 2026-10-23
 Title: Empirical Bayes Linear Models in R
 Authors@R: c(person("Peter","Carbonetto",role=c("aut","cre"),
                     email="peter.carbonetto@gmail.com"),
@@ -14,6 +14,7 @@ Description: The "ebverse" is a flexible modeling framework and
 License: MIT + file LICENSE
 Imports: 
     Matrix,
+    utils,
     stats,
     Rcpp (>= 1.1.0)
 Suggests: glmnet

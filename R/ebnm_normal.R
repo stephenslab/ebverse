@@ -1,3 +1,10 @@
-# TO DO: Implement function for computing key posterior statistics and
-# Bayes factors for empirical Bayes normal means (EBNM) model with a
-# normal prior.
+# TO DO: Explain here what this function is for, and what are the
+# inputs and outputs.
+#
+#' @importFrom stats dnorm
+compute_posterior_ebnm_normal <- function (bhat, s, s0) {
+  lbf <- dnorm(bhat,0,s0 + s,log = TRUE) - dnorm(bhat,0,s,log = TRUE)
+  s1 <- 1/(1/s0 + 1/s)
+  b1 <- bhat*s1/s
+  return(list(lbf = lbf,b1 = b1,s1 = s1))
+}
