@@ -86,6 +86,7 @@ fit_ser_model.ser_normal <- function (fit, dat) {
   # - Test the ability to "refit".
   # - Implement an Rcpp version of this.
   # - Add some simple unit tests.
+  # - Benchmark the R and C++ implementations.
   w <- fit$prior$prob
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
@@ -96,5 +97,3 @@ fit_ser_model.ser_normal <- function (fit, dat) {
   fit$lbf <- ans$weight_sum
   return(fit)
 }
-
-
