@@ -37,9 +37,9 @@ init_ser_model <- function (nvar, prior_family, prior, control) {
 #' @export
 #' 
 init_ser_model_normal <- function (nvar, 
-                                          prior = list(prob = 1/nvar, 
-                                                       prior_variance = 1),
-                                          control = list()) {
+                                   prior = list(prob = 1/nvar, 
+                                                prior_variance = 1),
+                                   control = list()) {
     control <- modifyList(ser_normal_control_default(),
                         control,keep.null = TRUE)
   if (length(prior$prob) == 1)
@@ -98,8 +98,22 @@ fit_ser_model.ser_normal <- function (fit, dat) {
                                        fit$prior$prior_variance)
   ans <- normalizelogweights(log(w) + res$lbf)
   pip <- ans$probs
-  b1 <- pip * res$b1
-  fit$posterior <- cbind(lbf = res$lbf,pip = pip,b1 = b1)
+  posterior_mean <- pip * res$b1
+  fit$posterior <- cbind(lbf = res$lbf,
+                         pip = pip,
+                         posterior_mean = posterior_mean)
   fit$lbf <- ans$weight_sum
   return(fit)
+}
+
+# TO DO: Explain here what this function is for, and what are the
+# inputs and outputs.
+#
+#' @importFrom stats dnorm
+compute_posterior_ebnm_normal <- function (bhat, s, s0) {
+  lbf <- dnorm(bhat,0,sqrt(s0 + s),log = TRUE) - 
+         dnorm(bhat,0,sqrt(s),log = TRUE)
+  s1 <- 1/(1/s0 + 1/s)
+  b1 <- bhat*s1/s
+  return(list(lbf = lbf,b1 = b1,s1 = s1))
 }
