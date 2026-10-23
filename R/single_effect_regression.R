@@ -37,10 +37,10 @@ init_ser_model <- function (nvar, prior_family, prior, control) {
 #' @export
 #' 
 init_ser_model_normal <- function (nvar, 
-                                   prior = list(prob = 1/nvar, 
-                                                prior_variance = 1),
-                                   control = list()) {
-  control <- modifyList(ser_normal_control_default(),
+                                          prior = list(prob = 1/nvar, 
+                                                       prior_variance = 1),
+                                          control = list()) {
+    control <- modifyList(ser_normal_control_default(),
                         control,keep.null = TRUE)
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
@@ -87,6 +87,9 @@ fit_ser_model.ser_normal <- function (fit, dat) {
   # - Implement an Rcpp version of this.
   # - Add some simple unit tests.
   # - Benchmark the R and C++ implementations.
+  # - Implement Laplace prior ("ser_laplace").
+  # - Fill out the docs, and in particular define the SER model,
+  #   and give a small example illustrating its use.
   w <- fit$prior$prob
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
