@@ -41,14 +41,15 @@ init_ser_model_normal <- function (nvar,
                                                 prior_variance = 1),
                                    control = list()) {
     control <- modifyList(ser_normal_control_default(),
-                        control,keep.null = TRUE)
+                          control,keep.null = TRUE)
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
   prior$prob <- prior$prob/sum(prior$prob)
-  fit <- list(prior = prior,
+  fit <- list(prior     = prior,
+              lbf       = as.numeric(NA),
               posterior = as.numeric(NA),
-              progress = as.numeric(NA),
-              control = control)
+              progress  = as.numeric(NA),
+              control   = control)
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
@@ -59,7 +60,8 @@ init_ser_model_normal <- function (nvar,
 #' 
 ser_normal_control_default <- function()
   list(estimate_prior_variance = TRUE,
-       tol = 1e-6,
+       paramtol = 1e-6,
+       lbftol = 1e-6,
        maxiter = 10,
        version = "R",
        verbose = "none")
@@ -82,12 +84,10 @@ fit_ser_model <- function (fit, dat, return_data = FALSE) {
 #' 
 fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # TO DO: 
-  # - Implement estimation of the prior variance.
   # - Create a "simulate" S3 method.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Add a "progress" output.
-  # - Implement "verbose" option.
   # - Test the ability to "refit".
   # - Implement an Rcpp version of this.
   # - Add some simple unit tests.
@@ -100,14 +100,41 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
     if (is.null(fit$dat))
       stop("data not provided")
   }
+
+  # Estimate the prior variance parameter.
+  if (fit$control$estimate_prior_variance) {
+    for (iter in 1:fit$control$maxiter) {
+      prior_variance_current <- fit$prior$prior_variance
+      lbf_current <- fit$lbf
+
+      # E step.    
+      res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
+                                           fit$prior$prior_variance)
+      ans <- normalizelogweights(log(fit$prior$prob) + res$lbf)
+
+      # M-step.
+      fit$prior$prior_variance <- sum(ans$probs * (res$b1^2 + res$s1))
+      if (fit$control$verbose == "detailed")
+      cat("s0 =",format(fit$prior$prior_variance,digits = 12),
+          " lbf =",format(ans$weight_sum,digits = 12),"\n")
+      if (!is.na(lbf_current) && lbf_current > ans$weight_sum + 1e-8)
+        stop("prior variance update decreased the likelihood")
+      if (abs(prior_variance_current - 
+              fit$prior$prior_variance) < fit$control$paramtol)
+        break
+    }
+  }
+
+  # Computing the posterior statistics one last time and prepare the
+  # output.
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
   ans <- normalizelogweights(log(fit$prior$prob) + res$lbf)
   pip <- ans$probs
-  posterior_mean <- pip * res$b1
-  fit$posterior <- cbind(lbf = res$lbf,
-                         pip = pip,
-                         posterior_mean = posterior_mean)
+  post_mean <- pip * res$b1
+  fit$posterior <- cbind(lbf       = res$lbf,
+                         pip       = pip,
+                         post_mean = post_mean)
   fit$lbf <- ans$weight_sum 
   if (return_data)
     fit$dat <- dat
