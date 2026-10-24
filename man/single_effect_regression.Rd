@@ -20,6 +20,8 @@ fit_ser_model(fit, dat, return_data = FALSE)
 
 \item{dat}{Describe the "dat" input here.}
 
+\item{return_data}{Describe the "return_data" option here.}
+
 \item{Describe}{the "control" input here.}
 }
 \value{

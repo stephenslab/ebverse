@@ -75,12 +75,13 @@ fit_ser_model <- function (fit, dat, return_data = FALSE) {
 #' @rdname single_effect_regression
 #'
 #' @param dat Describe the "dat" input here.
+#'
+#' @param return_data Describe the "return_data" option here.
 #' 
 #' @export
 #' 
 fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # TO DO: 
-  # - Implement return_data option.
   # - Implement estimation of the prior variance.
   # - Create a "simulate" S3 method.
   # - Write a function to simulate different X matrices---
@@ -95,16 +96,21 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
   # - Run R CMD check ...
-  w <- fit$prior$prob
+  if (missing(dat)) {
+    if (is.null(fit$dat))
+      stop("data not provided")
+  }
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
-  ans <- normalizelogweights(log(w) + res$lbf)
+  ans <- normalizelogweights(log(fit$prior$prob) + res$lbf)
   pip <- ans$probs
   posterior_mean <- pip * res$b1
   fit$posterior <- cbind(lbf = res$lbf,
                          pip = pip,
                          posterior_mean = posterior_mean)
-  fit$lbf <- ans$weight_sum
+  fit$lbf <- ans$weight_sum 
+  if (return_data)
+    fit$dat <- dat
   return(fit)
 }
 
