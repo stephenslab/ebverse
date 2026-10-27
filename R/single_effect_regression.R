@@ -2,36 +2,39 @@
 #'
 #' @title Fitting Single Effect Regression Models
 #'
-#' @description Add description here.
+#' @description Methods for fitting single effect regression (SER)
+#'   models from summary data.
 #'
-#' @param nvar Describe the "nvar" input here.
+#' @param nvar An integer no less than 2 specifying the number of
+#'   variables.
 #'
-#' @param Describe the "prior_family" input here.
-#' 
-#' @param Describe the "prior" input here.
+#' @param An object, possibly a list, specifying the SER prior. The
+#'   exact form of this input will depend on which SER model is
+#'   used. See \dQuote{details} for further information.
 #'
-#' @param Describe the "control" input here.
+#' @param An object, possibly a list, specifying settings that
+#'   affect the model fitting. See \dQuote{details} for further
+#'   information.
 #'
-#' @return An object storing: key posterior statistics for all
-#'     variables; the state of the model fit. It is a list
+#' @return An object storing key posterior statistics for all
+#'     variables and the state of the model fit. It is a list
 #'     with the following elements:
 #'
 #' \item{prior}{Describe "prior" output here.}
 #'
 #' \item{posterior}{Describe "posterior" output here.}
 #'
-#' \item{control}{Describe "control" output here.}
+#' @details TO DO: Define what is meant by an "SER model", define
+#'     the specific SER models that are implemented, and explain
+#'     what are the parameters specific to each model.
 #'
-#' @details Explain that this is a "minimal" user interface with very
-#'     little input checking; use directly at your own risk. It is
-#'     mainly used to implement the susie methods.
+#' @note While this interface is technically user-facing, it is
+#'   rather basic interface with very few checks for correctness; it
+#'   is mainly used to implement the susie model fitting
+#'   methods. Use at your own risk.
+#'
+#' @seealso \code{\link{susie}}
 #' 
-#' @export
-#' 
-init_ser_model <- function (nvar, prior_family, prior, control) {
-  # TO DO.
-}
-
 #' @importFrom utils modifyList
 #'
 #' @export
@@ -40,15 +43,23 @@ init_ser_model_normal <- function (nvar,
                                    prior = list(prob = 1/nvar, 
                                                 prior_variance = 1),
                                    control = list()) {
-    control <- modifyList(ser_normal_control_default(),
-                          control,keep.null = TRUE)
+
+  # Basic checks and basic processing of the inputs.
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
   prior$prob <- prior$prob/sum(prior$prob)
+  control <- modifyList(ser_normal_control_default(),
+                          control,keep.null = TRUE)
+
+  # Initialize the single effect regression model.
   fit <- list(prior     = prior,
               lbf       = as.numeric(NA),
               posterior = as.numeric(NA),
               progress  = as.numeric(NA),
+              local     = control$estimate_prior_variance &
+                          !control$global_prior_variance,
+              global    = control$estimate_prior_variance & 
+                          !control$global_prior_variance,
               control   = control)
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
@@ -60,6 +71,7 @@ init_ser_model_normal <- function (nvar,
 #' 
 ser_normal_control_default <- function()
   list(estimate_prior_variance = TRUE,
+       global_prior_variance = FALSE,
        paramtol = 1e-6,
        lbftol = 1e-6,
        maxiter = 10,
@@ -84,7 +96,6 @@ fit_ser_model <- function (fit, dat, return_data = FALSE) {
 #' 
 fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # TO DO: 
-  # - Create a "simulate" S3 method.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Add a "progress" output.
@@ -92,13 +103,12 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # - Implement an Rcpp version of this.
   # - Add some simple unit tests.
   # - Benchmark the R and C++ implementations.
-  # - Implement Laplace prior ("ser_laplace").
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
   # - Run R CMD check ...
   if (missing(dat)) {
     if (is.null(fit$dat))
-      stop("data not provided")
+      stop("data not provided",domain = NA)
   }
 
   # Estimate the prior variance parameter.
@@ -118,7 +128,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
       cat("s0 =",format(fit$prior$prior_variance,digits = 12),
           " lbf =",format(ans$weight_sum,digits = 12),"\n")
       if (!is.na(lbf_current) && lbf_current > ans$weight_sum + 1e-8)
-        stop("prior variance update decreased the likelihood")
+        stop("prior variance update decreased the likelihood",domain = NA)
       if (abs(prior_variance_current - 
               fit$prior$prior_variance) < fit$control$paramtol)
         break

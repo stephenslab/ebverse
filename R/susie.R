@@ -229,7 +229,7 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
   return(list(s = s,s0 = s0,pip = pip,b1 = b1,b2 = b2,s1 = s1,elbo = elbo))
 }
 
-#' @rdname fit_susie_model
+#' @rdname susie
 #'  
 #' @title Title goes here.
 #'
@@ -255,6 +255,8 @@ init_susie_model <- function (dat, prior, L = 10, sigma = 1,
   return(fit)
 }
 
+#' @rdname susie
+#'
 #' @title Title goes here.
 #'
 #' @description Description goes here.
@@ -274,7 +276,7 @@ fit_susie_model <- function (fit, dat) {
   return(fit)
 }
  
-#' @rdname fit_susie_model
+#' @rdname susie
 #'
 #' @title Add Title Here.
 #'
@@ -325,7 +327,7 @@ susie_model_fitting_core <- function (dat, prior, L = 10, control = list()) {
   return(list(PIP = PIP,B = B,s0 = s0,elbo = elbo,delta = delta))
 }
 
-#' @rdname fit_susie_model
+#' @rdname susie
 #' 
 #' @export
 #' 
