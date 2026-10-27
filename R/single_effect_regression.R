@@ -16,17 +16,27 @@
 #'   affect the model fitting. See \dQuote{details} for further
 #'   information.
 #'
-#' @return An object storing key posterior statistics for all
-#'     variables and the state of the model fit. It is a list
-#'     with the following elements:
+#' @return An object of class \dQuote{ser} storing key posterior
+#'   statistics for all variables and the state of the SER model
+#'   fit. It is a list with the following elements:
 #'
-#' \item{prior}{Describe "prior" output here.}
+#' \item{prior}{TO DO: Describe "prior" output here.}
 #'
 #' \item{posterior}{Describe "posterior" output here.}
 #'
+#' \item{lbf}{Describe "lbf" output here.}
+#'
+#' \item{progress}{Describe "progress" output here.}
+#' 
+#' \item{local}{Describe "local" output here.}
+#'
+#' \item{global}{Describe "global" output here.}
+#'
+#' \item{control}{Describe "control" output here.}
+#' 
 #' @details TO DO: Define what is meant by an "SER model", define
-#'     the specific SER models that are implemented, and explain
-#'     what are the parameters specific to each model.
+#'   the specific SER models that are implemented, and explain
+#'   what are the parameters specific to each model.
 #'
 #' @note While this interface is technically user-facing, it is
 #'   rather basic interface with very few checks for correctness; it
@@ -80,6 +90,19 @@ ser_normal_control_default <- function()
 
 #' @rdname single_effect_regression
 #'
+#' @param fit An object of class \dQuote{ser} that captures the state
+#'   of an SER model fit, typically the output from running an
+#'   \dQuote{init_ser_model} function, or an output from an
+#'   \code{fit_ser_model} call.
+#' 
+#' @param dat A matrix with \code{nvar} rows and 2 named columns:
+#'   \dQuote{bhat}, the least-squares estimates of the coefficients;
+#'   \dQuote{s}, the variances of these estimates. See
+#'   \dQuote{details} for how these are precisely defined.
+#'
+#' @param return_data If \code{return_data = TRUE}, the input data are
+#'   also included in the output.
+#' 
 #' @export
 #'
 fit_ser_model <- function (fit, dat, return_data = FALSE) {
@@ -88,10 +111,6 @@ fit_ser_model <- function (fit, dat, return_data = FALSE) {
 
 #' @rdname single_effect_regression
 #'
-#' @param dat Describe the "dat" input here.
-#'
-#' @param return_data Describe the "return_data" option here.
-#' 
 #' @export
 #' 
 fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
@@ -111,8 +130,8 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
       stop("data not provided",domain = NA)
   }
 
-  # Estimate the prior variance parameter.
-  if (fit$control$estimate_prior_variance) {
+  # Estimate the prior variance parameter locally.
+  if (fit$control$local & fit$control$estimate_prior_variance) {
     for (iter in 1:fit$control$maxiter) {
       prior_variance_current <- fit$prior$prior_variance
       lbf_current <- fit$lbf

@@ -23,22 +23,41 @@ fit_ser_model(fit, dat, return_data = FALSE)
 \item{nvar}{An integer no less than 2 specifying the number of
 variables.}
 
-\item{dat}{Describe the "dat" input here.}
+\item{fit}{An object of class \dQuote{ser} that captures the state
+of an SER model fit, typically the output from running an
+\dQuote{init_ser_model} function, or an output from an
+\code{fit_ser_model} call.}
 
-\item{return_data}{Describe the "return_data" option here.}
+\item{dat}{A matrix with \code{nvar} rows and 2 named columns:
+\dQuote{bhat}, the least-squares estimates of the coefficients;
+\dQuote{s}, the variances of these estimates. See
+\dQuote{details} for how these are precisely defined.}
+
+\item{return_data}{If \code{return_data = TRUE}, the input data are
+also included in the output.}
 
 \item{An}{object, possibly a list, specifying settings that
 affect the model fitting. See \dQuote{details} for further
 information.}
 }
 \value{
-An object storing key posterior statistics for all
-    variables and the state of the model fit. It is a list
-    with the following elements:
+An object of class \dQuote{ser} storing key posterior
+  statistics for all variables and the state of the SER model
+  fit. It is a list with the following elements:
 
-\item{prior}{Describe "prior" output here.}
+\item{prior}{TO DO: Describe "prior" output here.}
 
 \item{posterior}{Describe "posterior" output here.}
+
+\item{lbf}{Describe "lbf" output here.}
+
+\item{progress}{Describe "progress" output here.}
+
+\item{local}{Describe "local" output here.}
+
+\item{global}{Describe "global" output here.}
+
+\item{control}{Describe "control" output here.}
 }
 \description{
 Methods for fitting single effect regression (SER)
@@ -46,8 +65,8 @@ Methods for fitting single effect regression (SER)
 }
 \details{
 TO DO: Define what is meant by an "SER model", define
-    the specific SER models that are implemented, and explain
-    what are the parameters specific to each model.
+  the specific SER models that are implemented, and explain
+  what are the parameters specific to each model.
 }
 \note{
 While this interface is technically user-facing, it is
