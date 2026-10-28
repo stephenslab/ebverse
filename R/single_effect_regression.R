@@ -29,7 +29,11 @@
 #' \item{prior}{Data structure specifying the prior. This may
 #'   include hyperparameters that change during model fitting.}
 #'
-#' \item{posterior}{TO DO: Describe "posterior" output here.}
+#' \item{posterior}{A matrix with one row per variable and the
+#'   following columns: \sQuote{lbf}, the log-Bayes factor;
+#'   \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
+#'   the posterior mean of the regression coefficient; \sQuote{var},
+#'   the posterior variance of the regression coefficient.}
 #'
 #' \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'   \dQuote{null} model (b = 0).}
@@ -67,8 +71,12 @@ init_ser_model_normal <- function (nvar,
                                    control = list()) {
 
   # Basic checks and basic processing of the inputs.
+  if (length(prior$prob) != 1 & length(prior$prob) != nvar)
+    stop("prior$prob should be a vector of length 1 or nvar")
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
+  if (prior$prior_variance <= 0)
+    stop("prior$prior_variance should be a positive number")
   prior$prob <- prior$prob/sum(prior$prob)
   control <- modifyList(ser_normal_control_default(),
                           control,keep.null = TRUE)
@@ -78,11 +86,11 @@ init_ser_model_normal <- function (nvar,
               lbf       = as.numeric(NA),
               posterior = as.numeric(NA),
               progress  = as.numeric(NA),
-              local     = control$estimate_prior_variance &
-                          !control$global_prior_variance,
-              global    = control$estimate_prior_variance & 
-                          !control$global_prior_variance,
               control   = control)
+  fit$control$local <- control$estimate_prior_variance &
+                       !control$global_prior_variance
+  fit$control$global <- control$estimate_prior_variance & 
+                        !control$global_prior_variance
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
@@ -172,10 +180,13 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
                                        fit$prior$prior_variance)
   ans <- normalizelogweights(log(fit$prior$prob) + res$lbf)
   pip <- ans$probs
-  post_mean <- pip * res$b1
-  fit$posterior <- cbind(lbf       = res$lbf,
-                         pip       = pip,
-                         post_mean = post_mean)
+  b2  <- res$s1 + res$b1^2
+  post_mean <- pip*res$b1
+  post_var <-  pip*b2 - post_mean^2
+  fit$posterior <- cbind(lbf  = res$lbf,
+                         pip  = pip,
+                         mean = post_mean,
+                         var  = post_var)
   fit$lbf <- ans$weight_sum 
   if (return_data)
     fit$dat <- dat

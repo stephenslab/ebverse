@@ -52,7 +52,11 @@ An object of class \sQuote{ser} storing key posterior
 \item{prior}{Data structure specifying the prior. This may
   include hyperparameters that change during model fitting.}
 
-\item{posterior}{TO DO: Describe "posterior" output here.}
+\item{posterior}{A matrix with one row per variable and the
+  following columns: \sQuote{lbf}, the log-Bayes factor;
+  \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
+  the posterior mean of the regression coefficient; \sQuote{var},
+  the posterior variance of the regression coefficient.}
 
 \item{lbf}{Log-Bayes factor comparing the SER model to the
   \dQuote{null} model (b = 0).}
