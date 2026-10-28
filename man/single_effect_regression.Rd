@@ -91,5 +91,5 @@ This is a basic interface with very few checks; it is mainly
   own risk.
 }
 \seealso{
-\code{\link{susie}}
+\code{\link{fit_susie_model}}
 }

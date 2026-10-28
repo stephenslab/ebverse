@@ -1,5 +1,7 @@
 #' @useDynLib ebverse
 #'
+#' @importFrom Rcpp evalCpp
+#' 
 #' @export
 #'
 hello_world <- function (x) {

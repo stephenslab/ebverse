@@ -55,7 +55,7 @@
 #'   used to implement the susie model fitting methods. Use at your
 #'   own risk.
 #'
-#' @seealso \code{\link{susie}}
+#' @seealso \code{\link{fit_susie_model}}
 #' 
 #' @importFrom utils modifyList
 #'
@@ -137,7 +137,6 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
   # - Benchmark the R and C++ implementations.
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
-  # - Run R CMD check ...
   if (missing(dat)) {
     if (is.null(fit$dat))
       stop("the data were not provided",domain = NA)
