@@ -23,45 +23,62 @@ fit_ser_model(fit, dat, return_data = FALSE)
 \item{nvar}{An integer no less than 2 specifying the number of
 variables.}
 
-\item{fit}{An object of class \dQuote{ser} that captures the state
+\item{prior}{An object, possibly a list, specifying the SER
+prior. The exact form of this input will depend on which SER
+model is used. See \sQuote{details} for further information.}
+
+\item{control}{An object, possibly a list, specifying settings that
+affect the model fitting. See \sQuote{details} for further
+information.}
+
+\item{fit}{An object of class \sQuote{ser} that captures the state
 of an SER model fit, typically the output from running an
-\dQuote{init_ser_model} function, or an output from an
+\sQuote{init_ser_model} function, or an output from a
 \code{fit_ser_model} call.}
 
 \item{dat}{A matrix with \code{nvar} rows and 2 named columns:
-\dQuote{bhat}, the least-squares estimates of the coefficients;
-\dQuote{s}, the variances of these estimates. See
-\dQuote{details} for how these are precisely defined.}
+\sQuote{bhat}, the least-squares estimates of the coefficients;
+\sQuote{s}, the variances of these estimates. See
+\sQuote{details} for how these are precisely defined.}
 
 \item{return_data}{If \code{return_data = TRUE}, the input data are
-also included in the output.}
-
-\item{An}{object, possibly a list, specifying settings that
-affect the model fitting. See \dQuote{details} for further
-information.}
+included in the output.}
 }
 \value{
-An object of class \dQuote{ser} storing key posterior
+An object of class \sQuote{ser} storing key posterior
   statistics for all variables and the state of the SER model
   fit. It is a list with the following elements:
 
-\item{prior}{TO DO: Describe "prior" output here.}
+\item{prior}{Data structure specifying the prior. This may
+  include hyperparameters that change during model fitting.}
 
-\item{posterior}{Describe "posterior" output here.}
+\item{posterior}{TO DO: Describe "posterior" output here.}
 
-\item{lbf}{Describe "lbf" output here.}
+\item{lbf}{Log-Bayes factor comparing the SER model to the
+  \dQuote{null} model (b = 0).}
 
-\item{progress}{Describe "progress" output here.}
+\item{progress}{TO DO: Describe "progress" output here.}
 
-\item{local}{Describe "local" output here.}
+\item{local}{Logical specifying whether one or more parameters may
+  be estimated \dQuote{locally} (that is, they are estimated
+  separately in this SER).}
 
-\item{global}{Describe "global" output here.}
+\item{global}{Logical specifying whether one or more parameters may
+  be estimated \dQuote{globally} (that is, they are estimated
+  simultaneously in multiple SERs).}
 
-\item{control}{Describe "control" output here.}
+\item{control}{A data structure, likely a list, containing the
+  settings that affect how the model fitting is conducted.}
 }
 \description{
 Methods for fitting single effect regression (SER)
-  models from summary data.
+  models and computing posterior statistics from summary
+  data. Typically the model fitting involves estimating
+  parameters in the prior (\dQuote{hyperparameters}) by
+  maximizing the likelihood, but potentially other (non-prior)
+  parameters could be estimated as well. The \sQuote{fit_ser_model}
+  method is the main method for fitting SER models, and for
+  computing posterior statistics.
 }
 \details{
 TO DO: Define what is meant by an "SER model", define
@@ -69,10 +86,9 @@ TO DO: Define what is meant by an "SER model", define
   what are the parameters specific to each model.
 }
 \note{
-While this interface is technically user-facing, it is
-  rather basic interface with very few checks for correctness; it
-  is mainly used to implement the susie model fitting
-  methods. Use at your own risk.
+This is a basic interface with very few checks; it is mainly
+  used to implement the susie model fitting methods. Use at your
+  own risk.
 }
 \seealso{
 \code{\link{susie}}
