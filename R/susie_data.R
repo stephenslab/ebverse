@@ -7,6 +7,8 @@
 #' @param X Describe input argument "X" here.
 #'
 #' @param y Describe input argument "y" here.
+#'
+#' @seealso \code{\link{susie}}
 #' 
 #' @export
 #' 

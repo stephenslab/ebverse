@@ -2,8 +2,8 @@
 % Please edit documentation in R/susie.R
 \name{init_susie_model}
 \alias{init_susie_model}
-\alias{fit_susie_control_default}
 \alias{fit_susie_model}
+\alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
 init_susie_model(
@@ -15,9 +15,9 @@ init_susie_model(
   return_data = FALSE
 )
 
-fit_susie_control_default()
-
 fit_susie_model(fit, dat, return_data = missing(dat))
+
+fit_susie_control_default()
 }
 \arguments{
 \item{dat}{Describe "dat" input argument here.}
@@ -48,7 +48,7 @@ Description goes here.
 
 }
 \seealso{
-\code{\link{}} \code{\link{fit_ser_model}}
+\code{\link{susie_data}}, \code{\link{fit_ser_model}}
 
 \code{\link{prepare_mlm_data}},
   \code{\link{prepare_mlm_summary_data}},

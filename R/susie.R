@@ -248,7 +248,7 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' 
 #' @return Describe the output here.
 #'
-#' @seealso \code{\link{}} \code{\link{fit_ser_model}}
+#' @seealso \code{\link{susie_data}}, \code{\link{fit_ser_model}}
 #'
 #' @examples
 #' # TO DO: Add an example.
@@ -272,13 +272,6 @@ init_susie_model <- function (dat, ser, L = 10, residual_variance = 1,
   class(fit) <- c("susie","list")
   return(fit)
 }
-
-#' @rdname susie
-#' 
-#' @export
-#' 
-fit_susie_control_default <- function () 
-  list(verbose = "detailed")
 
 #' @rdname susie
 #'
@@ -309,9 +302,21 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   return(fit)
 }
  
+#' @rdname susie
+#' 
+#' @export
+#' 
+fit_susie_control_default <- function() 
+  list(estimate_residual_variance = TRUE,
+       paramtol = 1e-6,
+       elbotol  = as.numeric(NA),
+       maxiter  = 10,
+       version  = "R",
+       verbose  = "detailed")
+
 # TO DO: Add brief description of this function.
-susie_model_fitting_core <- function (dat, prior, L = 10, control = list()) {
-# numiter = 10, a0 = 0.01, b0 = 0.01,  verbose = TRUE)
+susie_model_fitting_core <- function (fit, dat, control) {
+# numiter = 10, verbose = TRUE)
 
   # Initialize the posterior mean estimates of b, and initialize
   # storage for the PIPs and other quantities.

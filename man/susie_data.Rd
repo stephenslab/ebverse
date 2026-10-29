@@ -29,3 +29,6 @@ Description goes here.
 
 Description goes here.
 }
+\seealso{
+\code{\link{susie}}
+}
