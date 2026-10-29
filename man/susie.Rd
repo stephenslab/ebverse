@@ -7,7 +7,14 @@
 \alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
-init_susie_model(dat, prior, L = 10, sigma = 1, return_dat = FALSE)
+init_susie_model(
+  dat,
+  ser,
+  L = 10,
+  sigma = 1,
+  control = list(),
+  return_data = FALSE
+)
 
 fit_susie_model(fit, dat)
 
@@ -18,11 +25,11 @@ fit_susie_control_default()
 \arguments{
 \item{dat}{An object}
 
-\item{prior}{Describe "prior" here.}
-
 \item{L}{Describe "L" here.}
 
 \item{sigma}{Describe "sigma" here.}
+
+\item{prior}{Describe "prior" here.}
 
 \item{return_dat}{Describe "return_dat" here.}
 }

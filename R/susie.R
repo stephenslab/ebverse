@@ -248,8 +248,11 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' 
 #' @export
 #' 
-init_susie_model <- function (dat, prior, L = 10, sigma = 1,
-                              return_dat = FALSE) {
+init_susie_model <- function (dat, ser, L = 10, sigma = 1,
+                              control = list(),
+                              return_data = FALSE) {
+
+  # TO DO NEXT: Work on this function.
   fit <- list()
   class(fit) <- c("susie","list")
   return(fit)
