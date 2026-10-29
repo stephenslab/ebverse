@@ -87,7 +87,7 @@ init_ser_model <- function (dat,
 #' 
 #' @param bhat A vector of least-squares estimates of the coefficients.
 #'
-#' @param s A vector of variances of the least-squares estimates.
+#' @param shat A vector of variances of the least-squares estimates.
 #'
 #' @param X A matrix of with rows corresponding to observations
 #'   (samples) and columns corresponding to candidate explanatory
@@ -99,27 +99,29 @@ init_ser_model <- function (dat,
 #' 
 #' @return \code{prepare_ser_data} returns a matrix with two named
 #'   columns: \sQuote{bhat}, the least-squares estimates of the
-#'   coefficients; \sQuote{s}, the variances of these estimates. See
-#'   \sQuote{details} for precise definitions of these terms.
+#'   coefficients; \sQuote{shat}, the variances of these
+#'   estimates. See \sQuote{details} for precise definitions of
+#'   these terms.
 #'   
 #' @export
 #' 
-prepare_ser_data <- function (bhat, s, X, y, sigma) {
-  if (!((missing(X) & missing(y) & missing(sigma) & !missing(bhat) & 
-         !missing(s)) |
-        (!missing(X) & !missing(y) & !missing(sigma) & missing(bhat) & 
-         missing(s))))
-    stop("Either (bhat, s) or (X, y, sigma) should be provided")
-  if (missing(bhat) & missing(s)) {
-    xx <- colSums(X^2)
+prepare_ser_data <- function (bhat, shat, X, y, sigma) {
+  if (!((missing(X) & missing(y) & missing(sigma) & 
+         !missing(bhat) & !missing(shat)) |
+        (!missing(X) & !missing(y) & !missing(sigma) & 
+         missing(bhat) & missing(shat))))
+    stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
+         "(and not both)")
+  if (missing(bhat) & missing(shat)) {
+    xx   <- colSums(X^2)
     bhat <- drop(y %*% X)/xx
-    s <- sigma/xx
+    shat <- sigma/xx
   }
-  if (length(bhat) != length(s))
+  if (length(bhat) != length(shat))
     stop("bhat and s should be the same length")
-  if (length(bhat) < 2 | length(s) < 2)
+  if (length(bhat) < 2 | length(shat) < 2)
     stop("bhat and s should have at least two entries")
-  dat <- cbind(bhat = bhat,s = s)
+  dat <- cbind(bhat = bhat,shat = shat)
   class(dat) <- c("ser_data","matrix","array")
   return(dat)
 }
@@ -252,7 +254,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       lbf_current <- lbf
 
       # E step.    
-      res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
+      res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
                                            prior$prior_variance)
       ans <- normalizelogweights(log(prior$prob) + res$lbf)
       lbf <- ans$weight_sum
@@ -290,7 +292,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
   # Compute the posterior statistics one last time and prepare the
   # output.
-  res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
+  res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
                                        prior$prior_variance)
   ans <- normalizelogweights(log(prior$prob) + res$lbf)
   pip <- ans$probs

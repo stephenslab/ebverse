@@ -17,7 +17,7 @@ init_ser_model(
   return_data = FALSE
 )
 
-prepare_ser_data(bhat, s, X, y, sigma)
+prepare_ser_data(bhat, shat, X, y, sigma)
 
 init_ser_model_normal(
   dat,
@@ -49,7 +49,7 @@ included in the output.}
 
 \item{bhat}{A vector of least-squares estimates of the coefficients.}
 
-\item{s}{A vector of variances of the least-squares estimates.}
+\item{shat}{A vector of variances of the least-squares estimates.}
 
 \item{X}{A matrix of with rows corresponding to observations
 (samples) and columns corresponding to candidate explanatory
@@ -98,8 +98,9 @@ of an SER model fit, typically the output from running an
 
 \code{prepare_ser_data} returns a matrix with two named
   columns: \sQuote{bhat}, the least-squares estimates of the
-  coefficients; \sQuote{s}, the variances of these estimates. See
-  \sQuote{details} for precise definitions of these terms.
+  coefficients; \sQuote{shat}, the variances of these
+  estimates. See \sQuote{details} for precise definitions of
+  these terms.
 }
 \description{
 Methods for fitting single effect regression (SER)

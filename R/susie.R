@@ -257,7 +257,7 @@ init_susie_model <- function (dat, ser, L = 10, sigma = 1,
                               control = list(),
                               return_data = FALSE) {
   #
-  # TO DO NEXT: Work on this function.
+  # TO DO: Work on this function.
   #
   fit <- list()
   class(fit) <- c("susie","list")
