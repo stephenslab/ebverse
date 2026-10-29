@@ -11,10 +11,8 @@
 #'   method is the main method for fitting SER models, and for
 #'   computing posterior statistics.
 #'
-#' @param dat A matrix with \code{nvar} rows and 2 named columns:
-#'   \sQuote{bhat}, the least-squares estimates of the coefficients;
-#'   \sQuote{s}, the variances of these estimates. See
-#'   \sQuote{details} for how these are precisely defined.
+#' @param dat An object of class \sQuote{ser_data}, typically an
+#'     output from \code{prepare_ser_data}.
 #'
 #' @param prior An object, possibly a list, specifying the SER
 #'   prior. The exact form of this input will depend on which SER
@@ -27,9 +25,10 @@
 #' @param return_data If \code{return_data = TRUE}, the input data are
 #'   included in the output.
 #' 
-#' @return An object of class \sQuote{ser} storing key posterior
-#'   statistics for all variables and the state of the SER model
-#'   fit. It is a list with the following elements:
+#' @return \code{init_ser_model} and \code{fit_ser_model} return
+#'   objects of class \sQuote{ser} storing key posterior statistics
+#'   for all variables and the state of the SER model fit. It is a
+#'   list with the following elements:
 #'
 #' \item{prior}{Data structure specifying the prior. This may
 #'   include hyperparameters that change during model fitting.}
@@ -66,6 +65,9 @@
 #'   own risk.
 #'
 #' @seealso \code{\link{fit_susie_model}}
+#'
+#' @examples
+#' # TO DO: Add an example.
 #' 
 #' @export
 #' 
@@ -78,9 +80,48 @@ init_ser_model <- function (dat,
   family <- match.arg(family)
   if (family == "normal")
     fit <- init_ser_model_normal(dat,prior,control,return_data)
-  if (return_data)
-    fit$dat <- dat
   return(fit)
+}
+
+#' @rdname single_effect_regression
+#' 
+#' @param bhat A vector of least-squares estimates of the coefficients.
+#'
+#' @param s A vector of variances of the least-squares estimates.
+#'
+#' @param X A matrix of with rows corresponding to observations
+#'   (samples) and columns corresponding to candidate explanatory
+#'   variables.
+#'
+#' @param y A vector of regression outcomes.
+#' 
+#' @param sigma Residual variances.
+#' 
+#' @return \code{prepare_ser_data} returns a matrix with two named
+#'   columns: \sQuote{bhat}, the least-squares estimates of the
+#'   coefficients; \sQuote{s}, the variances of these estimates. See
+#'   \sQuote{details} for precise definitions of these terms.
+#'   
+#' @export
+#' 
+prepare_ser_data <- function (bhat, s, X, y, sigma) {
+  if (!((missing(X) & missing(y) & missing(sigma) & !missing(bhat) & 
+         !missing(s)) |
+        (!missing(X) & !missing(y) & !missing(sigma) & missing(bhat) & 
+         missing(s))))
+    stop("Either (bhat, s) or (X, y, sigma) should be provided")
+  if (missing(bhat) & missing(s)) {
+    xx <- colSums(X^2)
+    bhat <- drop(y %*% X)/xx
+    s <- sigma/xx
+  }
+  if (length(bhat) != length(s))
+    stop("bhat and s should be the same length")
+  if (length(bhat) < 2 | length(s) < 2)
+    stop("bhat and s should have at least two entries")
+  dat <- cbind(bhat = bhat,s = s)
+  class(dat) <- c("ser_data","matrix","array")
+  return(dat)
 }
 
 #' @rdname single_effect_regression
@@ -95,7 +136,9 @@ init_ser_model_normal <- function (dat,
                                    control = list(),
                                    return_data = FALSE) {
 
-  # Basic checks and basic processing of the inputs.
+  # Basic checks and processing of the inputs.
+  if (!inherits(dat,"ser_data"))
+    stop("dat is not a valid SER data set")
   nvar <- nrow(dat)
   if (length(prior$prob) != 1 & length(prior$prob) != nvar)
     stop("prior$prob should be a vector of length 1 or nvar",domain = NA)
@@ -117,6 +160,8 @@ init_ser_model_normal <- function (dat,
                        !control$global_prior_variance
   fit$control$global <- control$estimate_prior_variance & 
                         !control$global_prior_variance
+  if (return_data)
+    fit$dat <- dat
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }

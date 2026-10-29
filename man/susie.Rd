@@ -2,9 +2,9 @@
 % Please edit documentation in R/susie.R
 \name{init_susie_model}
 \alias{init_susie_model}
+\alias{fit_susie_control_default}
 \alias{fit_susie_model}
 \alias{susie_model_fitting_core}
-\alias{fit_susie_control_default}
 \title{Title goes here.}
 \usage{
 init_susie_model(
@@ -16,25 +16,25 @@ init_susie_model(
   return_data = FALSE
 )
 
+fit_susie_control_default()
+
 fit_susie_model(fit, dat)
 
 susie_model_fitting_core(dat, prior, L = 10, control = list())
-
-fit_susie_control_default()
 }
 \arguments{
 \item{dat}{An object}
+
+\item{ser}{Describe "ser" here.}
 
 \item{L}{Describe "L" here.}
 
 \item{sigma}{Describe "sigma" here.}
 
-\item{prior}{Describe "prior" here.}
-
-\item{return_dat}{Describe "return_dat" here.}
+\item{return_data}{Describe "return_data" input here.}
 }
 \value{
-Description of the output goes here.
+Describe the output here.
 }
 \description{
 Description goes here.
@@ -42,10 +42,14 @@ Description goes here.
 Add description here.
 }
 \examples{
+# TO DO: Add an example.
+
 # TO DO: Add example(s) here.
 
 }
 \seealso{
+\code{\link{}} \code{\link{fit_ser_model}}
+
 \code{\link{prepare_mlm_data}},
   \code{\link{prepare_mlm_summary_data}},
   \code{\link{susie_model_fitting_core}}

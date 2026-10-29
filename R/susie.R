@@ -236,27 +236,40 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' @param dat Describe "dat" here. (This should be a "prepared" data
 #'   set.)
 #' 
-#' @param prior Describe "prior" here.
+#' @param ser Describe "ser" here.
 #'
 #' @param L Describe "L" here.
 #'
 #' @param sigma Describe "sigma" here.
 #'
-#' @param return_dat Describe "return_dat" here.
+#' @param return_data Describe "return_data" input here.
 #' 
-#' @return Description of the output goes here.
+#' @return Describe the output here.
+#'
+#' @seealso \code{\link{}} \code{\link{fit_ser_model}}
+#'
+#' @examples
+#' # TO DO: Add an example.
 #' 
 #' @export
 #' 
 init_susie_model <- function (dat, ser, L = 10, sigma = 1,
                               control = list(),
                               return_data = FALSE) {
-
+  #
   # TO DO NEXT: Work on this function.
+  #
   fit <- list()
   class(fit) <- c("susie","list")
   return(fit)
 }
+
+#' @rdname susie
+#' 
+#' @export
+#' 
+fit_susie_control_default <- function ()
+  list(verbose = "detailed")
 
 #' @rdname susie
 #'
@@ -330,9 +343,3 @@ susie_model_fitting_core <- function (dat, prior, L = 10, control = list()) {
   return(list(PIP = PIP,B = B,s0 = s0,elbo = elbo,delta = delta))
 }
 
-#' @rdname susie
-#' 
-#' @export
-#' 
-fit_susie_control_default <- function ()
-  list(verbose = "detailed")

@@ -2,6 +2,7 @@
 % Please edit documentation in R/single_effect_regression.R
 \name{init_ser_model}
 \alias{init_ser_model}
+\alias{prepare_ser_data}
 \alias{init_ser_model_normal}
 \alias{ser_normal_control_default}
 \alias{fit_ser_model}
@@ -15,6 +16,8 @@ init_ser_model(
   control = list(),
   return_data = FALSE
 )
+
+prepare_ser_data(bhat, s, X, y, sigma)
 
 init_ser_model_normal(
   dat,
@@ -30,10 +33,8 @@ fit_ser_model(fit, dat, return_data = missing(dat))
 \method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat))
 }
 \arguments{
-\item{dat}{A matrix with \code{nvar} rows and 2 named columns:
-\sQuote{bhat}, the least-squares estimates of the coefficients;
-\sQuote{s}, the variances of these estimates. See
-\sQuote{details} for how these are precisely defined.}
+\item{dat}{An object of class \sQuote{ser_data}, typically an
+output from \code{prepare_ser_data}.}
 
 \item{prior}{An object, possibly a list, specifying the SER
 prior. The exact form of this input will depend on which SER
@@ -46,15 +47,28 @@ information.}
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
 
+\item{bhat}{A vector of least-squares estimates of the coefficients.}
+
+\item{s}{A vector of variances of the least-squares estimates.}
+
+\item{X}{A matrix of with rows corresponding to observations
+(samples) and columns corresponding to candidate explanatory
+variables.}
+
+\item{y}{A vector of regression outcomes.}
+
+\item{sigma}{Residual variances.}
+
 \item{fit}{An object of class \sQuote{ser} that captures the state
 of an SER model fit, typically the output from running an
 \sQuote{init_ser_model} function, or an output from a
 \code{fit_ser_model} call.}
 }
 \value{
-An object of class \sQuote{ser} storing key posterior
-  statistics for all variables and the state of the SER model
-  fit. It is a list with the following elements:
+\code{init_ser_model} and \code{fit_ser_model} return
+  objects of class \sQuote{ser} storing key posterior statistics
+  for all variables and the state of the SER model fit. It is a
+  list with the following elements:
 
 \item{prior}{Data structure specifying the prior. This may
   include hyperparameters that change during model fitting.}
@@ -81,6 +95,11 @@ An object of class \sQuote{ser} storing key posterior
 
 \item{control}{A data structure, likely a list, containing the
   settings that affect how the model fitting is conducted.}
+
+\code{prepare_ser_data} returns a matrix with two named
+  columns: \sQuote{bhat}, the least-squares estimates of the
+  coefficients; \sQuote{s}, the variances of these estimates. See
+  \sQuote{details} for precise definitions of these terms.
 }
 \description{
 Methods for fitting single effect regression (SER)
@@ -101,6 +120,10 @@ TO DO: Define what is meant by an "SER model", define
 This is a basic interface with very few checks; it is mainly
   used to implement the susie model fitting methods. Use at your
   own risk.
+}
+\examples{
+# TO DO: Add an example.
+
 }
 \seealso{
 \code{\link{fit_susie_model}}
