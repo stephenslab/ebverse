@@ -84,49 +84,6 @@ init_ser_model <- function (dat,
 }
 
 #' @rdname single_effect_regression
-#' 
-#' @param bhat A vector of least-squares estimates of the coefficients.
-#'
-#' @param shat A vector of variances of the least-squares estimates.
-#'
-#' @param X A matrix of with rows corresponding to observations
-#'   (samples) and columns corresponding to candidate explanatory
-#'   variables.
-#'
-#' @param y A vector of regression outcomes.
-#' 
-#' @param sigma Residual variances.
-#' 
-#' @return \code{prepare_ser_data} returns a matrix with two named
-#'   columns: \sQuote{bhat}, the least-squares estimates of the
-#'   coefficients; \sQuote{shat}, the variances of these
-#'   estimates. See \sQuote{details} for precise definitions of
-#'   these terms.
-#'   
-#' @export
-#' 
-prepare_ser_data <- function (bhat, shat, X, y, sigma) {
-  if (!((missing(X) & missing(y) & missing(sigma) & 
-         !missing(bhat) & !missing(shat)) |
-        (!missing(X) & !missing(y) & !missing(sigma) & 
-         missing(bhat) & missing(shat))))
-    stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
-         "(and not both)")
-  if (missing(bhat) & missing(shat)) {
-    xx   <- colSums(X^2)
-    bhat <- drop(y %*% X)/xx
-    shat <- sigma/xx
-  }
-  if (length(bhat) != length(shat))
-    stop("bhat and s should be the same length")
-  if (length(bhat) < 2 | length(shat) < 2)
-    stop("bhat and s should have at least two entries")
-  dat <- cbind(bhat = bhat,shat = shat)
-  class(dat) <- c("ser_data","matrix","array")
-  return(dat)
-}
-
-#' @rdname single_effect_regression
 #'
 #' @importFrom utils modifyList
 #'
@@ -167,19 +124,6 @@ init_ser_model_normal <- function (dat,
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
-
-#' @rdname single_effect_regression
-#' 
-#' @export
-#' 
-ser_normal_control_default <- function()
-  list(estimate_prior_variance = TRUE,
-       global_prior_variance = FALSE,
-       paramtol = 1e-6,
-       lbftol = as.numeric(NA),
-       maxiter = 10,
-       version = "R",
-       verbose = "none")
 
 #' @rdname single_effect_regression
 #'
@@ -236,6 +180,63 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   else
     fit["dat"] <- NULL
   return(fit)
+}
+
+#' @rdname single_effect_regression
+#' 
+#' @export
+#' 
+ser_normal_control_default <- function()
+  list(estimate_prior_variance = TRUE,
+       global_prior_variance = FALSE,
+       paramtol = 1e-6,
+       lbftol = as.numeric(NA),
+       maxiter = 10,
+       version = "R",
+       verbose = "none")
+
+#' @rdname single_effect_regression
+#' 
+#' @param bhat A vector of least-squares estimates of the coefficients.
+#'
+#' @param shat A vector of variances of the least-squares estimates.
+#'
+#' @param X A matrix of with rows corresponding to observations
+#'   (samples) and columns corresponding to candidate explanatory
+#'   variables.
+#'
+#' @param y A vector of regression outcomes.
+#' 
+#' @param sigma A vector of residual variances from the
+#'   single-variable models.
+#' 
+#' @return \code{prepare_ser_data} returns a matrix with two named
+#'   columns: \sQuote{bhat}, the least-squares estimates of the
+#'   coefficients; \sQuote{shat}, the variances of these
+#'   estimates. See \sQuote{details} for precise definitions of
+#'   these terms.
+#'   
+#' @export
+#' 
+prepare_ser_data <- function (bhat, shat, X, y, sigma) {
+  if (!((missing(X) & missing(y) & missing(sigma) & 
+         !missing(bhat) & !missing(shat)) |
+        (!missing(X) & !missing(y) & !missing(sigma) & 
+         missing(bhat) & missing(shat))))
+    stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
+         "(and not both)")
+  if (missing(bhat) & missing(shat)) {
+    xx   <- colSums(X^2)
+    bhat <- drop(y %*% X)/xx
+    shat <- sigma/xx
+  }
+  if (length(bhat) != length(shat))
+    stop("bhat and s should be the same length")
+  if (length(bhat) < 2 | length(shat) < 2)
+    stop("bhat and s should have at least two entries")
+  dat <- cbind(bhat = bhat,shat = shat)
+  class(dat) <- c("ser_data","matrix","array")
+  return(dat)
 }
 
 # This implements the core model fitting algorithm for the single
@@ -314,10 +315,10 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 # with a zero-centered normal prior.
 #
 #' @importFrom stats dnorm
-compute_posterior_ebnm_normal <- function (bhat, s, s0) {
-  lbf <- dnorm(bhat,0,sqrt(s0 + s),log = TRUE) - 
-         dnorm(bhat,0,sqrt(s),log = TRUE)
-  s1 <- 1/(1/s0 + 1/s)
-  b1 <- bhat*s1/s
+compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
+  lbf <- dnorm(bhat,0,sqrt(s0 + shat),log = TRUE) - 
+         dnorm(bhat,0,sqrt(shat),log = TRUE)
+  s1 <- 1/(1/s0 + 1/shat)
+  b1 <- bhat*s1/shat
   return(list(lbf = lbf,b1 = b1,s1 = s1))
 }

@@ -2,11 +2,11 @@
 % Please edit documentation in R/single_effect_regression.R
 \name{init_ser_model}
 \alias{init_ser_model}
-\alias{prepare_ser_data}
 \alias{init_ser_model_normal}
-\alias{ser_normal_control_default}
 \alias{fit_ser_model}
 \alias{fit_ser_model.ser_normal}
+\alias{ser_normal_control_default}
+\alias{prepare_ser_data}
 \title{Fitting Single Effect Regression Models}
 \usage{
 init_ser_model(
@@ -17,8 +17,6 @@ init_ser_model(
   return_data = FALSE
 )
 
-prepare_ser_data(bhat, shat, X, y, sigma)
-
 init_ser_model_normal(
   dat,
   prior = list(prob = 1/nrow(dat), prior_variance = 1),
@@ -26,11 +24,13 @@ init_ser_model_normal(
   return_data = FALSE
 )
 
-ser_normal_control_default()
-
 fit_ser_model(fit, dat, return_data = missing(dat))
 
 \method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat))
+
+ser_normal_control_default()
+
+prepare_ser_data(bhat, shat, X, y, sigma)
 }
 \arguments{
 \item{dat}{An object of class \sQuote{ser_data}, typically an
@@ -47,6 +47,11 @@ information.}
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
 
+\item{fit}{An object of class \sQuote{ser} that captures the state
+of an SER model fit, typically the output from running an
+\sQuote{init_ser_model} function, or an output from a
+\code{fit_ser_model} call.}
+
 \item{bhat}{A vector of least-squares estimates of the coefficients.}
 
 \item{shat}{A vector of variances of the least-squares estimates.}
@@ -57,12 +62,8 @@ variables.}
 
 \item{y}{A vector of regression outcomes.}
 
-\item{sigma}{Residual variances.}
-
-\item{fit}{An object of class \sQuote{ser} that captures the state
-of an SER model fit, typically the output from running an
-\sQuote{init_ser_model} function, or an output from a
-\code{fit_ser_model} call.}
+\item{sigma}{A vector of residual variances from the
+single-variable models.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return

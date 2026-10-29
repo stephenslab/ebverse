@@ -233,16 +233,18 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #'  
 #' @title Title goes here.
 #'
-#' @param dat Describe "dat" here. (This should be a "prepared" data
-#'   set.)
+#' @param dat Describe "dat" input argument here.
 #' 
-#' @param ser Describe "ser" here.
+#' @param ser Describe "ser" input argument here.
 #'
-#' @param L Describe "L" here.
+#' @param L Describe "L" input argument here.
 #'
-#' @param sigma Describe "sigma" here.
+#' @param residual_variance Describe "residual_variance" input
+#'     argument here.
 #'
-#' @param return_data Describe "return_data" input here.
+#' @param control Describe the "control" input argument here.
+#'  
+#' @param return_data Describe "return_data" input argument here.
 #' 
 #' @return Describe the output here.
 #'
@@ -253,13 +255,20 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' 
 #' @export
 #' 
-init_susie_model <- function (dat, ser, L = 10, sigma = 1,
+init_susie_model <- function (dat, ser, L = 10, residual_variance = 1,
                               control = list(),
                               return_data = FALSE) {
   #
-  # TO DO: Work on this function.
+  # TO DO NEXT: Work on this function.
   #
+  # NOTES: 
+  # - This is a function that is intended to be part of the main
+  #   user interface and so there should be more careful checking
+  #   of the inputs.
+  # 
   fit <- list()
+  if (return_data)
+    fit$dat <- dat
   class(fit) <- c("susie","list")
   return(fit)
 }
@@ -268,7 +277,7 @@ init_susie_model <- function (dat, ser, L = 10, sigma = 1,
 #' 
 #' @export
 #' 
-fit_susie_control_default <- function ()
+fit_susie_control_default <- function () 
   list(verbose = "detailed")
 
 #' @rdname susie
@@ -277,7 +286,7 @@ fit_susie_control_default <- function ()
 #'
 #' @description Description goes here.
 #'
-#' @param dat An object
+#' @param fit An object...
 #'
 #' @seealso \code{\link{prepare_mlm_data}},
 #'   \code{\link{prepare_mlm_summary_data}},
@@ -288,20 +297,19 @@ fit_susie_control_default <- function ()
 #' 
 #' @export
 #'
-fit_susie_model <- function (fit, dat) {
+fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
+  #
+  # TO DO NEXT: Work on this function.
+  #
+  # NOTES: 
+  # - This is a function that is intended to be part of the main
+  #   user interface and so there should be more careful checking
+  #   of the inputs.
+  # 
   return(fit)
 }
  
-#' @rdname susie
-#'
-#' @title Add Title Here.
-#'
-#' @description Add description here.
-#' 
-#' @export
-#' 
-#' @keywords internal
-#'
+# TO DO: Add brief description of this function.
 susie_model_fitting_core <- function (dat, prior, L = 10, control = list()) {
 # numiter = 10, a0 = 0.01, b0 = 0.01,  verbose = TRUE)
 

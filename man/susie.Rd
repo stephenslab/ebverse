@@ -4,42 +4,42 @@
 \alias{init_susie_model}
 \alias{fit_susie_control_default}
 \alias{fit_susie_model}
-\alias{susie_model_fitting_core}
 \title{Title goes here.}
 \usage{
 init_susie_model(
   dat,
   ser,
   L = 10,
-  sigma = 1,
+  residual_variance = 1,
   control = list(),
   return_data = FALSE
 )
 
 fit_susie_control_default()
 
-fit_susie_model(fit, dat)
-
-susie_model_fitting_core(dat, prior, L = 10, control = list())
+fit_susie_model(fit, dat, return_data = missing(dat))
 }
 \arguments{
-\item{dat}{An object}
+\item{dat}{Describe "dat" input argument here.}
 
-\item{ser}{Describe "ser" here.}
+\item{ser}{Describe "ser" input argument here.}
 
-\item{L}{Describe "L" here.}
+\item{L}{Describe "L" input argument here.}
 
-\item{sigma}{Describe "sigma" here.}
+\item{residual_variance}{Describe "residual_variance" input
+argument here.}
 
-\item{return_data}{Describe "return_data" input here.}
+\item{control}{Describe the "control" input argument here.}
+
+\item{return_data}{Describe "return_data" input argument here.}
+
+\item{fit}{An object...}
 }
 \value{
 Describe the output here.
 }
 \description{
 Description goes here.
-
-Add description here.
 }
 \examples{
 # TO DO: Add an example.
@@ -54,4 +54,3 @@ Add description here.
   \code{\link{prepare_mlm_summary_data}},
   \code{\link{susie_model_fitting_core}}
 }
-\keyword{internal}

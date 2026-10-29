@@ -7,7 +7,22 @@
 \usage{
 prepare_susie_full_data(X, y)
 
-prepare_susie_summary_data(XtX, Xty, yty, z, bhat, shat, R, n)
+prepare_susie_summary_data(z, R, bhat, shat, n, var_y)
+}
+\arguments{
+\item{X}{Describe input argument "X" here.}
+
+\item{y}{Describe input argument "y" here.}
+
+\item{z}{Describe input argument "XtX" here.}
+
+\item{R}{Describe input argument "R" here.}
+
+\item{bhat}{Describe input argument "bhat" here.}
+
+\item{n}{Describe input argument "n" here.}
+
+\item{var_y}{Describe input argument "yty" here.}
 }
 \description{
 Description goes here.
