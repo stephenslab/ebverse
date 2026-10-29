@@ -38,7 +38,8 @@
 #' \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'   \dQuote{null} model (b = 0).}
 #'
-#' \item{progress}{TO DO: Describe "progress" output here.}
+#' \item{progress}{A data frame containing detailed information about
+#'   the algorithm's progress.}
 #' 
 #' \item{local}{Logical specifying whether one or more parameters may
 #'   be estimated \dQuote{locally} (that is, they are estimated
@@ -72,11 +73,11 @@ init_ser_model_normal <- function (nvar,
 
   # Basic checks and basic processing of the inputs.
   if (length(prior$prob) != 1 & length(prior$prob) != nvar)
-    stop("prior$prob should be a vector of length 1 or nvar")
+    stop("prior$prob should be a vector of length 1 or nvar",domain = NA)
   if (length(prior$prob) == 1)
     prior$prob <- rep(1,nvar)
   if (prior$prior_variance <= 0)
-    stop("prior$prior_variance should be a positive number")
+    stop("prior$prior_variance should be a positive number",domain = NA)
   prior$prob <- prior$prob/sum(prior$prob)
   control <- modifyList(ser_normal_control_default(),
                           control,keep.null = TRUE)
@@ -103,7 +104,7 @@ ser_normal_control_default <- function()
   list(estimate_prior_variance = TRUE,
        global_prior_variance = FALSE,
        paramtol = 1e-6,
-       lbftol = 1e-6,
+       lbftol = as.numeric(NA),
        maxiter = 10,
        version = "R",
        verbose = "none")
@@ -125,7 +126,7 @@ ser_normal_control_default <- function()
 #' 
 #' @export
 #'
-fit_ser_model <- function (fit, dat, return_data = FALSE) {
+fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
    UseMethod("fit_ser_model")
 }
 
@@ -133,25 +134,30 @@ fit_ser_model <- function (fit, dat, return_data = FALSE) {
 #'
 #' @export
 #' 
-fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
+fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   # TO DO: 
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
-  # - Add a "progress" output.
-  # - Implement tolerance checking.
-  # - Test the ability to "refit".
   # - Implement an Rcpp version of this.
   # - Add some simple unit tests.
   # - Benchmark the R and C++ implementations.
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
+  force(return_data)
   if (missing(dat)) {
     if (is.null(fit$dat))
       stop("the data were not provided",domain = NA)
-  }
+    dat <- fit$dat
+  }  
 
   # Estimate the prior variance parameter locally.
   if (fit$control$local & fit$control$estimate_prior_variance) {
+    progress <- as.data.frame(matrix(0,fit$control$maxiter,5))
+    names(progress) <- c("iter","lbf","prior.var","delta.lbf",
+                         "delta.prior.var")
+    progress[,"iter"] <- 1:fit$control$maxiter
+    if (fit$control$verbose == "detailed")
+      cat("iter log-Bayes factor prior var d(logBF) d(p.var)\n")
     for (iter in 1:fit$control$maxiter) {
       prior_variance_current <- fit$prior$prior_variance
       lbf_current <- fit$lbf
@@ -160,21 +166,41 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
       res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                            fit$prior$prior_variance)
       ans <- normalizelogweights(log(fit$prior$prob) + res$lbf)
+      fit$lbf <- ans$weight_sum
 
       # M-step.
       fit$prior$prior_variance <- sum(ans$probs * (res$b1^2 + res$s1))
+
+      # Update the "progress" data frame and check whether the
+      # stopping criteria are satisfied.
+      progress[iter,"lbf"] <- fit$lbf
+      progress[iter,"prior.var"] <- fit$prior$prior_variance
+      progress[iter,"delta.lbf"] <- fit$lbf - lbf_current
+      progress[iter,"delta.prior.var"] <- 
+        fit$prior$prior_variance - prior_variance_current
       if (fit$control$verbose == "detailed")
-      cat("s0 =",format(fit$prior$prior_variance,digits = 12),
-          " lbf =",format(ans$weight_sum,digits = 12),"\n")
-      if (!is.na(lbf_current) && lbf_current > ans$weight_sum + 1e-8)
+        cat(sprintf("%4d %+16.9e %8.3e %+8.1e %+8.1e\n",
+                    progress[iter,"iter"],progress[iter,"lbf"],
+                    progress[iter,"prior.var"],progress[iter,"delta.lbf"],
+                    progress[iter,"delta.prior.var"]))
+      if (fit$prior$prior_variance <= 0)
+        stop("prior variance is zero or negative",domain = NA)
+      if (!is.na(lbf_current) && 
+          !is.na(fit$control$lbftol) &&
+          lbf_current > fit$lbf + fit$control$lbftol)
         stop("prior variance update decreased the likelihood",domain = NA)
-      if (abs(prior_variance_current - 
+      if (!is.na(fit$control$paramtol) &&
+          abs(prior_variance_current - 
               fit$prior$prior_variance) < fit$control$paramtol)
+        break
+      if (!is.na(lbf_current) && 
+          !is.na(fit$control$lbftol) &&
+          fit$lbf - lbf_current < fit$control$lbftol)
         break
     }
   }
 
-  # Computing the posterior statistics one last time and prepare the
+  # Compute the posterior statistics one last time and prepare the
   # output.
   res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"s"],
                                        fit$prior$prior_variance)
@@ -188,8 +214,17 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = FALSE) {
                          mean = post_mean,
                          var  = post_var)
   fit$lbf <- ans$weight_sum 
+  progress <- progress[1:iter,]
+  rownames(progress) <- NULL
+  if (is.data.frame(fit$progress)) {
+    progress$iter <- progress$iter + max(fit$progress$iter)
+    fit$progress <- rbind(fit$progress,progress)
+  } else
+    fit$progress <- progress
   if (return_data)
     fit$dat <- dat
+  else
+    fit["dat"] <- NULL
   return(fit)
 }
 

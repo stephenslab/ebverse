@@ -15,9 +15,9 @@ init_ser_model_normal(
 
 ser_normal_control_default()
 
-fit_ser_model(fit, dat, return_data = FALSE)
+fit_ser_model(fit, dat, return_data = missing(dat))
 
-\method{fit_ser_model}{ser_normal}(fit, dat, return_data = FALSE)
+\method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat))
 }
 \arguments{
 \item{nvar}{An integer no less than 2 specifying the number of
@@ -61,7 +61,8 @@ An object of class \sQuote{ser} storing key posterior
 \item{lbf}{Log-Bayes factor comparing the SER model to the
   \dQuote{null} model (b = 0).}
 
-\item{progress}{TO DO: Describe "progress" output here.}
+\item{progress}{A data frame containing detailed information about
+  the algorithm's progress.}
 
 \item{local}{Logical specifying whether one or more parameters may
   be estimated \dQuote{locally} (that is, they are estimated
