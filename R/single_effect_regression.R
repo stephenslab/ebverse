@@ -226,6 +226,8 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
     stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
          "(and not both)")
   if (missing(bhat) & missing(shat)) {
+
+    # TO DO: Package this code into a helper function.
     xx   <- colSums(X^2)
     bhat <- drop(y %*% X)/xx
     shat <- sigma/xx
@@ -242,6 +244,9 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
 # This implements the core model fitting algorithm for the single
 # effect regression with normal priors.
 fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
+
+  # TO DO: Organize this code better to make it more human-readable.
+  # Also add some helpful comments.
   progress <- as.numeric(NA)
   if (control$local & control$estimate_prior_variance) {
     progress <- as.data.frame(matrix(0,control$maxiter,5))
@@ -312,7 +317,11 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 }
 
 # Compute the Bayes factor and posterior statistics for an EBNM model
-# with a zero-centered normal prior.
+# with a zero-centered normal prior. The inputs are the least-squares
+# estimates (bhat), the variances of those estimates (s0), and the
+# prior variance of the coefficients (s0). The outputs are the
+# log-Bayes factor (lbf), the posterior mean estimates (b1), and the
+# posterior variances (s1).
 #
 #' @importFrom stats dnorm
 compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
