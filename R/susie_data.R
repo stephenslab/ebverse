@@ -1,4 +1,4 @@
-#' @rdname susie_data
+#' @name susie_data
 #'
 #' @title Title goes here.
 #'
@@ -8,8 +8,8 @@
 #'
 #' @param y Describe input argument "y" here.
 #'
-#' @seealso \code{\link{fit_susie_model}}
-#' 
+#' @seealso \link{susie}
+#'
 #' @export
 #' 
 prepare_susie_full_data <- function (X, y) {

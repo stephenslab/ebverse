@@ -229,7 +229,7 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
   return(list(s = s,s0 = s0,pip = pip,b1 = b1,b2 = b2,s1 = s1,elbo = elbo))
 }
 
-#' @rdname susie
+#' @name susie
 #'  
 #' @title Title goes here.
 #'
@@ -248,16 +248,15 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' 
 #' @return Describe the output here.
 #'
-#' @seealso \code{\link{susie_data}}, \code{\link{fit_ser_model}}
+#' @seealso \link{susie_data}, \link{single_effect_regression}
 #'
 #' @examples
-#' # TO DO: Add an example.
+#' # TO DO: Add one or several examples.
 #' 
 #' @export
 #' 
 init_susie_model <- function (dat, ser, L = 10, residual_variance = 1,
-                              control = list(),
-                              return_data = FALSE) {
+                              control = list(), return_data = FALSE) {
   #
   # TO DO NEXT: Work on this function.
   #
@@ -280,10 +279,6 @@ init_susie_model <- function (dat, ser, L = 10, residual_variance = 1,
 #' @description Description goes here.
 #'
 #' @param fit An object...
-#'
-#' @seealso \code{\link{prepare_mlm_data}},
-#'   \code{\link{prepare_mlm_summary_data}},
-#'   \code{\link{susie_model_fitting_core}}
 #'
 #' @examples
 #' # TO DO: Add example(s) here.

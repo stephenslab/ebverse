@@ -1,5 +1,5 @@
-#' @rdname single_effect_regression
-#'
+#' @name single_effect_regression
+#' 
 #' @title Fitting Single Effect Regression Models
 #'
 #' @description Methods for fitting single effect regression (SER)
@@ -67,7 +67,7 @@
 #'   used to implement the susie model fitting methods. Use at your
 #'   own risk.
 #'
-#' @seealso \code{\link{fit_susie_model}}
+#' @seealso \link{susie}
 #'
 #' @examples
 #' # TO DO: Add one or several examples.
