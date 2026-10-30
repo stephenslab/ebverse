@@ -257,13 +257,13 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
       # E step.
-      res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
-                                           prior$prior_variance)
-      ans <- normalizelogweights(log(prior$prob) + res$lbf)
-      b1  <- res$b1
-      s1  <- res$s1
-      pip <- ans$probs
-      lbf <- ans$weight_sum
+      post <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
+                                            prior$prior_variance)
+      ans  <- normalizelogweights(log(prior$prob) + post$lbf)
+      b1   <- post$b1
+      s1   <- post$s1
+      pip  <- ans$probs
+      lbf  <- ans$weight_sum
 
       # M-step.
       prior$prior_variance <- sum(pip * (b1^2 + s1))
@@ -272,8 +272,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       progress[iter,"lbf"] <- lbf
       progress[iter,"prior.var"] <- prior$prior_variance
       progress[iter,"delta.lbf"] <- lbf - current_state$lbf
-      progress[iter,"delta.prior.var"] <- 
-        prior$prior_variance - current_state$prior_variance
+      progress[iter,"delta.prior.var"] <- prior$prior_variance - 
+                                          current_state$prior_variance
 
       # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
@@ -300,23 +300,27 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
     }
   }
 
-  # Compute the posterior statistics one last time and prepare the
-  # output.
-  res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
-                                       prior$prior_variance)
-  ans <- normalizelogweights(log(prior$prob) + res$lbf)
+  # Compute the posterior statistics one last time.
+  post <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
+                                        prior$prior_variance)
+  ans <- normalizelogweights(log(prior$prob) + post$lbf)
   pip <- ans$probs
-  b1  <- res$b1
-  s1  <- res$s1
+  b1  <- post$b1
+  s1  <- post$s1
   b2  <- s1 + b1^2
   post_mean <- pip*b1
   post_var  <- pip*b2 - post_mean^2
-  posterior <- cbind(lbf = res$lbf,pip = pip,mean = post_mean,var = post_var)
+
+  # Prepare the output.
+  posterior <- cbind(lbf = post$lbf,pip = pip,mean = post_mean,
+                     var = post_var)
   lbf       <- ans$weight_sum 
   progress  <- progress[1:iter,]
   rownames(progress) <- NULL
-  return(list(prior = prior,lbf = lbf,posterior = posterior,
-              progress = progress))
+  return(list(prior     = prior,
+              lbf       = lbf,
+              posterior = posterior,
+              progress  = progress))
 }
 
 # Compute the least-squares estimate and its variance given the data
