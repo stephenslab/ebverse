@@ -229,11 +229,9 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
     stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
          "(and not both)")
   if (missing(bhat) & missing(shat)) {
-
-    # TO DO: Package this code into a helper function.
-    xx   <- colSums(X^2)
-    bhat <- drop(y %*% X)/xx
-    shat <- sigma/xx
+    res  <- compute_lse(X,y,sigma)
+    bhat <- res$bhat
+    shat <- res$shat
   }
   if (length(bhat) != length(shat))
     stop("bhat and s should be the same length")
@@ -247,9 +245,6 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
 # This implements the core model fitting algorithm for the single
 # effect regression with normal priors.
 fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
-
-  # TO DO: Organize this code better to make it more human-readable.
-  # Also add some helpful comments.
   progress <- as.numeric(NA)
   if (control$local & control$estimate_prior_variance) {
     progress <- as.data.frame(matrix(0,control$maxiter,5))
@@ -259,42 +254,48 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
     if (control$verbose == "detailed")
       cat("iter log-Bayes factor prior var d(logBF) d(p.var)\n")
     for (iter in 1:control$maxiter) {
-      prior_variance_current <- prior$prior_variance
-      lbf_current <- lbf
+      current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
-      # E step.    
+      # E step.
       res <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
                                            prior$prior_variance)
       ans <- normalizelogweights(log(prior$prob) + res$lbf)
+      b1  <- res$b1
+      s1  <- res$s1
+      pip <- ans$probs
       lbf <- ans$weight_sum
 
       # M-step.
-      prior$prior_variance <- sum(ans$probs * (res$b1^2 + res$s1))
+      prior$prior_variance <- sum(pip * (b1^2 + s1))
 
-      # Update progress data frame and check stopping criteria.
+      # Update the progress data frame.
       progress[iter,"lbf"] <- lbf
       progress[iter,"prior.var"] <- prior$prior_variance
-      progress[iter,"delta.lbf"] <- lbf - lbf_current
+      progress[iter,"delta.lbf"] <- lbf - current_state$lbf
       progress[iter,"delta.prior.var"] <- 
-        prior$prior_variance - prior_variance_current
+        prior$prior_variance - current_state$prior_variance
+
+      # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
         cat(sprintf("%4d %+16.9e %8.3e %+8.1e %+8.1e\n",
                     progress[iter,"iter"],progress[iter,"lbf"],
                     progress[iter,"prior.var"],progress[iter,"delta.lbf"],
                     progress[iter,"delta.prior.var"]))
+
+      # Check for errors as well as the stopping criteria.
       if (prior$prior_variance <= 0)
         stop("prior variance is zero or negative",domain = NA)
-      if (!is.na(lbf_current) && 
+      if (!is.na(current_state$lbf) && 
           !is.na(control$lbftol) &&
-          lbf_current > lbf + control$lbftol)
+          current_state$lbf > lbf + control$lbftol)
         stop("prior variance update decreased the likelihood",domain = NA)
       if (!is.na(control$paramtol) &&
-          abs(prior_variance_current - 
+          abs(current_state$prior_variance - 
               prior$prior_variance) < control$paramtol)
         break
-      if (!is.na(lbf_current) && 
+      if (!is.na(current_state$lbf) && 
           !is.na(control$lbftol) &&
-          lbf - lbf_current < control$lbftol)
+          lbf - current_state$lbf < control$lbftol)
         break
     }
   }
@@ -305,18 +306,26 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                                        prior$prior_variance)
   ans <- normalizelogweights(log(prior$prob) + res$lbf)
   pip <- ans$probs
-  b2  <- res$s1 + res$b1^2
-  post_mean <- pip*res$b1
+  b1  <- res$b1
+  s1  <- res$s1
+  b2  <- s1 + b1^2
+  post_mean <- pip*b1
   post_var  <- pip*b2 - post_mean^2
-  posterior <- cbind(lbf  = res$lbf,
-                     pip  = pip,
-                     mean = post_mean,
-                     var  = post_var)
+  posterior <- cbind(lbf = res$lbf,pip = pip,mean = post_mean,var = post_var)
   lbf       <- ans$weight_sum 
   progress  <- progress[1:iter,]
   rownames(progress) <- NULL
   return(list(prior = prior,lbf = lbf,posterior = posterior,
               progress = progress))
+}
+
+# Compute the least-squares estimate and its variance given the data
+# (X, y) and the residual variances (sigma).
+compute_lse <- function (X, y, sigma) {
+  xx   <- colSums(X^2)
+  bhat <- drop(y %*% X)/xx
+  shat <- sigma/xx
+  return(list(bhat = bhat,shat = shat))
 }
 
 # Compute the Bayes factor and posterior statistics for an EBNM model
