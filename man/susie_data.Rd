@@ -20,6 +20,8 @@ prepare_susie_summary_data(z, R, bhat, shat, n, var_y)
 
 \item{bhat}{Describe input argument "bhat" here.}
 
+\item{shat}{Describe input argument "shat" here.}
+
 \item{n}{Describe input argument "n" here.}
 
 \item{var_y}{Describe input argument "yty" here.}
@@ -30,5 +32,5 @@ Description goes here.
 Description goes here.
 }
 \seealso{
-\code{\link{susie}}
+\code{\link{fit_susie_model}}
 }

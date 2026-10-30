@@ -14,6 +14,9 @@
 #' @param dat An object of class \sQuote{ser_data}, typically an
 #'     output from \code{prepare_ser_data}.
 #'
+#' @param family The SER family. See \dQuote{details} for more
+#'   information.
+#' 
 #' @param prior An object, possibly a list, specifying the SER
 #'   prior. The exact form of this input will depend on which SER
 #'   model is used. See \sQuote{details} for further information.
@@ -67,7 +70,7 @@
 #' @seealso \code{\link{fit_susie_model}}
 #'
 #' @examples
-#' # TO DO: Add an example.
+#' # TO DO: Add one or several examples.
 #' 
 #' @export
 #' 
@@ -109,14 +112,14 @@ init_ser_model_normal <- function (dat,
   control <- modifyList(ser_normal_control_default(),
                           control,keep.null = TRUE)
 
-  # Initialize the single effect regression model.
+  # Initialize the SER model.
   fit <- list(prior     = prior,
               lbf       = as.numeric(NA),
               posterior = as.numeric(NA),
               progress  = as.numeric(NA),
               control   = control)
-  fit$control$local <- control$estimate_prior_variance &
-                       !control$global_prior_variance
+  fit$control$local  <- control$estimate_prior_variance &
+                        !control$global_prior_variance
   fit$control$global <- control$estimate_prior_variance & 
                         !control$global_prior_variance
   if (return_data)
@@ -172,7 +175,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   # Prepare the output.
   if (is.data.frame(fit$progress)) {
     progress$iter <- progress$iter + max(fit$progress$iter)
-    fit$progress <- rbind(fit$progress,progress)
+    fit$progress  <- rbind(fit$progress,progress)
   } else
     fit$progress <- res$progress
   if (return_data)
@@ -190,10 +193,10 @@ ser_normal_control_default <- function()
   list(estimate_prior_variance = TRUE,
        global_prior_variance = FALSE,
        paramtol = 1e-6,
-       lbftol = as.numeric(NA),
-       maxiter = 10,
-       version = "R",
-       verbose = "none")
+       lbftol   = as.numeric(NA),
+       maxiter  = 10,
+       version  = "R",
+       verbose  = "none")
 
 #' @rdname single_effect_regression
 #' 

@@ -8,7 +8,7 @@
 #'
 #' @param y Describe input argument "y" here.
 #'
-#' @seealso \code{\link{susie}}
+#' @seealso \code{\link{fit_susie_model}}
 #' 
 #' @export
 #' 
@@ -36,6 +36,8 @@ prepare_susie_full_data <- function (X, y) {
 #'
 #' @param bhat Describe input argument "bhat" here.
 #'
+#' @param shat Describe input argument "shat" here.
+#' 
 #' @param n Describe input argument "n" here.
 #'
 #' @param var_y Describe input argument "yty" here.

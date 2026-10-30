@@ -36,6 +36,9 @@ prepare_ser_data(bhat, shat, X, y, sigma)
 \item{dat}{An object of class \sQuote{ser_data}, typically an
 output from \code{prepare_ser_data}.}
 
+\item{family}{The SER family. See \dQuote{details} for more
+information.}
+
 \item{prior}{An object, possibly a list, specifying the SER
 prior. The exact form of this input will depend on which SER
 model is used. See \sQuote{details} for further information.}
@@ -124,7 +127,7 @@ This is a basic interface with very few checks; it is mainly
   own risk.
 }
 \examples{
-# TO DO: Add an example.
+# TO DO: Add one or several examples.
 
 }
 \seealso{
