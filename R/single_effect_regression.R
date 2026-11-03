@@ -37,31 +37,31 @@
 #'   for all variables and the state of the SER model fit. It is a
 #'   list with the following elements:
 #'
-#' \item{prior}{Data structure specifying the prior. This may
-#'   include hyperparameters that change during model fitting.}
+#'   \item{prior}{Data structure specifying the prior. This may
+#'     include hyperparameters that change during model fitting.}
 #'
-#' \item{posterior}{A matrix with one row per variable and the
-#'   following columns: \sQuote{lbf}, the log-Bayes factor;
-#'   \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
-#'   the posterior mean of the regression coefficient; \sQuote{var},
-#'   the posterior variance of the regression coefficient.}
+#'   \item{posterior}{A data frame with one row per variable and the
+#'     following columns: \sQuote{lbf}, the log-Bayes factor;
+#'     \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
+#'     the posterior mean of the regression coefficient; \sQuote{var},
+#'     the posterior variance of the regression coefficient.}
 #'
-#' \item{lbf}{Log-Bayes factor comparing the SER model to the
-#'   \dQuote{null} model (b = 0).}
+#'   \item{lbf}{Log-Bayes factor comparing the SER model to the
+#'     \dQuote{null} model (b = 0).}
 #'
-#' \item{progress}{A data frame containing detailed information about
-#'   the algorithm's progress.}
+#'   \item{progress}{A data frame containing detailed information about
+#'     the algorithm's progress.}
 #' 
-#' \item{local}{Logical specifying whether one or more parameters may
-#'   be estimated \dQuote{locally} (that is, they are estimated
-#'   separately in this SER).}
+#'   \item{local}{Logical specifying whether one or more parameters may
+#'     be estimated \dQuote{locally} (that is, they are estimated
+#'     separately in this SER).}
 #'
-#' \item{global}{Logical specifying whether one or more parameters may
-#'   be estimated \dQuote{globally} (that is, they are estimated
-#'   simultaneously in multiple SERs).}
+#'   \item{global}{Logical specifying whether one or more parameters may
+#'     be estimated \dQuote{globally} (that is, they are estimated
+#'     simultaneously in multiple SERs).}
 #'
-#' \item{control}{A data structure, likely a list, containing the
-#'   settings that affect how the model fitting is conducted.}
+#'   \item{control}{A data structure, likely a list, containing the
+#'     settings that affect how the model fitting is conducted.}
 #' 
 #' @details TO DO: Define what is meant by an "SER model", define
 #'   the specific SER models that are implemented, and explain
@@ -164,7 +164,7 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  # - Add names to outputs whenever possible.
+  # - Add names to outputs wherever possible.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement an Rcpp version of this.
@@ -180,7 +180,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
     dat <- fit$dat
   }  
 
-  # Estimate the prior variance parameter locally.
+  # Fit the SER model and compute the posterior statistics.
   res <- fit_ser_model_normal_core(dat,fit$prior,fit$lbf,fit$control)
   fit$prior     <- res$prior
   fit$lbf       <- res$lbf
@@ -261,6 +261,8 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
 # effect regression with normal priors.
 fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   progress <- as.numeric(NA)
+
+  # Estimate the prior variance parameter locally.
   if (control$local & control$estimate_prior_variance) {
     progress <- as.data.frame(matrix(0,control$maxiter,5))
     names(progress) <- c("iter","lbf","prior.var","delta.lbf",
@@ -327,8 +329,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   post_var  <- pip*b2 - post_mean^2
 
   # Prepare the output.
-  posterior <- cbind(lbf = post$lbf,pip = pip,mean = post_mean,
-                     var = post_var)
+  posterior <- data.frame(lbf = post$lbf,pip = pip,mean = post_mean,
+                          var = post_var)
   lbf       <- ans$weight_sum 
   progress  <- progress[1:iter,]
   rownames(progress) <- NULL

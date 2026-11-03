@@ -9,8 +9,8 @@
 \usage{
 init_susie_model(
   dat,
-  ser,
   L = 10,
+  ser = init_ser_model(dat),
   residual_variance = 1,
   control = list(),
   return_data = FALSE
@@ -26,22 +26,35 @@ output from a call to \code{\link{prepare_susie_full_data}} or
 \code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
 for other ways to create \sQuote{susie_data} objects.}
 
-\item{ser}{Describe "ser" input argument here.}
-
-\item{L}{An integer, 1 or more, specifying the number of single
+\item{L}{An integer, 1 or greater, specifying the number of single
 effects.}
+
+\item{ser}{An object of class \sQuote{ser} or a list of
+\sQuote{ser} objects specifying the SER family for each of the
+L single effect regressions. If \code{ser} is a list, it should
+have L elements.}
 
 \item{residual_variance}{Initial estimate of the residual variance
 parameter.}
 
-\item{control}{Describe the "control" input argument here.}
+\item{control}{An object, possibly a list, specifying settings that
+affect the model fitting. See \sQuote{details} for further
+information.}
 
-\item{return_data}{Describe "return_data" input argument here.}
+\item{return_data}{If \code{return_data = TRUE}, the input data are
+included in the output.}
 
 \item{fit}{An object...}
 }
 \value{
-Describe the output here.
+\code{init_susie_model} and \code{fit_susie_model} return
+  objects of class \sQuote{susie} storing key posterior statistics
+  for all variables and the state of the SuSiE model fit. It is a
+  list with the following elements:
+
+  \item{item1}{Description of item1 goes here.}
+
+  \item{item2}{Description of item2 goes here.}
 }
 \description{
 Methods for fitting \dQuote{Sum of Single Effect}

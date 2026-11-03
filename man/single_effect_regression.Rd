@@ -81,31 +81,31 @@ single-variable models.}
   for all variables and the state of the SER model fit. It is a
   list with the following elements:
 
-\item{prior}{Data structure specifying the prior. This may
-  include hyperparameters that change during model fitting.}
+  \item{prior}{Data structure specifying the prior. This may
+    include hyperparameters that change during model fitting.}
 
-\item{posterior}{A matrix with one row per variable and the
-  following columns: \sQuote{lbf}, the log-Bayes factor;
-  \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
-  the posterior mean of the regression coefficient; \sQuote{var},
-  the posterior variance of the regression coefficient.}
+  \item{posterior}{A data frame with one row per variable and the
+    following columns: \sQuote{lbf}, the log-Bayes factor;
+    \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
+    the posterior mean of the regression coefficient; \sQuote{var},
+    the posterior variance of the regression coefficient.}
 
-\item{lbf}{Log-Bayes factor comparing the SER model to the
-  \dQuote{null} model (b = 0).}
+  \item{lbf}{Log-Bayes factor comparing the SER model to the
+    \dQuote{null} model (b = 0).}
 
-\item{progress}{A data frame containing detailed information about
-  the algorithm's progress.}
+  \item{progress}{A data frame containing detailed information about
+    the algorithm's progress.}
 
-\item{local}{Logical specifying whether one or more parameters may
-  be estimated \dQuote{locally} (that is, they are estimated
-  separately in this SER).}
+  \item{local}{Logical specifying whether one or more parameters may
+    be estimated \dQuote{locally} (that is, they are estimated
+    separately in this SER).}
 
-\item{global}{Logical specifying whether one or more parameters may
-  be estimated \dQuote{globally} (that is, they are estimated
-  simultaneously in multiple SERs).}
+  \item{global}{Logical specifying whether one or more parameters may
+    be estimated \dQuote{globally} (that is, they are estimated
+    simultaneously in multiple SERs).}
 
-\item{control}{A data structure, likely a list, containing the
-  settings that affect how the model fitting is conducted.}
+  \item{control}{A data structure, likely a list, containing the
+    settings that affect how the model fitting is conducted.}
 
 \code{prepare_ser_data} returns a matrix with two named
   columns: \sQuote{bhat}, the least-squares estimates of the
