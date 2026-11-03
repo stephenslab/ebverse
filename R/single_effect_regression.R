@@ -242,6 +242,7 @@ ser_normal_control_default <- function()
 #' @export
 #' 
 prepare_ser_data <- function (bhat, shat, X, y, sigma = 1) {
+  unit_sigma <- FALSE
   if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
         (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
     stop("Either {bhat, shat} or {X, y} should be provided ",
@@ -253,12 +254,14 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma = 1) {
     res  <- compute_lse(X,y,sigma)
     bhat <- res$bhat
     shat <- res$shat
+    unit_sigma <- all(abs(1 - sigma) < 2*.Machine$double.eps)
   }
   if (length(bhat) != length(shat))
     stop("bhat and s should be the same length")
   if (length(bhat) < 2 | length(shat) < 2)
     stop("bhat and s should have at least two entries")
   dat <- data.frame(bhat = bhat,shat = shat)
+  attr(dat,"unit_sigma") <- unit_sigma
   class(dat) <- c("ser_data","data.frame")
   return(dat)
 }
