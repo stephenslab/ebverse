@@ -34,8 +34,8 @@ ser_normal_control_default()
 prepare_ser_data(bhat, shat, X, y, sigma)
 }
 \arguments{
-\item{dat}{An object of class \sQuote{ser_data}, typically an
-output from \code{prepare_ser_data}.}
+\item{dat}{An object of class \sQuote{ser_data}, such as the
+output from a call to \code{prepare_ser_data}.}
 
 \item{family}{The SER family. See \dQuote{details} for more
 information.}
@@ -114,7 +114,7 @@ Methods for fitting single effect regression (SER)
   parameters in the prior (\dQuote{hyperparameters}) by
   maximizing the likelihood, but potentially other (non-prior)
   parameters could be estimated as well. The \sQuote{fit_ser_model}
-  method is the main method for fitting SER models, and for
+  method is the main method for fitting SER models and
   computing posterior statistics.
 }
 \details{
@@ -123,9 +123,9 @@ TO DO: Define what is meant by an "SER model", define
   what are the parameters specific to each model.
 }
 \note{
-This is a basic interface with very few checks; it is mainly
-  used to implement the susie model fitting methods. Use at your
-  own risk.
+This is a \dQuote{lightweight} interface with few features
+  and few checks; it is mainly used to implement the susie model
+  fitting methods. (Use at your own risk!)
 }
 \examples{
 # TO DO: Add one or several examples.

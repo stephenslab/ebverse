@@ -231,13 +231,22 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 
 #' @name susie
 #'  
-#' @title Title goes here.
+#' @title Fitting Sum of Single Effect (SuSiE) Models
 #'
-#' @param dat Describe "dat" input argument here.
+#' @description Methods for fitting \dQuote{Sum of Single Effect}
+#'   (SuSiE) models and computing posterior statistics from SuSiE
+#'   models. The \sQuote{fit_susie_model} method is the main method
+#'   for fitting SuSiE models and computing posterior statistics.
+#' 
+#' @param dat An object of class \sQuote{susie_data}, for example the
+#'   output from a call to \code{\link{prepare_susie_full_data}} or
+#'   \code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+#'   for other ways to create \sQuote{susie_data} objects.
 #' 
 #' @param ser Describe "ser" input argument here.
 #'
-#' @param L Describe "L" input argument here.
+#' @param L An integer, 1 or greater, specifying the number of single
+#'   effects.
 #'
 #' @param residual_variance Describe "residual_variance" input
 #'     argument here.
@@ -294,6 +303,17 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
+  force(return_data)
+  if (missing(dat)) {
+    if (is.null(fit$dat))
+      stop("the data were not provided",domain = NA)
+    dat <- fit$dat
+  }  
+
+  if (return_data)
+    fit$dat <- dat
+  else
+    fit["dat"] <- NULL
   return(fit)
 }
  

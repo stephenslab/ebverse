@@ -5,7 +5,7 @@
 \alias{init_susie_model}
 \alias{fit_susie_model}
 \alias{fit_susie_control_default}
-\title{Title goes here.}
+\title{Fitting Sum of Single Effect (SuSiE) Models}
 \usage{
 init_susie_model(
   dat,
@@ -21,11 +21,15 @@ fit_susie_model(fit, dat, return_data = missing(dat))
 fit_susie_control_default()
 }
 \arguments{
-\item{dat}{Describe "dat" input argument here.}
+\item{dat}{An object of class \sQuote{susie_data}, for example the
+output from a call to \code{\link{prepare_susie_full_data}} or
+\code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+for other ways to create \sQuote{susie_data} objects.}
 
 \item{ser}{Describe "ser" input argument here.}
 
-\item{L}{Describe "L" input argument here.}
+\item{L}{An integer, 1 or greater, specifying the number of single
+effects.}
 
 \item{residual_variance}{Describe "residual_variance" input
 argument here.}
@@ -40,6 +44,11 @@ argument here.}
 Describe the output here.
 }
 \description{
+Methods for fitting \dQuote{Sum of Single Effect}
+  (SuSiE) models and computing posterior statistics from SuSiE
+  models. The \sQuote{fit_susie_model} method is the main method
+  for fitting SuSiE models and computing posterior statistics.
+
 Description goes here.
 }
 \examples{

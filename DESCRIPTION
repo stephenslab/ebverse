@@ -1,12 +1,13 @@
 Encoding: UTF-8
 Type: Package
 Package: ebverse
-Version: 0.1-36
-Date: 2026-10-29
+Version: 0.1-37
+Date: 2026-11-02
 Title: Empirical Bayes Linear Models in R
 Authors@R: c(person("Peter","Carbonetto",role=c("aut","cre"),
                     email="peter.carbonetto@gmail.com"),
              person("Gao","Wang",role="ctb"),
+	     person("Yuxin","Zou",role="ctb"),
              person("Matthew","Stephens",role="aut"))
 URL: https://github.com/stephenslab/ebverse/
 BugReports: https://github.com/stephenslab/ebverse/issues

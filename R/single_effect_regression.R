@@ -8,11 +8,11 @@
 #'   parameters in the prior (\dQuote{hyperparameters}) by
 #'   maximizing the likelihood, but potentially other (non-prior)
 #'   parameters could be estimated as well. The \sQuote{fit_ser_model}
-#'   method is the main method for fitting SER models, and for
+#'   method is the main method for fitting SER models and
 #'   computing posterior statistics.
 #'
-#' @param dat An object of class \sQuote{ser_data}, typically an
-#'     output from \code{prepare_ser_data}.
+#' @param dat An object of class \sQuote{ser_data}, such as the
+#'   output from a call to \code{prepare_ser_data}.
 #'
 #' @param family The SER family. See \dQuote{details} for more
 #'   information.
@@ -63,9 +63,9 @@
 #'   the specific SER models that are implemented, and explain
 #'   what are the parameters specific to each model.
 #'
-#' @note This is a basic interface with very few checks; it is mainly
-#'   used to implement the susie model fitting methods. Use at your
-#'   own risk.
+#' @note This is a \dQuote{lightweight} interface with few features
+#'   and few checks; it is mainly used to implement the susie model
+#'   fitting methods. (Use at your own risk!)
 #'
 #' @seealso \link{susie}
 #'
@@ -149,6 +149,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
   #
+  # - Add version number to the "fit".
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement an Rcpp version of this.
