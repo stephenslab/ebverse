@@ -56,6 +56,26 @@ prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
   return(dat)
 }
 
-#
-# TO DO: Define the S3 methods for susie_data objects.
-#
+#' @title Add Title Here.
+#'
+#' @description Add description here.
+#'
+#' @param dat Describe input argument "data" here.
+#'
+#' @return Describe the return value here.
+#' 
+#' @seealso \link{susie_data}
+#' 
+#' @export
+#'
+#' @keywords internal
+#' 
+compute_XtXb <- function (dat, b) {
+  UseMethod("compute_XtXb")
+}
+
+#'
+#' @export
+#' 
+compute_XtXb.susie_full_data <- function (dat, b)
+  drop(drop(dat$X %*% b) %*% dat$X)

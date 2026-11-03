@@ -226,9 +226,14 @@ ser_normal_control_default <- function()
 #' @param y A vector of regression outcomes.
 #' 
 #' @param sigma A vector of residual variances from the
-#'   single-variable models.
+#'   single-variable models, or a scalar for the case in which all
+#'   the single-variable models have the same residual variance.
+#'   Only needed if X, y are provided.
+#'
+#' @details Only provide (bhat, shat) or (X, y); an error will occur
+#'   if the wrong combination of data are provided.
 #' 
-#' @return \code{prepare_ser_data} returns a matrix with two named
+#' @return \code{prepare_ser_data} returns a data frame with two
 #'   columns: \sQuote{bhat}, the least-squares estimates of the
 #'   coefficients; \sQuote{shat}, the variances of these
 #'   estimates. See \sQuote{details} for precise definitions of
@@ -236,14 +241,15 @@ ser_normal_control_default <- function()
 #'   
 #' @export
 #' 
-prepare_ser_data <- function (bhat, shat, X, y, sigma) {
-  if (!((missing(X) & missing(y) & missing(sigma) & 
-         !missing(bhat) & !missing(shat)) |
-        (!missing(X) & !missing(y) & !missing(sigma) & 
-         missing(bhat) & missing(shat))))
-    stop("Either {bhat, shat} or {X, y, sigma} should be provided ",
+prepare_ser_data <- function (bhat, shat, X, y, sigma = 1) {
+  if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
+        (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
+    stop("Either {bhat, shat} or {X, y} should be provided ",
          "(and not both)")
   if (missing(bhat) & missing(shat)) {
+    J <- ncol(X)
+    if (length(sigma) == 1)
+      sigma <- rep(sigma,J)
     res  <- compute_lse(X,y,sigma)
     bhat <- res$bhat
     shat <- res$shat
@@ -252,8 +258,8 @@ prepare_ser_data <- function (bhat, shat, X, y, sigma) {
     stop("bhat and s should be the same length")
   if (length(bhat) < 2 | length(shat) < 2)
     stop("bhat and s should have at least two entries")
-  dat <- cbind(bhat = bhat,shat = shat)
-  class(dat) <- c("ser_data","matrix","array")
+  dat <- data.frame(bhat = bhat,shat = shat)
+  class(dat) <- c("ser_data","data.frame")
   return(dat)
 }
 
@@ -274,7 +280,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
       # E step.
-      post <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
+      post <- compute_posterior_ebnm_normal(dat$bhat,dat$shat,
                                             prior$prior_variance)
       ans  <- normalizelogweights(log(prior$prob) + post$lbf)
       b1   <- post$b1
@@ -318,7 +324,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   }
 
   # Compute the posterior statistics one last time.
-  post <- compute_posterior_ebnm_normal(dat[,"bhat"],dat[,"shat"],
+  post <- compute_posterior_ebnm_normal(dat$bhat,dat$shat,
                                         prior$prior_variance)
   ans <- normalizelogweights(log(prior$prob) + post$lbf)
   pip <- ans$probs

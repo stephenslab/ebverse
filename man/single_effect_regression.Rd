@@ -33,7 +33,7 @@ fit_ser_model(fit, dat, return_data = missing(dat))
 
 ser_normal_control_default()
 
-prepare_ser_data(bhat, shat, X, y, sigma)
+prepare_ser_data(bhat, shat, X, y, sigma = 1)
 }
 \arguments{
 \item{dat}{An object of class \sQuote{ser_data}, such as the
@@ -73,7 +73,9 @@ variables.}
 \item{y}{A vector of regression outcomes.}
 
 \item{sigma}{A vector of residual variances from the
-single-variable models.}
+single-variable models, or a scalar for the case in which all
+the single-variable models have the same residual variance.
+Only needed if X, y are provided.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return
@@ -107,7 +109,7 @@ single-variable models.}
   \item{control}{A data structure, likely a list, containing the
     settings that affect how the model fitting is conducted.}
 
-\code{prepare_ser_data} returns a matrix with two named
+\code{prepare_ser_data} returns a data frame with two
   columns: \sQuote{bhat}, the least-squares estimates of the
   coefficients; \sQuote{shat}, the variances of these
   estimates. See \sQuote{details} for precise definitions of
@@ -127,6 +129,9 @@ Methods for fitting single effect regression (SER)
 TO DO: Define what is meant by an "SER model", define
   the specific SER models that are implemented, and explain
   what are the parameters specific to each model.
+
+Only provide (bhat, shat) or (X, y); an error will occur
+  if the wrong combination of data are provided.
 }
 \note{
 This is a \dQuote{lightweight} interface with few features
