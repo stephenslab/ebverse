@@ -248,8 +248,8 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #' @param L An integer, 1 or greater, specifying the number of single
 #'   effects.
 #'
-#' @param residual_variance Describe "residual_variance" input
-#'     argument here.
+#' @param residual_variance Initial estimate of the residual variance
+#'   parameter.
 #'
 #' @param control Describe the "control" input argument here.
 #'  
@@ -261,6 +261,8 @@ simple_ser <- function (X, y, s0 = 1, s = 1, numiter = 10,
 #'
 #' @examples
 #' # TO DO: Add one or several examples.
+#'
+#' @importFrom utils packageVersion
 #' 
 #' @export
 #' 
@@ -269,14 +271,18 @@ init_susie_model <- function (dat, ser, L = 10, residual_variance = 1,
   #
   # TO DO NEXT: Work on this function.
   #
+  # TO DO: How to specify a default initialization of "ser"?
+  #
   # NOTES: 
   # - This is a function that is intended to be part of the main
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
+  control <- modifyList(susie_control_default(),control,keep.null = TRUE)
   fit <- list()
   if (return_data)
     fit$dat <- dat
+  fit$version <- packageVersion("ebverse")
   class(fit) <- c("susie","list")
   return(fit)
 }
@@ -303,12 +309,32 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
+
+  # Check and process the inputs.
   force(return_data)
   if (missing(dat)) {
     if (is.null(fit$dat))
       stop("the data were not provided",domain = NA)
     dat <- fit$dat
   }  
+
+  # Iterate the co-ordinate ascent updates.
+  for (i in 1:control$maxiter) {
+
+    # Repeat for each single effect.
+    for (k in 1:L) {
+      b <- B[,k]
+      r <- drop(r + X %*% b)
+      out <- simple_ser(X,r,s0 = s0[k],numiter = 1,prior = "NIG", 
+                        a0 = a0,b0 = b0,verbose = FALSE)
+      b       <- with(out,pip * b1)
+      B[,k]   <- b
+      PIP[,k] <- out$pip
+      s0[k]   <- out$s0
+      elbo[k] <- out$elbo
+      r <- drop(r - X %*% b)
+    }
+  }
 
   if (return_data)
     fit$dat <- dat

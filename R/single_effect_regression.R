@@ -21,6 +21,10 @@
 #'   prior. The exact form of this input will depend on which SER
 #'   model is used. See \sQuote{details} for further information.
 #'
+#' @param init_method Posterior statistics need to be in SER model
+#'   fits at all times, even if they are just initial guesses. This
+#'   argument specifies how the initial guess is obtained.
+#' 
 #' @param control An object, possibly a list, specifying settings that
 #'   affect the model fitting. See \sQuote{details} for further
 #'   information.
@@ -78,23 +82,26 @@ init_ser_model <- function (dat,
                             family = "normal",
                             prior = list(prob = 1/nrow(dat), 
                                          prior_variance = 1),
+                            init_method = "null",
                             control = list(),
                             return_data = FALSE) {
   family <- match.arg(family)
   if (family == "normal")
-    fit <- init_ser_model_normal(dat,prior,control,return_data)
+    fit <- init_ser_model_normal(dat,prior,init_method,control,return_data)
   return(fit)
 }
 
 #' @rdname single_effect_regression
 #'
 #' @importFrom utils modifyList
-#'
+#' @importFrom stats rnorm
+#' 
 #' @export
 #' 
 init_ser_model_normal <- function (dat, 
                                    prior = list(prob = 1/nrow(dat), 
                                                 prior_variance = 1),
+                                   init_method = c("null","random"),
                                    control = list(),
                                    return_data = FALSE) {
 
@@ -109,13 +116,22 @@ init_ser_model_normal <- function (dat,
   if (prior$prior_variance <= 0)
     stop("prior$prior_variance should be a positive number",domain = NA)
   prior$prob <- prior$prob/sum(prior$prob)
-  control <- modifyList(ser_normal_control_default(),
-                          control,keep.null = TRUE)
+  init_method <- match.arg(init_method)
+  control <- modifyList(ser_normal_control_default(),control,
+                        keep.null = TRUE)
+
+  # Make an initial guess for the posterior statistics.
+  posterior <- cbind(lbf  = 0,
+                     pip  = prior$prob,
+                     mean = 0,
+                     var  = prior$prior_variance)
+  if (init_method == "random")
+    posterior$mean <- rnorm(nvar,0,sqrt(prior$prior_variance))
 
   # Initialize the SER model.
   fit <- list(prior     = prior,
               lbf       = as.numeric(NA),
-              posterior = as.numeric(NA),
+              posterior = posterior,
               progress  = as.numeric(NA),
               control   = control)
   fit$control$local  <- control$estimate_prior_variance &
@@ -148,8 +164,7 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  #
-  # - Add version number to the "fit".
+  # - Add names to outputs whenever possible.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement an Rcpp version of this.
@@ -158,7 +173,6 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   # - Fill out the docs, and in particular define the SER model,
   #   and give a small example illustrating its use.
   # - Run R CMD check...
-  #
   force(return_data)
   if (missing(dat)) {
     if (is.null(fit$dat))

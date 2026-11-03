@@ -14,6 +14,7 @@ init_ser_model(
   dat,
   family = "normal",
   prior = list(prob = 1/nrow(dat), prior_variance = 1),
+  init_method = "null",
   control = list(),
   return_data = FALSE
 )
@@ -21,6 +22,7 @@ init_ser_model(
 init_ser_model_normal(
   dat,
   prior = list(prob = 1/nrow(dat), prior_variance = 1),
+  init_method = c("null", "random"),
   control = list(),
   return_data = FALSE
 )
@@ -43,6 +45,10 @@ information.}
 \item{prior}{An object, possibly a list, specifying the SER
 prior. The exact form of this input will depend on which SER
 model is used. See \sQuote{details} for further information.}
+
+\item{init_method}{Posterior statistics need to be in SER model
+fits at all times, even if they are just initial guesses. This
+argument specifies how the initial guess is obtained.}
 
 \item{control}{An object, possibly a list, specifying settings that
 affect the model fitting. See \sQuote{details} for further

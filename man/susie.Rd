@@ -28,11 +28,11 @@ for other ways to create \sQuote{susie_data} objects.}
 
 \item{ser}{Describe "ser" input argument here.}
 
-\item{L}{An integer, 1 or greater, specifying the number of single
+\item{L}{An integer, 1 or more, specifying the number of single
 effects.}
 
-\item{residual_variance}{Describe "residual_variance" input
-argument here.}
+\item{residual_variance}{Initial estimate of the residual variance
+parameter.}
 
 \item{control}{Describe the "control" input argument here.}
 
