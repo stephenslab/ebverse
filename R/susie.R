@@ -156,6 +156,8 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
       stop("the data were not provided",domain = NA)
     dat <- fit$dat
   }  
+  if (any(attr(dat$ss,"residual_variance") != 1)) 
+    stop("dat$ss does not give the correct summary statistics",domain = NA)
 
   # Fit the SuSiE model and compute the posterior statistics.
   res <- fit_susie_model_core(dat,fit,fit$control)
