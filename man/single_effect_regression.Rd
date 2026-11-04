@@ -11,20 +11,18 @@
 \title{Fitting Single Effect Regression Models}
 \usage{
 init_ser_model(
-  dat,
+  nvar,
   family = "normal",
-  prior = list(prob = 1/nrow(dat), prior_variance = 1),
+  prior = list(prob = 1/nvar, prior_variance = 1),
   init_method = "null",
-  control = list(),
-  return_data = FALSE
+  control = list()
 )
 
 init_ser_model_normal(
-  dat,
-  prior = list(prob = 1/nrow(dat), prior_variance = 1),
+  nvar,
+  prior = list(prob = 1/nvar, prior_variance = 1),
   init_method = c("null", "random"),
-  control = list(),
-  return_data = FALSE
+  control = list()
 )
 
 fit_ser_model(fit, dat, return_data = missing(dat))
@@ -33,12 +31,9 @@ fit_ser_model(fit, dat, return_data = missing(dat))
 
 ser_normal_control_default()
 
-prepare_ser_data(bhat, shat, X, y, sigma = 1)
+prepare_ser_data(bhat, shat, X, y, residual_variance = 1)
 }
 \arguments{
-\item{dat}{An object of class \sQuote{ser_data}, such as the
-output from a call to \code{prepare_ser_data}.}
-
 \item{family}{The SER family. See \dQuote{details} for more
 information.}
 
@@ -54,13 +49,16 @@ argument specifies how the initial guess is obtained.}
 affect the model fitting. See \sQuote{details} for further
 information.}
 
-\item{return_data}{If \code{return_data = TRUE}, the input data are
-included in the output.}
-
 \item{fit}{An object of class \sQuote{ser} that captures the state
 of an SER model fit, typically the output from running an
 \sQuote{init_ser_model} function, or an output from a
 \code{fit_ser_model} call.}
+
+\item{dat}{An object of class \sQuote{ser_data}, such as the
+output from a call to \code{prepare_ser_data}.}
+
+\item{return_data}{If \code{return_data = TRUE}, the input data are
+included in the output.}
 
 \item{bhat}{A vector of least-squares estimates of the coefficients.}
 
@@ -72,10 +70,9 @@ variables.}
 
 \item{y}{A vector of regression outcomes.}
 
-\item{sigma}{A vector of residual variances from the
-single-variable models, or a scalar for the case in which all
-the single-variable models have the same residual variance.
-Only needed if X, y are provided.}
+\item{residual_variance}{The residual variance parameter which is
+used to compute the the outputted statistics. This is only used
+when X, y are provided instead of bhat, shat.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return
@@ -108,6 +105,9 @@ Only needed if X, y are provided.}
 
   \item{control}{A data structure, likely a list, containing the
     settings that affect how the model fitting is conducted.}
+
+  \item{dat}{When \code{return_data}, the SER data set that was
+    used to fit the model.}
 
 \code{prepare_ser_data} returns a data frame with two
   columns: \sQuote{bhat}, the least-squares estimates of the

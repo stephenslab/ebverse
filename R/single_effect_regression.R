@@ -11,9 +11,6 @@
 #'   method is the main method for fitting SER models and
 #'   computing posterior statistics.
 #'
-#' @param dat An object of class \sQuote{ser_data}, such as the
-#'   output from a call to \code{prepare_ser_data}.
-#'
 #' @param family The SER family. See \dQuote{details} for more
 #'   information.
 #' 
@@ -29,9 +26,6 @@
 #'   affect the model fitting. See \sQuote{details} for further
 #'   information.
 #'
-#' @param return_data If \code{return_data = TRUE}, the input data are
-#'   included in the output.
-#' 
 #' @return \code{init_ser_model} and \code{fit_ser_model} return
 #'   objects of class \sQuote{ser} storing key posterior statistics
 #'   for all variables and the state of the SER model fit. It is a
@@ -62,6 +56,9 @@
 #'
 #'   \item{control}{A data structure, likely a list, containing the
 #'     settings that affect how the model fitting is conducted.}
+#'
+#'   \item{dat}{When \code{return_data}, the SER data set that was
+#'     used to fit the model.}
 #' 
 #' @details TO DO: Define what is meant by an "SER model", define
 #'   the specific SER models that are implemented, and explain
@@ -78,16 +75,14 @@
 #' 
 #' @export
 #' 
-init_ser_model <- function (dat, 
+init_ser_model <- function (nvar, 
                             family = "normal",
-                            prior = list(prob = 1/nrow(dat), 
-                                         prior_variance = 1),
+                            prior = list(prob = 1/nvar,prior_variance = 1),
                             init_method = "null",
-                            control = list(),
-                            return_data = FALSE) {
+                            control = list()) {
   family <- match.arg(family)
   if (family == "normal")
-    fit <- init_ser_model_normal(dat,prior,init_method,control,return_data)
+    fit <- init_ser_model_normal(nvar,prior,init_method,control)
   return(fit)
 }
 
@@ -98,17 +93,13 @@ init_ser_model <- function (dat,
 #' 
 #' @export
 #' 
-init_ser_model_normal <- function (dat, 
-                                   prior = list(prob = 1/nrow(dat), 
+init_ser_model_normal <- function (nvar, 
+                                   prior = list(prob = 1/nvar, 
                                                 prior_variance = 1),
                                    init_method = c("null","random"),
-                                   control = list(),
-                                   return_data = FALSE) {
+                                   control = list()) {
 
   # Basic checks and processing of the inputs.
-  if (!inherits(dat,"ser_data"))
-    stop("dat is not a valid SER data set")
-  nvar <- nrow(dat)
   if (length(prior$prob) != 1 & length(prior$prob) != nvar)
     stop("prior$prob should be a vector of length 1 or nvar",domain = NA)
   if (length(prior$prob) == 1)
@@ -138,8 +129,6 @@ init_ser_model_normal <- function (dat,
                         !control$global_prior_variance
   fit$control$global <- control$estimate_prior_variance & 
                         !control$global_prior_variance
-  if (return_data)
-    fit$dat <- dat
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
@@ -151,6 +140,9 @@ init_ser_model_normal <- function (dat,
 #'   \sQuote{init_ser_model} function, or an output from a
 #'   \code{fit_ser_model} call.
 #' 
+#' @param return_data If \code{return_data = TRUE}, the input data are
+#'   included in the output.
+#' 
 #' @export
 #'
 fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
@@ -158,6 +150,9 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 }
 
 #' @rdname single_effect_regression
+#'
+#' @param dat An object of class \sQuote{ser_data}, such as the
+#'   output from a call to \code{prepare_ser_data}.
 #'
 #' @export
 #' 
@@ -225,10 +220,9 @@ ser_normal_control_default <- function()
 #'
 #' @param y A vector of regression outcomes.
 #' 
-#' @param sigma A vector of residual variances from the
-#'   single-variable models, or a scalar for the case in which all
-#'   the single-variable models have the same residual variance.
-#'   Only needed if X, y are provided.
+#' @param residual_variance The residual variance parameter which is
+#'   used to compute the the outputted statistics. This is only used
+#'   when X, y are provided instead of bhat, shat.
 #'
 #' @details Only provide (bhat, shat) or (X, y); an error will occur
 #'   if the wrong combination of data are provided.
@@ -241,27 +235,24 @@ ser_normal_control_default <- function()
 #'   
 #' @export
 #' 
-prepare_ser_data <- function (bhat, shat, X, y, sigma = 1) {
-  unit_sigma <- FALSE
+prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
   if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
         (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
     stop("Either {bhat, shat} or {X, y} should be provided ",
          "(and not both)")
   if (missing(bhat) & missing(shat)) {
     J <- ncol(X)
-    if (length(sigma) == 1)
-      sigma <- rep(sigma,J)
-    res  <- compute_lse(X,y,sigma)
+    if (length(residual_variance) != 1)
+      stop("residual_variance should be a single number")
+    res  <- compute_lse(X,y,residual_variance)
     bhat <- res$bhat
     shat <- res$shat
-    unit_sigma <- all(abs(1 - sigma) < 2*.Machine$double.eps)
   }
   if (length(bhat) != length(shat))
     stop("bhat and s should be the same length")
   if (length(bhat) < 2 | length(shat) < 2)
     stop("bhat and s should have at least two entries")
   dat <- data.frame(bhat = bhat,shat = shat)
-  attr(dat,"unit_sigma") <- unit_sigma
   class(dat) <- c("ser_data","data.frame")
   return(dat)
 }
