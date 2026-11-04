@@ -114,10 +114,10 @@ init_ser_model_normal <- function (nvar,
                         keep.null = TRUE)
 
   # Make an initial guess for the posterior statistics.
-  posterior <- cbind(lbf  = 0,
-                     pip  = prior$prob,
-                     mean = 0,
-                     var  = prior$prior_variance)
+  posterior <- data.frame(lbf  = 0,
+                          pip  = prior$prob,
+                          mean = 0,
+                          var  = prior$prior_variance)
   if (init_method == "random")
     posterior$mean <- rnorm(nvar,0,sqrt(prior$prior_variance))
 
@@ -130,7 +130,7 @@ init_ser_model_normal <- function (nvar,
   fit$control$local  <- control$estimate_prior_variance &
                         !control$global_prior_variance
   fit$control$global <- control$estimate_prior_variance & 
-                        !control$global_prior_variance
+                        control$global_prior_variance
   class(fit) <- c("ser_normal","ser","list")
   return(fit)
 }
@@ -161,6 +161,7 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
+  # - Add a "trace" control parameter (default: TRUE).
   # - Add names to outputs wherever possible.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
@@ -266,8 +267,8 @@ prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
 fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   progress <- as.numeric(NA)
 
-  # Estimate the prior variance parameter locally.
-  if (control$local & control$estimate_prior_variance) {
+  # Estimate the prior variance parameter "locally".
+  if (control$estimate_prior_variance & control$local) {
     progress <- as.data.frame(matrix(0,control$maxiter,5))
     names(progress) <- c("iter","lbf","prior.var","delta.lbf",
                          "delta.prior.var")
@@ -333,8 +334,10 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   post_var  <- pip*b2 - post_mean^2
 
   # Prepare the output.
-  posterior <- data.frame(lbf = post$lbf,pip = pip,mean = post_mean,
-                          var = post_var)
+  posterior <- data.frame(lbf  = post$lbf,
+                          pip  = pip,
+                          mean = post_mean,
+                          var  = post_var)
   lbf       <- ans$weight_sum 
   progress  <- progress[1:iter,]
   rownames(progress) <- NULL

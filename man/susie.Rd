@@ -10,7 +10,8 @@
 init_susie_model(
   nvar,
   L = 10,
-  ser = init_ser_model(nvar),
+  ser = init_ser_model(nvar, family = "normal", control = list(maxiter = 1, trace =
+    FALSE)),
   residual_variance = 1,
   control = list()
 )

@@ -83,8 +83,13 @@ compute_elbo <- function (ll0, lbf) {
 #' 
 #' @export
 #' 
-init_susie_model <- function (nvar, L = 10, ser = init_ser_model(nvar),
-                              residual_variance = 1, control = list()) {
+init_susie_model <- 
+  function (nvar, 
+            L = 10, 
+            ser = init_ser_model(nvar,family = "normal",
+                                 control = list(maxiter = 1,trace = FALSE)),
+            residual_variance = 1, 
+            control = list()) {
   #
   # NOTES: 
   # - This is a function that is intended to be part of the main
@@ -134,14 +139,20 @@ init_susie_model <- function (nvar, L = 10, ser = init_ser_model(nvar),
 #'
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
-  # TO DO NEXT: Work on this function.
-  #
   # NOTES: 
   # - This is a function that is intended to be part of the main
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
   # TO DO:
+  # - Test fit_susie_model with L = 1.
+  # - Test refitting of a susie model.
+  # - Add a "trace" control parameter (default: TRUE).
+  # - Add a "progress" output.
+  # - Implement the "susie_data" functions.
+  # - Implement estimation of the residual variance.
+  # - Implement the ELBO computations.
+  # - Implement a "summary" S3 method.
   # - Add names to outputs wherever possible.
   #
 
@@ -160,7 +171,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
     stop("dat$ss does not give the correct summary statistics",domain = NA)
 
   # Fit the SuSiE model and compute the posterior statistics.
-  res <- fit_susie_model_core(dat,fit,fit$control)
+  fit <- fit_susie_model_core(dat,fit,fit$control)
 
   # Prepare the output
   #
@@ -174,25 +185,25 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 }
 
 # This implements the core SuSiE model fitting algorithm.
-#
-# TO DO: Test this function for L = 1.
-# 
 fit_susie_model_core <- function (dat, fit, control) {
 
   # Get the number of single effects.
   L <- length(fit$ser) 
 
-  browser()
-
   # Iterate the SER updates.
   for (i in 1:control$maxiter) {
 
     # Compute the posterior mean of b.
+    #
+    # TO DO: Hide this code inside a separate (internal) function
+    # called "compute_post_mean_susie".
+    # 
     if (L > 1) {
       b <- rep(0,dat$nvar)
       for (k in 1:L)
-        b <- b + fit$ser$posterior$mean
+        b <- b + fit$ser[[k]]$posterior$mean
     }
+    current_state <- list(b = b)
 
     # Repeat for each single effect.
     for (k in 1:L) {
@@ -204,31 +215,36 @@ fit_susie_model_core <- function (dat, fit, control) {
       # 
       fit_ser <- fit$ser[[k]]
       bhat    <- dat$ss$bhat
-      shat    <- dat$ss$shat
+      d       <- dat$ss$shat
       sigma   <- fit$residual_variance
       if (L > 1) {
-        bk   <- fit_ser$posterior_mean
+        bk   <- fit_ser$posterior$mean
         b    <- b - bk
         r    <- compute_XtXb(dat,b)
-        bhat <- bhat - r*shat
+        bhat <- bhat - d*r
       } 
-      dat_ser <- prepare_ser_data(bhat = bhat,shat = sigma*shat)
+      dat_ser <- prepare_ser_data(bhat = bhat,shat = sigma*d)
       fit_ser <- fit_ser_model(fit_ser,dat_ser)
       if (L > 1) {
-        bk <- fit_ser$posterior_mean
+        bk <- fit_ser$posterior$mean
         b  <- b + bk
       }
       fit$ser[[k]] <- fit_ser
     }
 
     #
-    # TO DO:
+    # TO DO
     #
     # The EM update for the residual variance is ERSS/n, where "ERSS" is
     # the expected residual sum of squares.
     #  erss <- compute_erss(X,y,pip,b1,b2)
     #  s <- erss/n
     #
+
+    #
+    # TEMPORARY
+    #
+    cat(max(abs(current_state$b - b)),"\n")
   }
 
   return(fit)
