@@ -11,6 +11,8 @@
 #'   method is the main method for fitting SER models and
 #'   computing posterior statistics.
 #'
+#' @param nvar The number of variables in the SER model.
+#' 
 #' @param family The SER family. See \dQuote{details} for more
 #'   information.
 #' 
@@ -44,7 +46,7 @@
 #'     \dQuote{null} model (b = 0).}
 #'
 #'   \item{progress}{A data frame containing detailed information about
-#'     the algorithm's progress.}
+#'     the progress on the model fitting.}
 #' 
 #'   \item{local}{Logical specifying whether one or more parameters may
 #'     be estimated \dQuote{locally} (that is, they are estimated

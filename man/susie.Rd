@@ -4,27 +4,23 @@
 \alias{susie}
 \alias{init_susie_model}
 \alias{fit_susie_model}
-\alias{fit_susie_control_default}
+\alias{susie_control_default}
 \title{Fitting Sum of Single Effect (SuSiE) Models}
 \usage{
 init_susie_model(
-  dat,
+  nvar,
   L = 10,
-  ser = init_ser_model(dat),
+  ser = init_ser_model(nvar),
   residual_variance = 1,
-  control = list(),
-  return_data = FALSE
+  control = list()
 )
 
 fit_susie_model(fit, dat, return_data = missing(dat))
 
-fit_susie_control_default()
+susie_control_default()
 }
 \arguments{
-\item{dat}{An object of class \sQuote{susie_data}, for example the
-output from a call to \code{\link{prepare_susie_full_data}} or
-\code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
-for other ways to create \sQuote{susie_data} objects.}
+\item{nvar}{The number of variables in the SuSiE model.}
 
 \item{L}{An integer, 1 or greater, specifying the number of single
 effects.}
@@ -41,10 +37,15 @@ parameter.}
 affect the model fitting. See \sQuote{details} for further
 information.}
 
+\item{fit}{An object...}
+
+\item{dat}{An object of class \sQuote{susie_data}, for example the
+output from a call to \code{\link{prepare_susie_full_data}} or
+\code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+for other ways to create \sQuote{susie_data} objects.}
+
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
-
-\item{fit}{An object...}
 }
 \value{
 \code{init_susie_model} and \code{fit_susie_model} return
@@ -52,9 +53,22 @@ included in the output.}
   for all variables and the state of the SuSiE model fit. It is a
   list with the following elements:
 
-  \item{item1}{Description of item1 goes here.}
+  \item{ser}{The L single effect regression models which define the
+    SuSiE posterior distribution.}
 
-  \item{item2}{Description of item2 goes here.}
+  \item{residual_variance}{The residual variance parameter.}
+
+  \item{elbo}{The value of the ELBO (an approximate marginal
+    likelihood) at the current model fit.}
+
+  \item{progress}{A data frame containing detailed information about
+    progress on the model fitting.}
+
+  \item{control}{A list containing the settings that affect how the
+    model fitting is performed.}
+
+  \item{version}{The version of the ebverse R package that was
+    used to generate this object}
 }
 \description{
 Methods for fitting \dQuote{Sum of Single Effect}

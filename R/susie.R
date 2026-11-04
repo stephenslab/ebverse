@@ -31,11 +31,8 @@ compute_elbo <- function (ll0, lbf) {
 #'   (SuSiE) models and computing posterior statistics from SuSiE
 #'   models. The \sQuote{fit_susie_model} method is the main method
 #'   for fitting SuSiE models and computing posterior statistics.
-#' 
-#' @param dat An object of class \sQuote{susie_data}, for example the
-#'   output from a call to \code{\link{prepare_susie_full_data}} or
-#'   \code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
-#'   for other ways to create \sQuote{susie_data} objects.
+#'
+#' @param nvar The number of variables in the SuSiE model.
 #' 
 #' @param L An integer, 1 or greater, specifying the number of single
 #'   effects.
@@ -52,17 +49,27 @@ compute_elbo <- function (ll0, lbf) {
 #'   affect the model fitting. See \sQuote{details} for further
 #'   information.
 #'  
-#' @param return_data If \code{return_data = TRUE}, the input data are
-#'   included in the output.
-#' 
 #' @return \code{init_susie_model} and \code{fit_susie_model} return
 #'   objects of class \sQuote{susie} storing key posterior statistics
 #'   for all variables and the state of the SuSiE model fit. It is a
 #'   list with the following elements:
 #'
-#'   \item{item1}{Description of item1 goes here.}
+#'   \item{ser}{The L single effect regression models which define the
+#'     SuSiE posterior distribution.}
+#' 
+#'   \item{residual_variance}{The residual variance parameter.}
 #'
-#'   \item{item2}{Description of item2 goes here.}
+#'   \item{elbo}{The value of the ELBO (an approximate marginal
+#'     likelihood) at the current model fit.}
+#' 
+#'   \item{progress}{A data frame containing detailed information about
+#'     progress on the model fitting.}
+#'
+#'   \item{control}{A list containing the settings that affect how the
+#'     model fitting is performed.}
+#' 
+#'   \item{version}{The version of the ebverse R package that was
+#'     used to generate this object}
 #'
 #' @seealso \link{susie_data}, \link{single_effect_regression}
 #'
@@ -73,11 +80,8 @@ compute_elbo <- function (ll0, lbf) {
 #' 
 #' @export
 #' 
-init_susie_model <- function (dat, L = 10, ser = init_ser_model(dat),
-                              residual_variance = 1, control = list(), 
-                              return_data = FALSE) {
-  #
-  # TO DO NEXT: Work on this function.
+init_susie_model <- function (nvar, L = 10, ser = init_ser_model(nvar),
+                              residual_variance = 1, control = list()) {
   #
   # NOTES: 
   # - This is a function that is intended to be part of the main
@@ -86,8 +90,6 @@ init_susie_model <- function (dat, L = 10, ser = init_ser_model(dat),
   # 
   if (L < 1)
     stop("L should be at least 1")
-  if (!inherits(dat,"susie_data"))
-    stop("'dat' should be an object of class 'susie_data'",domain = NA)
   if (inherits(ser,"ser")) {
     ser <- rep(list(ser),L)
   } else if (is.list(ser)) {
@@ -102,8 +104,6 @@ init_susie_model <- function (dat, L = 10, ser = init_ser_model(dat),
               residual_variance = residual_variance,
               progress          = as.numeric(NA),
               control           = control)
-  if (return_data)
-    fit$dat <- dat
   fit$version <- packageVersion("ebverse")
   class(fit) <- c("susie","list")
   return(fit)
@@ -117,6 +117,14 @@ init_susie_model <- function (dat, L = 10, ser = init_ser_model(dat),
 #'
 #' @param fit An object...
 #'
+#' @param dat An object of class \sQuote{susie_data}, for example the
+#'   output from a call to \code{\link{prepare_susie_full_data}} or
+#'   \code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+#'   for other ways to create \sQuote{susie_data} objects.
+#' 
+#' @param return_data If \code{return_data = TRUE}, the input data are
+#'   included in the output.
+#' 
 #' @examples
 #' # TO DO: Add example(s) here.
 #' 
@@ -218,7 +226,7 @@ fit_susie_model_core <- function (dat, fit, control) {
 #' 
 #' @export
 #' 
-fit_susie_control_default <- function() 
+susie_control_default <- function() 
   list(estimate_residual_variance = TRUE,
        paramtol = 1e-6,
        elbotol  = as.numeric(NA),

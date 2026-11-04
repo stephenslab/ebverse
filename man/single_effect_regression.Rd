@@ -34,6 +34,8 @@ ser_normal_control_default()
 prepare_ser_data(bhat, shat, X, y, residual_variance = 1)
 }
 \arguments{
+\item{nvar}{The number of variables in the SER model.}
+
 \item{family}{The SER family. See \dQuote{details} for more
 information.}
 
@@ -93,7 +95,7 @@ when X, y are provided instead of bhat, shat.}
     \dQuote{null} model (b = 0).}
 
   \item{progress}{A data frame containing detailed information about
-    the algorithm's progress.}
+    the progress on the model fitting.}
 
   \item{local}{Logical specifying whether one or more parameters may
     be estimated \dQuote{locally} (that is, they are estimated
