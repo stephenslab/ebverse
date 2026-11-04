@@ -53,7 +53,7 @@ information.}
 
 \item{fit}{An object of class \sQuote{ser} that captures the state
 of an SER model fit, typically the output from running an
-\sQuote{init_ser_model} function, or an output from a
+\sQuote{init_ser_model} function, or an output from a previous
 \code{fit_ser_model} call.}
 
 \item{dat}{An object of class \sQuote{ser_data}, such as the
@@ -108,8 +108,8 @@ when X, y are provided instead of bhat, shat.}
   \item{control}{A data structure, likely a list, containing the
     settings that affect how the model fitting is conducted.}
 
-  \item{dat}{When \code{return_data}, the SER data set that was
-    used to fit the model.}
+  \item{dat}{When \code{return_data = TRUE}, this contains the 
+    data that were used to fit the model.}
 
 \code{prepare_ser_data} returns a data frame with two
   columns: \sQuote{bhat}, the least-squares estimates of the

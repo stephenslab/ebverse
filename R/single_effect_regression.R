@@ -59,8 +59,8 @@
 #'   \item{control}{A data structure, likely a list, containing the
 #'     settings that affect how the model fitting is conducted.}
 #'
-#'   \item{dat}{When \code{return_data}, the SER data set that was
-#'     used to fit the model.}
+#'   \item{dat}{When \code{return_data = TRUE}, this contains the 
+#'     data that were used to fit the model.}
 #' 
 #' @details TO DO: Define what is meant by an "SER model", define
 #'   the specific SER models that are implemented, and explain
@@ -139,7 +139,7 @@ init_ser_model_normal <- function (nvar,
 #'
 #' @param fit An object of class \sQuote{ser} that captures the state
 #'   of an SER model fit, typically the output from running an
-#'   \sQuote{init_ser_model} function, or an output from a
+#'   \sQuote{init_ser_model} function, or an output from a previous
 #'   \code{fit_ser_model} call.
 #' 
 #' @param return_data If \code{return_data = TRUE}, the input data are
@@ -249,13 +249,15 @@ prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
     res  <- compute_lse(X,y,residual_variance)
     bhat <- res$bhat
     shat <- res$shat
-  }
+  } else
+    residual_variance <- as.numeric(NA)
   if (length(bhat) != length(shat))
     stop("bhat and s should be the same length")
   if (length(bhat) < 2 | length(shat) < 2)
     stop("bhat and s should have at least two entries")
   dat <- data.frame(bhat = bhat,shat = shat)
   class(dat) <- c("ser_data","data.frame")
+  attr(dat,"residual_variance") <- residual_variance
   return(dat)
 }
 

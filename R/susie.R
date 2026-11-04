@@ -70,6 +70,9 @@ compute_elbo <- function (ll0, lbf) {
 #' 
 #'   \item{version}{The version of the ebverse R package that was
 #'     used to generate this object}
+#' 
+#'   \item{dat}{When \code{return_data = TRUE}, this contains the 
+#'     data that were used to fit the model.}
 #'
 #' @seealso \link{susie_data}, \link{single_effect_regression}
 #'
@@ -111,15 +114,14 @@ init_susie_model <- function (nvar, L = 10, ser = init_ser_model(nvar),
 
 #' @rdname susie
 #'
-#' @title Title goes here.
-#'
-#' @description Description goes here.
-#'
-#' @param fit An object...
+#' @param fit An object of class \sQuote{susie} that captures the
+#'   state of a SuSiE model fit, typically the output from running
+#'   an \sQuote{init_susie_model} function, or an output from a
+#'   previous \code{fit_susie_model} call.
 #'
 #' @param dat An object of class \sQuote{susie_data}, for example the
 #'   output from a call to \code{\link{prepare_susie_full_data}} or
-#'   \code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+#'   \code{\link{prepare_susie_summary_data}}. See \link{susie_data}
 #'   for other ways to create \sQuote{susie_data} objects.
 #' 
 #' @param return_data If \code{return_data = TRUE}, the input data are
@@ -156,8 +158,12 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   }  
 
   # Fit the SuSiE model and compute the posterior statistics.
-  res <- fit_susie_model_core(dat,fit)
+  res <- fit_susie_model_core(dat,fit,fit$control)
 
+  # Prepare the output
+  #
+  # TO DO
+  #
   if (return_data)
     fit$dat <- dat
   else
@@ -167,13 +173,17 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 
 # This implements the core SuSiE model fitting algorithm.
 #
-# TO DO: Check that this also works for L = 1.
+# TO DO: Test this function for L = 1.
 # 
 fit_susie_model_core <- function (dat, fit, control) {
+
+  # Get the number of single effects.
   L <- length(fit$ser) 
 
+  browser()
+
   # Iterate the SER updates.
-  for (i in 1:fit$control$maxiter) {
+  for (i in 1:control$maxiter) {
 
     # Compute the posterior mean of b.
     if (L > 1) {

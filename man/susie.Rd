@@ -37,11 +37,14 @@ parameter.}
 affect the model fitting. See \sQuote{details} for further
 information.}
 
-\item{fit}{An object...}
+\item{fit}{An object of class \sQuote{susie} that captures the
+state of a SuSiE model fit, typically the output from running
+an \sQuote{init_susie_model} function, or an output from a
+previous \code{fit_susie_model} call.}
 
 \item{dat}{An object of class \sQuote{susie_data}, for example the
 output from a call to \code{\link{prepare_susie_full_data}} or
-\code{\link{prepare_susie_summary_data}}.  See \link{susie_data}
+\code{\link{prepare_susie_summary_data}}. See \link{susie_data}
 for other ways to create \sQuote{susie_data} objects.}
 
 \item{return_data}{If \code{return_data = TRUE}, the input data are
@@ -69,14 +72,15 @@ included in the output.}
 
   \item{version}{The version of the ebverse R package that was
     used to generate this object}
+
+  \item{dat}{When \code{return_data = TRUE}, this contains the 
+    data that were used to fit the model.}
 }
 \description{
 Methods for fitting \dQuote{Sum of Single Effect}
   (SuSiE) models and computing posterior statistics from SuSiE
   models. The \sQuote{fit_susie_model} method is the main method
   for fitting SuSiE models and computing posterior statistics.
-
-Description goes here.
 }
 \examples{
 # TO DO: Add one or several examples.
