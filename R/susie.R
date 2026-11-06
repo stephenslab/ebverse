@@ -256,17 +256,17 @@ compute_post_mean_susie <- function (ser_list) {
 
 # TO DO: Explain here what this function is for, and how to use it.
 susie_ibss_update <- function (dat, ser, L, b, sigma) {
-  bhat <- dat$ss$bhat
-  d       <- dat$ss$shat
+  bhat     <- dat$ss$bhat
+  d        <- dat$ss$shat
+  varnames <- variable.names(ser)
   if (L > 1) {
     b    <- b - ser$posterior$mean
     r    <- compute_XtXb(dat,b)
     bhat <- bhat - d*r
   } 
-  names(bhat) <- rownames(dat$ss)
-  names(d)    <- rownames(dat$ss)
-  dat_ser     <- prepare_ser_data(bhat = bhat,shat = sigma*d)
-  ser         <- fit_ser_model(ser,dat_ser)
+  dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
+                              shat = setNames(sigma*d,varnames))
+  ser <- fit_ser_model(ser,dat_ser)
   if (L > 1)
     b <- b + ser$posterior$mean
   return(list(ser = ser,b = b))
