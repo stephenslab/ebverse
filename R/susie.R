@@ -205,29 +205,9 @@ fit_susie_model_core <- function (dat, fit, control) {
     for (k in 1:L) {
 
       # Perform an SER update.
-      # 
-      # TO DO: Hide parts of this code in a separate (internal)
-      # function called "ser_update".
-      # 
-      fit_ser <- fit$ser[[k]]
-      bhat    <- dat$ss$bhat
-      d       <- dat$ss$shat
-      sigma   <- fit$residual_variance
-      if (L > 1) {
-        bk   <- fit_ser$posterior$mean
-        b    <- b - bk
-        r    <- compute_XtXb(dat,b)
-        bhat <- bhat - d*r
-      } 
-      names(bhat) <- rownames(dat$ss)
-      names(d)    <- rownames(dat$ss)
-      dat_ser <- prepare_ser_data(bhat = bhat,shat = sigma*d)
-      fit_ser <- fit_ser_model(fit_ser,dat_ser)
-      if (L > 1) {
-        bk <- fit_ser$posterior$mean
-        b  <- b + bk
-      }
-      fit$ser[[k]] <- fit_ser
+      res <- susie_ibss_update(dat,fit$ser[[k]],L,b,fit$residual_variance)
+      b <- res$b
+      fit$ser[[k]] <- res$ser
     }
 
     #
@@ -263,13 +243,31 @@ susie_control_default <- function()
 # Compute the posterior mean of "b" in a SuSiE model using the
 # posterior means of the coefficients in the individual single effect
 # regressions. Input "ser" is a list of single effect regressions.
-compute_post_mean_susie <- function (ser) {
-  L <- length(ser)
-  varnames <- variable.names(ser[[1]])
+compute_post_mean_susie <- function (ser_list) {
+  L <- length(ser_list)
+  varnames <- variable.names(ser_list[[1]])
   nvar <- length(varnames)
   b <- rep(0,nvar)
   for (k in 1:L)
-    b <- b + ser[[k]]$posterior$mean
+    b <- b + ser_list[[k]]$posterior$mean
   names(b) <- varnames
   return(b)
+}
+
+# TO DO: Explain here what this function is for, and how to use it.
+susie_ibss_update <- function (dat, ser, L, b, sigma) {
+  bhat <- dat$ss$bhat
+  d       <- dat$ss$shat
+  if (L > 1) {
+    b    <- b - ser$posterior$mean
+    r    <- compute_XtXb(dat,b)
+    bhat <- bhat - d*r
+  } 
+  names(bhat) <- rownames(dat$ss)
+  names(d)    <- rownames(dat$ss)
+  dat_ser     <- prepare_ser_data(bhat = bhat,shat = sigma*d)
+  ser         <- fit_ser_model(ser,dat_ser)
+  if (L > 1)
+    b <- b + ser$posterior$mean
+  return(list(ser = ser,b = b))
 }
