@@ -146,9 +146,10 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # 
   # TO DO:
   # - Test fit_susie_model with L = 1.
-  # - Test refitting of a susie model.
+  # - Test *refitting* of a susie model.
   # - Add a "trace" control parameter (default: TRUE).
   # - Add a "progress" output.
+  # - Add a step to check the "dat" input for correctness.
   # - Implement the "susie_data" functions.
   # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.

@@ -209,6 +209,7 @@ ser_normal_control_default <- function()
        lbftol   = as.numeric(NA),
        maxiter  = 10,
        version  = "R",
+       trace    = TRUE,
        verbose  = "none")
 
 #' @rdname single_effect_regression
@@ -269,13 +270,18 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
   # Estimate the prior variance parameter "locally".
   if (control$estimate_prior_variance & control$local) {
-    progress <- as.data.frame(matrix(0,control$maxiter,5))
-    names(progress) <- c("iter","lbf","prior.var","delta.lbf",
-                         "delta.prior.var")
-    progress[,"iter"] <- 1:control$maxiter
-    if (control$verbose == "detailed")
-      cat("iter log-Bayes factor prior var d(logBF) d(p.var)\n")
+    if (control$trace | control$verbose == "detailed") {
+      progress <- as.data.frame(matrix(0,control$maxiter,5))
+      names(progress) <- c("iter","lbf","prior.var","delta.lbf",
+                           "delta.prior.var")
+      progress[,"iter"] <- 1:control$maxiter
+      if (control$verbose == "detailed")
+        cat("iter log-Bayes factor prior var d(logBF) d(p.var)\n")
+    }
     for (iter in 1:control$maxiter) {
+
+      # Save the current prior variance and Bayes factor which are
+      # used to check the stopping criteria.
       current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
       # E step.
@@ -291,11 +297,13 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       prior$prior_variance <- sum(pip * (b1^2 + s1))
 
       # Update the progress data frame.
-      progress[iter,"lbf"] <- lbf
-      progress[iter,"prior.var"] <- prior$prior_variance
-      progress[iter,"delta.lbf"] <- lbf - current_state$lbf
-      progress[iter,"delta.prior.var"] <- prior$prior_variance - 
-                                          current_state$prior_variance
+      if (control$trace | control$verbose == "detailed") {
+        progress[iter,"lbf"] <- lbf
+        progress[iter,"prior.var"] <- prior$prior_variance
+        progress[iter,"delta.lbf"] <- lbf - current_state$lbf
+        progress[iter,"delta.prior.var"] <- prior$prior_variance - 
+                                            current_state$prior_variance
+      }
 
       # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
@@ -338,9 +346,12 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                           pip  = pip,
                           mean = post_mean,
                           var  = post_var)
-  lbf       <- ans$weight_sum 
-  progress  <- progress[1:iter,]
-  rownames(progress) <- NULL
+  lbf <- ans$weight_sum 
+  if (control$trace) {
+    progress  <- progress[1:iter,]
+    rownames(progress) <- NULL
+  } else
+    progress <- as.numeric(NA)
   return(list(prior     = prior,
               lbf       = lbf,
               posterior = posterior,
