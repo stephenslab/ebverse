@@ -97,12 +97,12 @@ init_susie_model <-
   #   of the inputs.
   # 
   if (L < 1)
-    stop("L should be at least 1")
+    stop("L should be at least 1",domain = NA)
   if (inherits(ser,"ser")) {
     ser <- rep(list(ser),L)
   } else if (is.list(ser)) {
     if (length(ser) != L)
-      stop("'ser' does not match 'L'")
+      stop("'ser' does not match 'L'",domain = NA)
   } else
     stop("'ser' should be an object of class 'ser', or a list of ser ",
          "objects",domain = NA)
@@ -145,6 +145,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   of the inputs.
   # 
   # TO DO:
+  # - Implement some functions for simulating data from susie models.
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
   # - Add a "trace" control parameter (default: TRUE).

@@ -11,7 +11,8 @@
 #'   method is the main method for fitting SER models and
 #'   computing posterior statistics.
 #'
-#' @param nvar The number of variables in the SER model.
+#' @param variable.names The names of the variables in the
+#'   SER model.
 #' 
 #' @param family The SER family. See \dQuote{details} for more
 #'   information.
@@ -77,14 +78,15 @@
 #' 
 #' @export
 #' 
-init_ser_model <- function (nvar, 
+init_ser_model <- function (variable.names, 
                             family = "normal",
-                            prior = list(prob = 1/nvar,prior_variance = 1),
+                            prior = list(prob = 1/length(variable.names),
+                                         prior_variance = 1),
                             init_method = "null",
                             control = list()) {
   family <- match.arg(family)
   if (family == "normal")
-    fit <- init_ser_model_normal(nvar,prior,init_method,control)
+    fit <- init_ser_model_normal(variable.names,prior,init_method,control)
   return(fit)
 }
 
@@ -95,13 +97,15 @@ init_ser_model <- function (nvar,
 #' 
 #' @export
 #' 
-init_ser_model_normal <- function (nvar, 
-                                   prior = list(prob = 1/nvar, 
-                                                prior_variance = 1),
-                                   init_method = c("null","random"),
-                                   control = list()) {
+init_ser_model_normal <- 
+  function (variable.names, 
+            prior = list(prob = 1/length(variable.names), 
+                         prior_variance = 1),
+            init_method = c("null","random"),
+            control = list()) {
 
   # Basic checks and processing of the inputs.
+  nvar <- length(variable.names)
   if (length(prior$prob) != 1 & length(prior$prob) != nvar)
     stop("prior$prob should be a vector of length 1 or nvar",domain = NA)
   if (length(prior$prob) == 1)
@@ -109,6 +113,7 @@ init_ser_model_normal <- function (nvar,
   if (prior$prior_variance <= 0)
     stop("prior$prior_variance should be a positive number",domain = NA)
   prior$prob <- prior$prob/sum(prior$prob)
+  names(prior$prob) <- variable.names
   init_method <- match.arg(init_method)
   control <- modifyList(ser_normal_control_default(),control,
                         keep.null = TRUE)
@@ -118,6 +123,7 @@ init_ser_model_normal <- function (nvar,
                           pip  = prior$prob,
                           mean = 0,
                           var  = prior$prior_variance)
+  rownames(posterior) <- variable.names
   if (init_method == "random")
     posterior$mean <- rnorm(nvar,0,sqrt(prior$prior_variance))
 
@@ -161,7 +167,6 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  # - Add a "trace" control parameter (default: TRUE).
   # - Add names to outputs wherever possible.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
@@ -186,6 +191,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   progress      <- res$progress
 
   # Prepare the output.
+  rownames(fit$posterior) <- rownames(dat)
   if (is.data.frame(fit$progress)) {
     progress$iter <- progress$iter + max(fit$progress$iter)
     fit$progress  <- rbind(fit$progress,progress)
@@ -243,21 +249,25 @@ prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
   if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
         (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
     stop("Either {bhat, shat} or {X, y} should be provided ",
-         "(and not both)")
+         "(and not both)",domain = NA)
   if (missing(bhat) & missing(shat)) {
     J <- ncol(X)
     if (length(residual_variance) != 1)
-      stop("residual_variance should be a single number")
+      stop("residual_variance should be a single number",domain = NA)
     res  <- compute_lse(X,y,residual_variance)
     bhat <- res$bhat
     shat <- res$shat
   } else
     residual_variance <- as.numeric(NA)
   if (length(bhat) != length(shat))
-    stop("bhat and s should be the same length")
+    stop("bhat and s should be the same length",domain = NA)
   if (length(bhat) < 2 | length(shat) < 2)
-    stop("bhat and s should have at least two entries")
+    stop("bhat and s should have at least two entries",domain = NA)
+  if (is.null(names(bhat)) | is.null(names(shat)))
+    stop("variables must be named by providing names for bhat and shat, or ",
+         "column names for X",domain = NA)
   dat <- data.frame(bhat = bhat,shat = shat)
+  rownames(dat) <- names(bhat)
   class(dat) <- c("ser_data","data.frame")
   attr(dat,"residual_variance") <- residual_variance
   return(dat)
@@ -300,7 +310,10 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       if (control$trace | control$verbose == "detailed") {
         progress[iter,"lbf"] <- lbf
         progress[iter,"prior.var"] <- prior$prior_variance
-        progress[iter,"delta.lbf"] <- lbf - current_state$lbf
+        if (iter == 1)
+          progress[iter,"delta.lbf"] <- NA
+        else
+          progress[iter,"delta.lbf"] <- lbf - current_state$lbf
         progress[iter,"delta.prior.var"] <- prior$prior_variance - 
                                             current_state$prior_variance
       }
@@ -308,8 +321,10 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
         cat(sprintf("%4d %+16.9e %8.3e %+8.1e %+8.1e\n",
-                    progress[iter,"iter"],progress[iter,"lbf"],
-                    progress[iter,"prior.var"],progress[iter,"delta.lbf"],
+                    progress[iter,"iter"],
+                    progress[iter,"lbf"],
+                    progress[iter,"prior.var"],
+                    progress[iter,"delta.lbf"],
                     progress[iter,"delta.prior.var"]))
 
       # Check for errors as well as the stopping criteria.
@@ -325,6 +340,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
         break
       if (!is.na(current_state$lbf) && 
           !is.na(control$lbftol) &&
+          iter > 1 &&
           lbf - current_state$lbf < control$lbftol)
         break
     }
@@ -364,6 +380,8 @@ compute_lse <- function (X, y, sigma) {
   xx   <- colSums(X^2)
   bhat <- drop(y %*% X)/xx
   shat <- sigma/xx
+  names(bhat) <- colnames(X)
+  names(shat) <- colnames(X)
   return(list(bhat = bhat,shat = shat))
 }
 

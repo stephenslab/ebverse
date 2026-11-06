@@ -11,16 +11,16 @@
 \title{Fitting Single Effect Regression Models}
 \usage{
 init_ser_model(
-  nvar,
+  variable.names,
   family = "normal",
-  prior = list(prob = 1/nvar, prior_variance = 1),
+  prior = list(prob = 1/length(variable.names), prior_variance = 1),
   init_method = "null",
   control = list()
 )
 
 init_ser_model_normal(
-  nvar,
-  prior = list(prob = 1/nvar, prior_variance = 1),
+  variable.names,
+  prior = list(prob = 1/length(variable.names), prior_variance = 1),
   init_method = c("null", "random"),
   control = list()
 )
@@ -34,7 +34,8 @@ ser_normal_control_default()
 prepare_ser_data(bhat, shat, X, y, residual_variance = 1)
 }
 \arguments{
-\item{nvar}{The number of variables in the SER model.}
+\item{variable.names}{The names of the variables in the
+SER model.}
 
 \item{family}{The SER family. See \dQuote{details} for more
 information.}
