@@ -8,10 +8,10 @@
 \title{Fitting Sum of Single Effect (SuSiE) Models}
 \usage{
 init_susie_model(
-  nvar,
+  variable.names,
   L = 10,
-  ser = init_ser_model(nvar, family = "normal", control = list(maxiter = 1, trace =
-    FALSE)),
+  ser = init_ser_model(variable.names, family = "normal", control = list(maxiter = 1,
+    trace = FALSE)),
   residual_variance = 1,
   control = list()
 )
@@ -21,7 +21,8 @@ fit_susie_model(fit, dat, return_data = missing(dat))
 susie_control_default()
 }
 \arguments{
-\item{nvar}{The number of variables in the SuSiE model.}
+\item{variable.names}{The names of the variables in the SuSiE
+model.}
 
 \item{L}{An integer, 1 or greater, specifying the number of single
 effects.}

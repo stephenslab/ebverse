@@ -167,10 +167,11 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  # - Add names to outputs wherever possible.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
-  # - Implement an Rcpp version of this.
+  # - Create an example with small n and large J.
+  # - Implement an Rcpp version of this and see if it speeds up 
+  #   fit_susie_model() for the small n, large J case.
   # - Add some simple unit tests.
   # - Benchmark the R and C++ implementations.
   # - Fill out the docs, and in particular define the SER model,
@@ -373,6 +374,13 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
               posterior = posterior,
               progress  = progress))
 }
+
+#' @importFrom stats coef
+#'
+#' @export
+#' 
+variable.names.ser_normal <- function (fit)
+  names(fit$prior$prob)
 
 # Compute the least-squares estimate and its variance given the data
 # (X, y) and the residual variances (sigma).

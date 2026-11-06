@@ -32,7 +32,8 @@ compute_elbo <- function (ll0, lbf) {
 #'   models. The \sQuote{fit_susie_model} method is the main method
 #'   for fitting SuSiE models and computing posterior statistics.
 #'
-#' @param nvar The number of variables in the SuSiE model.
+#' @param variable.names The names of the variables in the SuSiE
+#'   model.
 #' 
 #' @param L An integer, 1 or greater, specifying the number of single
 #'   effects.
@@ -84,9 +85,9 @@ compute_elbo <- function (ll0, lbf) {
 #' @export
 #' 
 init_susie_model <- 
-  function (nvar, 
+  function (variable.names, 
             L = 10, 
-            ser = init_ser_model(nvar,family = "normal",
+            ser = init_ser_model(variable.names,family = "normal",
                                  control = list(maxiter = 1,trace = FALSE)),
             residual_variance = 1, 
             control = list()) {
@@ -106,6 +107,8 @@ init_susie_model <-
   } else
     stop("'ser' should be an object of class 'ser', or a list of ser ",
          "objects",domain = NA)
+  if (is.null(names(ser)))
+    names(ser) <- paste0("single_effect_",1:L)
   control <- modifyList(susie_control_default(),control,keep.null = TRUE)
   fit <- list(elbo              = as.numeric(NA),
               ser               = ser,
@@ -146,16 +149,15 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # 
   # TO DO:
   # - Implement some functions for simulating data from susie models.
+  # - Add a step to check the "dat" input for correctness.
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
   # - Add a "trace" control parameter (default: TRUE).
   # - Add a "progress" output.
-  # - Add a step to check the "dat" input for correctness.
   # - Implement the "susie_data" functions.
   # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.
   # - Implement a "summary" S3 method.
-  # - Add names to outputs wherever possible.
   #
 
   # Check and process the inputs.
@@ -196,15 +198,7 @@ fit_susie_model_core <- function (dat, fit, control) {
   for (i in 1:control$maxiter) {
 
     # Compute the posterior mean of b.
-    #
-    # TO DO: Hide this code inside a separate (internal) function
-    # called "compute_post_mean_susie".
-    # 
-    if (L > 1) {
-      b <- rep(0,dat$nvar)
-      for (k in 1:L)
-        b <- b + fit$ser[[k]]$posterior$mean
-    }
+    b <- compute_post_mean_susie(fit$ser)
     current_state <- list(b = b)
 
     # Repeat for each single effect.
@@ -225,6 +219,8 @@ fit_susie_model_core <- function (dat, fit, control) {
         r    <- compute_XtXb(dat,b)
         bhat <- bhat - d*r
       } 
+      names(bhat) <- rownames(dat$ss)
+      names(d)    <- rownames(dat$ss)
       dat_ser <- prepare_ser_data(bhat = bhat,shat = sigma*d)
       fit_ser <- fit_ser_model(fit_ser,dat_ser)
       if (L > 1) {
@@ -263,3 +259,17 @@ susie_control_default <- function()
        maxiter  = 100,
        version  = "R",
        verbose  = "detailed")
+
+# Compute the posterior mean of "b" in a SuSiE model using the
+# posterior means of the coefficients in the individual single effect
+# regressions. Input "ser" is a list of single effect regressions.
+compute_post_mean_susie <- function (ser) {
+  L <- length(ser)
+  varnames <- variable.names(ser[[1]])
+  nvar <- length(varnames)
+  b <- rep(0,nvar)
+  for (k in 1:L)
+    b <- b + ser[[k]]$posterior$mean
+  names(b) <- varnames
+  return(b)
+}
