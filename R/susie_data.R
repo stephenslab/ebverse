@@ -19,6 +19,10 @@ prepare_susie_full_data <- function (X, y) {
   # - I need to do a better job checking the inputs.
   # - Give messages/warnings to tell user what is going on.
   #
+  # TO DO:
+  # - Implement variable.names S3 method.
+  # - Implement sample.names S3 method.
+  #
   dat <- list()
   class(dat) <- c("susie_full_data","susie_data","list")
   return(dat)
@@ -75,7 +79,10 @@ compute_XtXb <- function (dat, b) {
 }
 
 #'
+#' @importFrom stats setNames
+#' 
 #' @export
 #' 
 compute_XtXb.susie_full_data <- function (dat, b)
-  drop(drop(dat$X %*% b) %*% dat$X)
+  setNames(drop(drop(dat$X %*% b) %*% dat$X),colnames(X))
+

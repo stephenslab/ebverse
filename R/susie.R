@@ -309,6 +309,8 @@ compute_post_mean_susie <- function (ser_list) {
 # which involves updating the (approximate) posterior distribution for
 # one SER while the other SERs remain fixed. Here, "ser" the SER that
 # will be updated.
+#
+#' @importFrom stats setNames
 susie_ibss_update <- function (dat, ser, L, b, sigma) {
   bhat     <- dat$ss$bhat
   d        <- dat$ss$shat
