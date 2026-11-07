@@ -193,11 +193,15 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # Prepare the output.
   rownames(fit$posterior) <- rownames(dat)
-  if (is.data.frame(fit$progress)) {
-    progress$iter <- progress$iter + max(fit$progress$iter)
-    fit$progress  <- rbind(fit$progress,progress)
+  if (fit$control$trace) {
+    if (is.data.frame(fit$progress)) {
+      progress$iter <- progress$iter + max(fit$progress$iter)
+      fit$progress  <- rbind(fit$progress,progress)
+    } else
+      fit$progress <- progress
+    rownames(fit$progress) <- NULL
   } else
-    fit$progress <- res$progress
+    fit$progress <- as.numeric(NA)
   if (return_data)
     fit$dat <- dat
   else
@@ -283,16 +287,17 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   if (control$estimate_prior_variance & control$local) {
     if (control$trace | control$verbose == "detailed") {
       progress <- as.data.frame(matrix(0,control$maxiter,5))
-      names(progress) <- c("iter","lbf","prior.var","delta.lbf",
-                           "delta.prior.var")
+      names(progress) <- c("iter","lbf","prior.var","d.lbf","d.prior.var")
       progress[,"iter"] <- 1:control$maxiter
-      if (control$verbose == "detailed")
-        cat("iter log-Bayes factor prior var d(logBF) d(p.var)\n")
+      if (control$verbose == "detailed") {
+        cat("iter log-Bayes factor  sigma0 d(logBF) d(sigma0)\n")
+        cat("---- ---------------- ------- -------- ---------\n")
+      }
     }
     for (iter in 1:control$maxiter) {
 
       # Save the current prior variance and Bayes factor which are
-      # used to check the stopping criteria.
+      # used to monitor progress.
       current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
       # E step.
@@ -309,24 +314,24 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
       # Update the progress data frame.
       if (control$trace | control$verbose == "detailed") {
-        progress[iter,"lbf"] <- lbf
-        progress[iter,"prior.var"] <- prior$prior_variance
+        progress[iter,"lbf"]         <- lbf
+        progress[iter,"prior.var"]   <- prior$prior_variance
+        progress[iter,"d.prior.var"] <- prior$prior_variance - 
+                                        current_state$prior_variance
         if (iter == 1)
-          progress[iter,"delta.lbf"] <- NA
+          progress[iter,"d.lbf"] <- NA
         else
-          progress[iter,"delta.lbf"] <- lbf - current_state$lbf
-        progress[iter,"delta.prior.var"] <- prior$prior_variance - 
-                                            current_state$prior_variance
+          progress[iter,"d.lbf"] <- lbf - current_state$lbf
       }
 
       # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
-        cat(sprintf("%4d %+16.9e %8.3e %+8.1e %+8.1e\n",
+        cat(sprintf("%4d %+16.9e %7.1e %+8.1e %+8.2e\n",
                     progress[iter,"iter"],
                     progress[iter,"lbf"],
                     progress[iter,"prior.var"],
-                    progress[iter,"delta.lbf"],
-                    progress[iter,"delta.prior.var"]))
+                    progress[iter,"d.lbf"],
+                    progress[iter,"d.prior.var"]))
 
       # Check for errors as well as the stopping criteria.
       if (prior$prior_variance <= 0)
@@ -364,10 +369,9 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                           mean = post_mean,
                           var  = post_var)
   lbf <- ans$weight_sum 
-  if (control$trace) {
-    progress  <- progress[1:iter,]
-    rownames(progress) <- NULL
-  } else
+  if (control$trace)
+    progress <- progress[1:iter,]
+  else
     progress <- as.numeric(NA)
   return(list(prior     = prior,
               lbf       = lbf,

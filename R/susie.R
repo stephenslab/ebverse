@@ -152,8 +152,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Add a step to check the "dat" input for correctness.
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
-  # - Add a "trace" control parameter (default: TRUE).
-  # - Add a "progress" output.
+  # - Add a stopping criterion based on the change in the PIPs.
   # - Implement the "susie_data" functions.
   # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.
@@ -190,16 +189,29 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 
 # This implements the core SuSiE model fitting algorithm.
 fit_susie_model_core <- function (dat, fit, control) {
+  if (control$trace | control$verbose == "detailed") {
+    progress <- as.data.frame(matrix(0,control$maxiter,5))
+    names(progress) <- c("iter","elbo","resid.var","d.b","d.pip")
+    progress[,"iter"] <- 1:control$maxiter
+    if (control$verbose == "detailed") {
+      cat("iter      ELBO sigma delta(b)  d(pip)\n") 
+      cat("---- --------- ----- -------- -------\n")
+    }
+  }
 
   # Get the number of single effects.
   L <- length(fit$ser) 
 
   # Iterate the SER updates.
-  for (i in 1:control$maxiter) {
+  for (iter in 1:control$maxiter) {
 
-    # Compute the posterior mean of b.
-    b <- compute_post_mean_susie(fit$ser)
-    current_state <- list(b = b)
+    # Compute the posterior mean of b and the PIPs.
+    b   <- compute_post_mean_susie(fit$ser)
+    pip <- susie_get_pips(fit)
+
+    # Save the current PIPs and the posterior mean coefficients which
+    # are used to monitor progress.
+    current_state <- list(b = b,pip = pip)
 
     # Repeat for each single effect.
     for (k in 1:L) {
@@ -219,12 +231,37 @@ fit_susie_model_core <- function (dat, fit, control) {
     #  s <- erss/n
     #
 
-    #
-    # TEMPORARY
-    #
-    cat(max(abs(current_state$b - b)),"\n")
+    # Update the progress data frame.
+    if (control$trace | control$verbose == "detailed") {
+      pip <- susie_get_pips(fit)
+      progress[iter,"elbo"]      <- 0
+      progress[iter,"resid.var"] <- fit$residual_variance
+      progress[iter,"d.b"]       <- max(abs(b - current_state$b))
+      progress[iter,"d.pip"]     <- max(abs(pip - current_state$pip))
+    }
+
+    # Update the user about the algorithm's process.
+    if (control$verbose == "detailed")
+      cat(sprintf("%4d %8.3e %5.2f %8.2e %7.1e\n",
+                  progress[iter,"iter"],
+                  progress[iter,"elbo"],
+                  progress[iter,"resid.var"],
+                  progress[iter,"d.b"],
+                  progress[iter,"d.pip"]))
   }
 
+  # Prepare the output.
+  if (fit$control$trace) {
+    progress  <- progress[1:iter,]
+    if (is.data.frame(fit$progress)) {
+      progress$iter <- progress$iter + max(fit$progress$iter)
+      fit$progress  <- rbind(fit$progress,progress)
+    }
+    else 
+      fit$progress <- progress
+    rownames(fit$progress) <- NULL
+  } else
+    fit$progress <- as.numeric(NA)
   return(fit)
 }
  
@@ -238,7 +275,21 @@ susie_control_default <- function()
        elbotol  = as.numeric(NA),
        maxiter  = 100,
        version  = "R",
+       trace    = TRUE,
        verbose  = "detailed")
+
+# TO DO: Explain here what this function does, and how to use it.
+susie_get_pips <- function (fit) {
+  varnames <- variable.names(fit$ser[[1]])
+  J <- length(varnames)
+  L <- length(fit$ser)
+  pip <- rep(1,J)
+  for (k in 1:L)
+    pip <- pip * (1 - fit$ser[[k]]$posterior$pip)
+  pip <- 1 - pip
+  names(pip) <- varnames
+  return(pip)
+}
 
 # Compute the posterior mean of "b" in a SuSiE model using the
 # posterior means of the coefficients in the individual single effect
@@ -246,15 +297,18 @@ susie_control_default <- function()
 compute_post_mean_susie <- function (ser_list) {
   L <- length(ser_list)
   varnames <- variable.names(ser_list[[1]])
-  nvar <- length(varnames)
-  b <- rep(0,nvar)
+  J <- length(varnames)
+  b <- rep(0,J)
   for (k in 1:L)
     b <- b + ser_list[[k]]$posterior$mean
   names(b) <- varnames
   return(b)
 }
 
-# TO DO: Explain here what this function is for, and how to use it.
+# This implements the core update of the IBSS algorithm for susie,
+# which involves updating the (approximate) posterior distribution for
+# one SER while the other SERs remain fixed. Here, "ser" the SER that
+# will be updated.
 susie_ibss_update <- function (dat, ser, L, b, sigma) {
   bhat     <- dat$ss$bhat
   d        <- dat$ss$shat
