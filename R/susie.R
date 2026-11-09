@@ -158,6 +158,8 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.
   # - Implement a "summary" S3 method.
+  # - Implement "global" estimation of parameters in the 
+  #   SER models.
   #
 
   # Check and process the inputs.

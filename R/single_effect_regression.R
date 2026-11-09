@@ -53,9 +53,11 @@
 #'     be estimated \dQuote{locally} (that is, they are estimated
 #'     separately in this SER).}
 #'
-#'   \item{global}{Logical specifying whether one or more parameters may
-#'     be estimated \dQuote{globally} (that is, they are estimated
-#'     simultaneously in multiple SERs).}
+#'   \item{global}{Logical specifying whether one or more parameters
+#'     may be estimated \dQuote{globally} (that is, they are estimated
+#'     simultaneously in multiple SERs). This is used when the SER
+#'     model is used as a building block for another model such as a
+#'     SuSiE model.}
 #'
 #'   \item{control}{A data structure, likely a list, containing the
 #'     settings that affect how the model fitting is conducted.}
