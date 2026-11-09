@@ -148,8 +148,9 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   of the inputs.
   # 
   # TO DO:
+  # - Write a function to simulate different X matrices---
+  #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement some functions for simulating data from susie models.
-  # - Add a step to check the "dat" input for correctness.
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
   # - Add a stopping criterion based on the change in the PIPs.

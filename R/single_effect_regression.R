@@ -6,10 +6,10 @@
 #'   models and computing posterior statistics from summary
 #'   data. Typically the model fitting involves estimating
 #'   parameters in the prior (\dQuote{hyperparameters}) by
-#'   maximizing the likelihood, but potentially other (non-prior)
+#'   maximizing the likelihood, but potentially other 
 #'   parameters could be estimated as well. The \sQuote{fit_ser_model}
 #'   method is the main method for fitting SER models and
-#'   computing posterior statistics.
+#'   returning key posterior statistics.
 #'
 #' @param variable.names The names of the variables in the
 #'   SER model.
@@ -63,13 +63,44 @@
 #'   \item{dat}{When \code{return_data = TRUE}, this contains the 
 #'     data that were used to fit the model.}
 #' 
-#' @details TO DO: Define what is meant by an "SER model", define
-#'   the specific SER models that are implemented, and explain
-#'   what are the parameters specific to each model.
+#' @details A single effect regression (SER) model is a Bayesian
+#'   multiple regression model in which only a single candidate
+#'   variable is active (\dQuote{included}). Therefore, the
+#'   posterior distribution becomes a \dQuote{mixture} of simpler
+#'   single-variable regression models.
 #'
-#' @note This is a \dQuote{lightweight} interface with few features
-#'   and few checks; it is mainly used to implement the susie model
-#'   fitting methods. (Use at your own risk!)
+#'   The first element of an SER model is a multiple regression
+#'   model of an outcome \eqn{\bf y},
+#'   \deqn{{\bf y} = {\bf X}{\bf b} + {\bf e},}
+#'   where \eqn{{\bf e}} is a vector of independent, normally
+#'   distributed error terms, \eqn{{\bf e} \sim N(0, \sigma^2 {\bf
+#'   I})}. The residual variance \eqn{\sigma^2} is assumed to be known.
+#'
+#'   The second element of a an SER model is an \emph{SER prior} on
+#'   the coefficients vector \eqn{\bf b}. An SER prior has the
+#'   property that any \eqn{\bf b} drawn from the prior has exactly
+#'   one nonzero coefficient. For example, the SER model initialized
+#'   by \code{init_ser_model_normal()} defines a prior in which
+#'   coefficient \eqn{j} is nonzero with prior probability
+#'   \eqn{\pi_j}, and the nonzero coefficient is assigned a normal
+#'   prior with zero mean and a variance \eqn{\sigma_0^2} which may be
+#'   estimated. Because the SER posterior reduces to a mixture of
+#'   single-variable regression models, the sufficient statistics
+#'   needed to compute the posterior are the same as the sufficient
+#'   statistics needed to compute the posterior under each
+#'   single-variable model, such as the least-squares estimate of each
+#'   coefficient and its variance.
+#' 
+#'   The key steps of an analysis with a single effect regression are:
+#'   (i) prepare the data using the \code{prepare_ser_data} function;
+#'   (ii) initialize the SER model using the \code{init_ser_data}
+#'   function; and (iii) fit the model and compute posterior
+#'   statistics from the fitted model using the \code{fit_ser_data}
+#'   function. 
+#'
+#' @note This is a \dQuote{lightweight} interface with relatively few
+#'   features and few checks; it is mainly used to implement the
+#'   susie methods.
 #'
 #' @seealso \link{susie}
 #'
@@ -167,8 +198,6 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  # - Write a function to simulate different X matrices---
-  #   see https://github.com/stephenslab/dsc-linreg.
   # - Create an example with small n and large J.
   # - Implement an Rcpp version of this and see if it speeds up 
   #   fit_susie_model() for the small n, large J case.
@@ -239,8 +268,9 @@ ser_normal_control_default <- function()
 #'   used to compute the the outputted statistics. This is only used
 #'   when X, y are provided instead of bhat, shat.
 #'
-#' @details Only provide (bhat, shat) or (X, y); an error will occur
-#'   if the wrong combination of data are provided.
+#' @note In \code{prepare_set_data}, only provide (bhat, shat) or
+#'   (X, y); an error will occur if the wrong combination of data
+#'   are provided.
 #' 
 #' @return \code{prepare_ser_data} returns a data frame with two
 #'   columns: \sQuote{bhat}, the least-squares estimates of the
