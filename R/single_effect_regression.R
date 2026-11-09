@@ -374,13 +374,21 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
         stop("prior variance update decreased the likelihood",domain = NA)
       if (!is.na(control$paramtol) &&
           abs(current_state$prior_variance - 
-              prior$prior_variance) < control$paramtol)
+              prior$prior_variance) < control$paramtol) {
+        if (control$verbose != "none")
+          message("parameter tolerance is met; model fitting is stopped",
+                  domain = NA)
         break
+      }
       if (!is.na(current_state$lbf) && 
           !is.na(control$lbftol) &&
           iter > 1 &&
-          lbf - current_state$lbf < control$lbftol)
+          lbf - current_state$lbf < control$lbftol) {
+        if (control$verbose != "none")  
+          message("Bayes factor tolerance is met; model fitting is stopped",
+                  domain = NA)
         break
+      }
     }
   }
 

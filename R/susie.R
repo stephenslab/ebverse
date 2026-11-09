@@ -153,7 +153,6 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Implement some functions for simulating data from susie models.
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
-  # - Add a stopping criterion based on the change in the PIPs.
   # - Implement the "susie_data" functions.
   # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.
@@ -251,10 +250,25 @@ fit_susie_model_core <- function (dat, fit, control) {
                   progress[iter,"resid.var"],
                   progress[iter,"d.b"],
                   progress[iter,"d.pip"]))
+
+      # Check for errors as well as the stopping criteria.
+    if (fit$residual_variance <= 0)
+      stop("prior variance is zero or negative",domain = NA)
+    # TO DO: Check for decreases in the ELBO.
+    if (!is.na(control$paramtol) &&
+        max(abs(current_state$pip - pip)) < control$paramtol) {
+      if (control$verbose != "none")
+        message("parameter estimation tolerance is met; ",
+                "model fitting is stopped",
+                domain = NA)
+      break
+    }
+    # TO DO: Check whether the ELBO increases by a smaller amount than
+    # the tolerance.
   }
 
   # Prepare the output.
-  if (fit$control$trace) {
+  if (control$trace) {
     progress  <- progress[1:iter,]
     if (is.data.frame(fit$progress)) {
       progress$iter <- progress$iter + max(fit$progress$iter)
