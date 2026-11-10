@@ -211,9 +211,10 @@ fit_susie_model_core <- function (dat, fit, control) {
     b   <- compute_post_mean_susie(fit$ser)
     pip <- susie_get_pips(fit)
 
-    # Save the current PIPs and the posterior mean coefficients which
-    # are used to monitor progress.
-    current_state <- list(b = b,pip = pip)
+    # Save some quantities to monitor progress.
+    current_state <- list(b = b,
+                          pip = pip,
+                          residual_variance = fit$residual_variance)
 
     # Repeat for each single effect.
     for (k in 1:L) {
@@ -222,6 +223,19 @@ fit_susie_model_core <- function (dat, fit, control) {
       res <- susie_ibss_update(dat,fit$ser[[k]],L,b,fit$residual_variance)
       b <- res$b
       fit$ser[[k]] <- res$ser
+    }
+
+    # Update the residual variance parameter.
+    if (control$estimate_residual_variance) {
+      B <- s$alpha * s$mu
+      XB2 <- sum((B %*% XtX) * B)
+      betabar <- colSums(B)
+      d <- attr(XtX,"d")
+      postb2 <- s$alpha * s$mu2 # Posterior second moment.
+      ER2_ss <- yty - 2*sum(betabar * Xty) + 
+        sum(betabar * (XtX %*% betabar)) -
+        XB2 + sum(d * t(postb2)))
+      fit$residual_variance <- ER2_ss
     }
 
     #
@@ -236,10 +250,12 @@ fit_susie_model_core <- function (dat, fit, control) {
     # Update the progress data frame.
     if (control$trace | control$verbose == "detailed") {
       pip <- susie_get_pips(fit)
-      progress[iter,"elbo"]      <- 0
-      progress[iter,"resid.var"] <- fit$residual_variance
-      progress[iter,"d.b"]       <- max(abs(b - current_state$b))
-      progress[iter,"d.pip"]     <- max(abs(pip - current_state$pip))
+      progress[iter,"elbo"]        <- 0
+      progress[iter,"resid.var"]   <- fit$residual_variance
+      progress[iter,"d.b"]         <- max(abs(b - current_state$b))
+      progress[iter,"d.pip"]       <- max(abs(pip - current_state$pip))
+      progress[iter,"d.resid.var"] <- fit$residual_variance - 
+                                      current_state$residual_variance
     }
 
     # Update the user about the algorithm's process.

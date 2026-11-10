@@ -11,17 +11,18 @@
 #' @seealso \link{susie}
 #'
 #' @export
-#' 
+#'
 prepare_susie_full_data <- function (X, y) {
   #
   # NOTES: 
-  # - Be strict about naming things.
+  # - Be strict about naming things!
   # - I need to do a better job checking the inputs.
   # - Give messages/warnings to tell user what is going on.
   #
   # TO DO:
   # - Implement variable.names S3 method.
   # - Implement sample.names S3 method.
+  # - Get this working for both dense and sparse matrices.
   #
   dat <- list()
   class(dat) <- c("susie_full_data","susie_data","list")
@@ -78,11 +79,12 @@ compute_XtXb <- function (dat, b) {
   UseMethod("compute_XtXb")
 }
 
-#'
-#' @importFrom stats setNames
 #' 
 #' @export
 #' 
-compute_XtXb.susie_full_data <- function (dat, b)
-  setNames(drop(drop(dat$X %*% b) %*% dat$X),colnames(X))
-
+# TO DO: Update this function to accept either a matrix or a vector.
+compute_XtXB.susie_full_data <- function (dat, B) {
+  Y <- t(dat$X %*% B) %*% dat$X
+  colnames(Y) <- colnames(X)
+  return(drop(Y))
+}
