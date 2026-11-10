@@ -108,7 +108,7 @@ init_susie_model <-
     stop("'ser' should be an object of class 'ser', or a list of ser ",
          "objects",domain = NA)
   if (is.null(names(ser)))
-    names(ser) <- paste0("single_effect_",1:L)
+    names(ser) <- paste0("L",1:L)
   control <- modifyList(susie_control_default(),control,keep.null = TRUE)
   fit <- list(elbo              = as.numeric(NA),
               ser               = ser,
@@ -154,7 +154,6 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
   # - Implement the "susie_data" functions.
-  # - Implement estimation of the residual variance.
   # - Implement the ELBO computations.
   # - Implement a "summary" S3 method.
   # - Implement "global" estimation of parameters in the 
@@ -196,8 +195,8 @@ fit_susie_model_core <- function (dat, fit, control) {
     names(progress) <- c("iter","elbo","resid.var","d.b","d.pip")
     progress[,"iter"] <- 1:control$maxiter
     if (control$verbose == "detailed") {
-      cat("iter      ELBO sigma delta(b)  d(pip)\n") 
-      cat("---- --------- ----- -------- -------\n")
+      cat("iter      ELBO   sigma delta(b)  d(pip) d(sigma)\n") 
+      cat("---- --------- ------- -------- ------- --------\n")
     }
   }
 
@@ -207,11 +206,9 @@ fit_susie_model_core <- function (dat, fit, control) {
   # Iterate the SER updates.
   for (iter in 1:control$maxiter) {
 
-    # Compute the posterior mean of b and the PIPs.
-    b   <- compute_post_mean_susie(fit$ser)
-    pip <- susie_get_pips(fit)
-
     # Save some quantities to monitor progress.
+    b <- compute_post_mean_susie(fit$ser)
+    pip <- susie_get_pips(fit$ser)
     current_state <- list(b = b,
                           pip = pip,
                           residual_variance = fit$residual_variance)
@@ -226,22 +223,12 @@ fit_susie_model_core <- function (dat, fit, control) {
     }
 
     # Update the residual variance parameter.
-    if (control$estimate_residual_variance) {
+    if (control$estimate_residual_variance)
       fit$residual_variance <- susie_update_residual_variance(dat,fit$ser)
-    }
-
-    #
-    # TO DO
-    #
-    # The EM update for the residual variance is ERSS/n, where "ERSS" is
-    # the expected residual sum of squares.
-    #  erss <- compute_erss(X,y,pip,b1,b2)
-    #  s <- erss/n
-    #
 
     # Update the progress data frame.
     if (control$trace | control$verbose == "detailed") {
-      pip <- susie_get_pips(fit)
+      pip <- susie_get_pips(fit$ser)
       progress[iter,"elbo"]        <- 0
       progress[iter,"resid.var"]   <- fit$residual_variance
       progress[iter,"d.b"]         <- max(abs(b - current_state$b))
@@ -252,14 +239,15 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Update the user about the algorithm's process.
     if (control$verbose == "detailed")
-      cat(sprintf("%4d %8.3e %5.2f %8.2e %7.1e\n",
+      cat(sprintf("%4d %8.3e %7.4f %8.2e %7.1e %7.2e\n",
                   progress[iter,"iter"],
                   progress[iter,"elbo"],
                   progress[iter,"resid.var"],
                   progress[iter,"d.b"],
-                  progress[iter,"d.pip"]))
+                  progress[iter,"d.pip"],
+                  progress[iter,"d.resid.var"]))
 
-      # Check for errors as well as the stopping criteria.
+    # Check for the stopping criteria and errors.
     if (fit$residual_variance <= 0)
       stop("prior variance is zero or negative",domain = NA)
     # TO DO: Check for decreases in the ELBO.
@@ -304,13 +292,13 @@ susie_control_default <- function()
        verbose  = "detailed")
 
 # TO DO: Explain here what this function does, and how to use it.
-susie_get_pips <- function (fit) {
-  varnames <- variable.names(fit$ser[[1]])
+susie_get_pips <- function (ser_list) {
+  varnames <- variable.names(ser_list[[1]])
   J <- length(varnames)
-  L <- length(fit$ser)
+  L <- length(ser_list)
   pip <- rep(1,J)
   for (k in 1:L)
-    pip <- pip * (1 - fit$ser[[k]]$posterior$pip)
+    pip <- pip * (1 - ser_list[[k]]$posterior$pip)
   pip <- 1 - pip
   names(pip) <- varnames
   return(pip)
@@ -354,14 +342,19 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
 }
 
 # TO DO: Explain here what this function does and how to use it.
-susie_update_residual_variance <- function (dat, ser) {
-  B <- s$alpha * s$mu
-  XB2 <- sum((B %*% XtX) * B)
-  betabar <- colSums(B)
-  d <- attr(XtX,"d")
-  postb2 <- s$alpha * s$mu2 # Posterior second moment.
-  ER2_ss <- yty - 2*sum(betabar * Xty) + 
-  sum(betabar * (XtX %*% betabar)) -
-  XB2 + sum(d * t(postb2)))
-  fit$residual_variance <- ER2_ss/n
+susie_update_residual_variance <- function (dat, ser_list) {
+  n    <- dat$n
+  L    <- length(ser_list)
+  b    <- compute_post_mean_susie(ser_list)
+  bhat <- dat$ss$bhat
+  d    <- dat$ss$shat
+  xy   <- bhat/d
+  erss <- n*dat$var_y - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
+  for (k in 1:L) {
+    bk <- ser_list[[k]]$posterior$mean
+    sk <- ser_list[[k]]$posterior$var
+    erss <- erss - sum(bk*compute_XtXb(dat,bk)) + 
+                   sum(sk/d) + sum(bk^2/d)
+  }
+  return(erss/n)
 }

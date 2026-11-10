@@ -25,7 +25,7 @@ prepare_susie_summary_data(z, R, bhat, shat, n, var_y)
 
 \item{n}{Describe input argument "n" here.}
 
-\item{var_y}{Describe input argument "yty" here.}
+\item{var_y}{Describe input argument "var_y" here.}
 }
 \description{
 Description goes here.

@@ -47,7 +47,7 @@ prepare_susie_full_data <- function (X, y) {
 #' 
 #' @param n Describe input argument "n" here.
 #'
-#' @param var_y Describe input argument "yty" here.
+#' @param var_y Describe input argument "var_y" here.
 #' 
 #' @export
 #' 
@@ -56,7 +56,7 @@ prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
   # NOTES: 
   # - Be strict about naming things.
   # - I need to do a better job checking the inputs.
-  # - Give messages/warnings to tell user what is going on.
+  # - Give messages/warnings to tell user what is going on (?).
   #
   dat <- list()
   class(dat) <- c("susie_summary_data","susie_data","list")
@@ -85,8 +85,8 @@ compute_XtXb <- function (dat, b) {
 #' @export
 #' 
 # TO DO: Update this function to accept either a matrix or a vector.
-compute_XtXB.susie_full_data <- function (dat, B) {
-  Y <- t(dat$X %*% B) %*% dat$X
+compute_XtXb.susie_full_data <- function (dat, b) {
+  Y <- t(dat$X %*% b) %*% dat$X
   colnames(Y) <- colnames(X)
   return(drop(Y))
 }
