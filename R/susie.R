@@ -227,15 +227,7 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Update the residual variance parameter.
     if (control$estimate_residual_variance) {
-      B <- s$alpha * s$mu
-      XB2 <- sum((B %*% XtX) * B)
-      betabar <- colSums(B)
-      d <- attr(XtX,"d")
-      postb2 <- s$alpha * s$mu2 # Posterior second moment.
-      ER2_ss <- yty - 2*sum(betabar * Xty) + 
-        sum(betabar * (XtX %*% betabar)) -
-        XB2 + sum(d * t(postb2)))
-      fit$residual_variance <- ER2_ss
+      fit$residual_variance <- susie_update_residual_variance(dat,fit$ser)
     }
 
     #
@@ -359,4 +351,17 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   if (L > 1)
     b <- b + ser$posterior$mean
   return(list(ser = ser,b = b))
+}
+
+# TO DO: Explain here what this function does and how to use it.
+susie_update_residual_variance <- function (dat, ser) {
+  B <- s$alpha * s$mu
+  XB2 <- sum((B %*% XtX) * B)
+  betabar <- colSums(B)
+  d <- attr(XtX,"d")
+  postb2 <- s$alpha * s$mu2 # Posterior second moment.
+  ER2_ss <- yty - 2*sum(betabar * Xty) + 
+  sum(betabar * (XtX %*% betabar)) -
+  XB2 + sum(d * t(postb2)))
+  fit$residual_variance <- ER2_ss/n
 }
