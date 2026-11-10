@@ -23,6 +23,8 @@ prepare_susie_full_data <- function (X, y) {
   # - Implement variable.names S3 method.
   # - Implement sample.names S3 method.
   # - Get this working for both dense and sparse matrices.
+  #   For sparse X, the output will be a "susie_full_data_sparse" 
+  #   object.
   #
   dat <- list()
   class(dat) <- c("susie_full_data","susie_data","list")
