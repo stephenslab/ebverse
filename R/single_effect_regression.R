@@ -235,7 +235,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   if (fit$control$trace) {
     if (is.data.frame(fit$progress)) {
       progress$iter <- progress$iter + max(fit$progress$iter)
-      fit$progress  <- rbind(fit$progress,progress)
+      fit$progress <- rbind(fit$progress,progress)
     } else
       fit$progress <- progress
   } else
@@ -390,8 +390,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
             !is.na(control$lbftol) &&
             lbf - current_state$lbf < control$lbftol) {
           if (control$verbose != "none")  
-            message("Bayes factor tolerance is met; model fitting is stopped",
-                    domain = NA)
+            message("Bayes factor tolerance is met; model fitting is ",
+                    "stopped",domain = NA)
           break
         }
       }
@@ -417,14 +417,15 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
   # Update the progress data frame to reflect the new posterior
   # calculations.
-  if (is.data.frame(progress)) {
+  if (control$trace) {
     iter <- iter + 1
     progress[iter,"lbf"]         <- lbf
     progress[iter,"prior.var"]   <- prior$prior_variance
     progress[iter,"d.lbf"]       <- lbf - current_state$lbf
     progress[iter,"d.prior.var"] <- 0
     progress <- progress[1:iter,]
-  }
+  } else
+    progress <- as.numeric(NA)
 
   # Prepare the output.
   posterior <- data.frame(lbf  = post$lbf,
@@ -474,5 +475,9 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
 
 # Compute KL(p_post || p_ser), the Kullback-Leibler divergence between
 # the SER posterior and the SER prior.
+#
+# NOTE: I'm not certain this is exactly the KL-divergence. Need to
+# check this.
+# 
 compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
   -lbf - sum((s1 + b1^2)/shat)/2 + sum(b1*bhat/shat)

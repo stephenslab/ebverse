@@ -1,28 +1,3 @@
-# Compute the log-likelihood under the "null" model.
-compute_null_loglik <- function (y, s)
-  sum(dnorm(y,0,sqrt(s),log = TRUE))
-
-# Compute the expected residual sum of squares. The inputs are the
-# data (X, y); the posterior inclusion probabilities (pip), and the
-# posterior second moments, the mean (b1) and the second moment (b2).
-compute_erss <- function (X, y, pip, b1, b2) {
-  xx  <- colSums(X^2)
-  bb  <- pip * b1
-  bb2 <- pip * b2
-  xb  <- drop(X %*% bb)
-  r   <- drop(y - xb)  
-  return(sum(r^2) - sum(xb^2) + sum(xx * bb2))
-}
-
-# Compute the ELBO (which is also the marginal log-likelihood since
-# the ELBO is exact). The inputs are: ll0, the log-likelihood under
-# the "null" model; and lbf, the log-Bayes factors.
-compute_elbo <- function (ll0, lbf) {
-  x <- max(lbf)  
-  bf <- exp(lbf - x)
-  return(ll0 + x + log(mean(bf)))
-}
-
 #' @name susie
 #'  
 #' @title Fitting Sum of Single Effect (SuSiE) Models
@@ -113,6 +88,7 @@ init_susie_model <-
     names(ser) <- paste0("L",1:L)
   control <- modifyList(susie_control_default(),control,keep.null = TRUE)
   fit <- list(elbo              = as.numeric(NA),
+              lbf               = as.numeric(NA),
               ser               = ser,
               residual_variance = residual_variance,
               progress          = as.numeric(NA),
@@ -181,7 +157,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 
   # Prepare the output
   #
-  # TO DO
+  # TO DO (e.g., add names to any outputs).
   #
   if (return_data)
     fit$dat <- dat
@@ -192,6 +168,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 
 # This implements the core SuSiE model fitting algorithm.
 fit_susie_model_core <- function (dat, fit, control) {
+  progress <- as.numeric(NA)
   if (control$trace | control$verbose == "detailed") {
     progress <- as.data.frame(matrix(0,control$maxiter,6))
     names(progress) <- c("iter","elbo","resid.var","d.elbo","d.b","d.pip")
@@ -210,40 +187,34 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Save some quantities to monitor progress.
     b <- compute_post_mean_susie(fit$ser)
-    pip <- susie_get_pips(fit$ser)
-    current_state <- list(b = b,
-                          pip = pip,
+    current_state <- list(b    = b,
+                          pip  = susie_get_pips(fit$ser),
                           elbo = fit$elbo,
                           residual_variance = fit$residual_variance)
 
-    # Repeat for each single effect.
+    # Perform the SER updates.
     for (k in 1:L) {
-
-      # Perform an SER update.
       res <- susie_ibss_update(dat,fit$ser[[k]],L,b,fit$residual_variance)
       b <- res$b
       fit$ser[[k]] <- res$ser
     }
 
+    # Compute the Bayes factor and ELBO.
     #
-    # TO DO: Compute the log-Bayes factor and ELBO.
+    # TO DO NEXT: Compute the log-Bayes factor (lbf)
     # 
-    n     <- dat$n
-    sigma <- fit$residual_variance
-    erss  <- n*susie_update_residual_variance(dat,fit$ser)
-    elbo  <- -n*log(2*pi*sigma)/2 - erss/(2*sigma)
-    for (k in 1:L)
-      elbo <- elbo - fit$ser[[k]]$KL
-    fit$elbo <- elbo
+    res      <- susie_compute_elbo(dat,fit)
+    fit$elbo <- res$elbo
+    erss     <- res$erss
 
     # Update the residual variance parameter.
     if (control$estimate_residual_variance)
       fit$residual_variance <- erss/dat$n
 
     # Update the progress data frame.
-    if (control$trace | control$verbose == "detailed") {
+    if (is.data.frame(progress)) {
       pip <- susie_get_pips(fit$ser)
-      progress[iter,"elbo"]        <- elbo
+      progress[iter,"elbo"]        <- fit$elbo
       progress[iter,"resid.var"]   <- fit$residual_variance
       progress[iter,"d.elbo"]      <- fit$elbo - current_state$elbo
       progress[iter,"d.elbo"]      <- fit$elbo - current_state$elbo
@@ -255,7 +226,7 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Update the user about the algorithm's process.
     if (control$verbose == "detailed")
-      cat(sprintf("%4d %+8.3e %07.4f %+8.1e %8.2e %7.1e %7.1e\n",
+      cat(sprintf("%4d %+8.3e %07.4f %+8.1e %8.2e %7.1e %+7.1e\n",
                   progress[iter,"iter"],
                   progress[iter,"elbo"],
                   progress[iter,"resid.var"],
@@ -264,40 +235,41 @@ fit_susie_model_core <- function (dat, fit, control) {
                   progress[iter,"d.pip"],
                   progress[iter,"d.resid.var"]))
 
-    # Check for the stopping criteria and errors.
+    # Check for errors as well as the stopping criteria. Some checks
+    # are only performed after the first iteration.
     if (fit$residual_variance <= 0)
       stop("prior variance is zero or negative",domain = NA)
-    if (!is.na(current_state$elbo) && 
-        !is.na(control$elbotol) &&
-          current_state$elbo > elbo + control$elbotol)
-      warning("updates decreased the ELBO",domain = NA)
-    if (!is.na(control$paramtol) &&
-        max(abs(current_state$pip - pip)) < control$paramtol) {
-      if (control$verbose != "none")
-        message("parameter estimation tolerance is met; ",
-                "model fitting is stopped",
-                domain = NA)
-      break
-    }
-    if (!is.na(current_state$elbo) && 
-        !is.na(fit$elbo) &&
-        !is.na(control$elbotol) &&
-        fit$elbo - current_state$elbo < control$elbotol) {
-      if (control$verbose != "none")  
-        message("ELBO tolerance is met; model fitting is stopped",
-                domain = NA)
+    if (iter > 1) {
+      if (!is.na(current_state$elbo) && 
+          !is.na(control$elbotol) &&
+          fit$elbo < current_state$elbo)
+        warning("updates decreased the ELBO",domain = NA)
+      if (!is.na(control$paramtol) &&
+          max(abs(current_state$pip - pip)) < control$paramtol) {
+        if (control$verbose != "none")
+          message("parameter estimation tolerance is met; ",
+                  "model fitting is stopped",
+                  domain = NA)
         break
       }
-    # TO DO: Check whether the ELBO increases by a smaller amount than
-    # the tolerance.
+      if (!is.na(current_state$elbo) && 
+          !is.na(fit$elbo) &&
+          !is.na(control$elbotol) &&
+          fit$elbo - current_state$elbo < control$elbotol) {
+        if (control$verbose != "none") 
+          message("ELBO tolerance is met; model fitting is stopped",
+                  domain = NA)
+        break
+      }
+    }
   }
 
   # Prepare the output.
   if (control$trace) {
-    progress  <- progress[1:iter,]
+    progress <- progress[1:iter,]
     if (is.data.frame(fit$progress)) {
       progress$iter <- progress$iter + max(fit$progress$iter)
-      fit$progress  <- rbind(fit$progress,progress)
+      fit$progress <- rbind(fit$progress,progress)
     }
     else 
       fit$progress <- progress
@@ -319,7 +291,8 @@ susie_control_default <- function()
        trace    = TRUE,
        verbose  = "detailed")
 
-# TO DO: Explain here what this function does, and how to use it.
+# Compute the posterior inclusion probabilities (PIPs) given the
+# single effect regression PIPs.
 susie_get_pips <- function (ser_list) {
   varnames <- variable.names(ser_list[[1]])
   J <- length(varnames)
@@ -372,8 +345,8 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   return(list(ser = ser,b = b))
 }
 
-# TO DO: Explain here what this function does and how to use it.
-susie_update_residual_variance <- function (dat, ser_list) {
+# TO DO: Explain here what this function is for, and how to use it.
+susie_compute_ebss <- function (dat, ser_list) {
   n <- dat$n
   L <- length(ser_list)
   b <- compute_post_mean_susie(ser_list)
@@ -382,9 +355,21 @@ susie_update_residual_variance <- function (dat, ser_list) {
   yy <- (n-1)*dat$var_y
   erss <- yy - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
   for (k in 1:L) {
-    bk <- ser_list[[k]]$posterior$mean
-    sk <- ser_list[[k]]$posterior$var
+    bk   <- ser_list[[k]]$posterior$mean
+    sk   <- ser_list[[k]]$posterior$var
     erss <- erss - sum(bk*compute_XtXb(dat,bk)) + sum((sk + bk^2)/d)
   }
-  return(erss/n)
+  return(erss)
+}
+
+# TO DO: Explain here what this function is for, and how to use it.
+susie_compute_elbo <- function (dat, fit) {
+  n     <- dat$n
+  L     <- length(fit$ser)
+  sigma <- fit$residual_variance
+  erss  <- susie_compute_ebss(dat,fit$ser)
+  elbo  <- -n*log(2*pi*sigma)/2 - erss/(2*sigma)
+  for (k in 1:L)
+    elbo <- elbo - fit$ser[[k]]$KL
+  return(list(elbo = elbo,erss = erss))
 }
