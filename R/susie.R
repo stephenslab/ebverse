@@ -222,6 +222,12 @@ fit_susie_model_core <- function (dat, fit, control) {
       fit$ser[[k]] <- res$ser
     }
 
+    # TO DO: Compute the ELBO.
+    #
+    # See elbo_ss.R and update_each_effect_ss.R in the susieR R package.
+    # See also Sec. B6 in the Appendix of the Zou et al susie_rss paper.
+    # 
+  
     # Update the residual variance parameter.
     if (control$estimate_residual_variance)
       fit$residual_variance <- susie_update_residual_variance(dat,fit$ser)
