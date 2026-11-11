@@ -359,7 +359,8 @@ susie_update_residual_variance <- function (dat, ser_list) {
   b <- compute_post_mean_susie(ser_list)
   d <- dat$ss$shat
   xy <- dat$ss$bhat/d
-  erss <- n*dat$var_y - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
+  yy <- (n-1)*dat$var_y
+  erss <- yy - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
   for (k in 1:L) {
     bk <- ser_list[[k]]$posterior$mean
     sk <- ser_list[[k]]$posterior$var
