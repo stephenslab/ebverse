@@ -46,7 +46,8 @@
 #'   \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'     \dQuote{null} model (b = 0).}
 #'
-#'   \item{KL}{TO DO: Explain what the "KL" output is.}
+#'   \item{KL}{Kullback-Leibler divergence between the posterior
+#'   distribution and the SER prior.}
 #'
 #'   \item{progress}{A data frame containing detailed information about
 #'     the progress on the model fitting.}
@@ -165,6 +166,7 @@ init_ser_model_normal <-
   # Initialize the SER model.
   fit <- list(prior     = prior,
               lbf       = as.numeric(NA),
+              kl        = as.numeric(NA),
               posterior = posterior,
               progress  = as.numeric(NA),
               control   = control)
@@ -470,7 +472,7 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
   return(list(lbf = lbf,b1 = b1,s1 = s1))
 }
 
-# TO DO: Explain what this function is for, and how to use it.
-# KL(p_post || p_susie).
+# Compute KL(p_post || p_ser), the Kullback-Leibler divergence between
+# the SER posterior and the SER prior.
 compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
   -lbf - sum((s1 + b1^2)/shat)/2 + sum(b1*bhat/shat)
