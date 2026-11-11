@@ -222,12 +222,17 @@ fit_susie_model_core <- function (dat, fit, control) {
       fit$ser[[k]] <- res$ser
     }
 
+    #
     # TO DO: Compute the log-Bayes factor and ELBO.
     #
     # See elbo_ss.R and update_each_effect_ss.R in the susieR R package.
     # See also Sec. B.6 in the Appendix of the Wang et al susie paper.
     # 
-  
+    # For this, I will implement an internal function in
+    # single_effect_regression.R that computes the K-L divergence
+    # term for a SER.
+    # 
+
     # Update the residual variance parameter.
     if (control$estimate_residual_variance)
       fit$residual_variance <- susie_update_residual_variance(dat,fit$ser)
