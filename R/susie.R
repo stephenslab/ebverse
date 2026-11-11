@@ -154,7 +154,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Test fit_susie_model with L = 1.
   # - Test *refitting* of a susie model.
   # - Implement the "susie_data" functions.
-  # - Implement the ELBO computations.
+  # - Implement both elbo and lbf computations.
   # - Implement a "summary" S3 method.
   # - Implement "global" estimation of parameters in the 
   #   SER models.
@@ -222,10 +222,10 @@ fit_susie_model_core <- function (dat, fit, control) {
       fit$ser[[k]] <- res$ser
     }
 
-    # TO DO: Compute the ELBO.
+    # TO DO: Compute the log-Bayes factor and ELBO.
     #
     # See elbo_ss.R and update_each_effect_ss.R in the susieR R package.
-    # See also Sec. B6 in the Appendix of the Zou et al susie_rss paper.
+    # See also Sec. B.6 in the Appendix of the Wang et al susie paper.
     # 
   
     # Update the residual variance parameter.
