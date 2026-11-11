@@ -270,7 +270,7 @@ fit_susie_model_core <- function (dat, fit, control) {
     if (!is.na(current_state$elbo) && 
         !is.na(control$elbotol) &&
           current_state$elbo > elbo + control$elbotol)
-        stop("updates decreased the ELBO",domain = NA)
+      warning("updates decreased the ELBO",domain = NA)
     if (!is.na(control$paramtol) &&
         max(abs(current_state$pip - pip)) < control$paramtol) {
       if (control$verbose != "none")

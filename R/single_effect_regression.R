@@ -323,9 +323,9 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   # Estimate the prior variance parameter "locally".
   if (control$estimate_prior_variance & control$local) {
     if (control$trace | control$verbose == "detailed") {
-      progress <- as.data.frame(matrix(0,control$maxiter,5))
+      progress <- as.data.frame(matrix(0,control$maxiter + 1,5))
       names(progress) <- c("iter","lbf","prior.var","d.lbf","d.prior.var")
-      progress[,"iter"] <- 1:control$maxiter
+      progress[,"iter"] <- seq(1,control$maxiter + 1)
       if (control$verbose == "detailed") {
         cat("iter log-Bayes factor   sigma0 d(logBF) d(sigma0)\n")
         cat("---- ---------------- -------- -------- ---------\n")
@@ -333,8 +333,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
     }
     for (iter in 1:control$maxiter) {
 
-      # Save the current prior variance and Bayes factor which are
-      # used to monitor progress.
+      # Save some quantities that are used to monitor progress.
       current_state <- list(prior_variance = prior$prior_variance,lbf = lbf)
 
       # E step.
@@ -348,18 +347,14 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
       # M-step.
       prior$prior_variance <- sum(pip * (b1^2 + s1))
-
+      
       # Update the progress data frame.
-      if (control$trace | control$verbose == "detailed") {
+      if (is.data.frame(progress)) {
         progress[iter,"lbf"]         <- lbf
         progress[iter,"prior.var"]   <- prior$prior_variance
+        progress[iter,"d.lbf"]       <- lbf - current_state$lbf
         progress[iter,"d.prior.var"] <- prior$prior_variance - 
                                         current_state$prior_variance
-        # TO DO: Explain here why we skip the first iteration
-        if (iter == 1)
-          progress[iter,"d.lbf"] <- NA
-        else
-          progress[iter,"d.lbf"] <- lbf - current_state$lbf
       }
 
       # Update the user about the algorithm's process.
@@ -371,35 +366,38 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                     progress[iter,"d.lbf"],
                     progress[iter,"d.prior.var"]))
 
-      # Check for errors as well as the stopping criteria.
+      # Check for errors as well as the stopping criteria. Some checks
+      # are only performed after the first iteration.
       if (prior$prior_variance <= 0)
         stop("prior variance is zero or negative",domain = NA)
-      if (!is.na(current_state$lbf) && 
-          !is.na(control$lbftol) &&
-          current_state$lbf > lbf + control$lbftol)
-        stop("prior variance update decreased the likelihood",domain = NA)
-      if (!is.na(control$paramtol) &&
-          abs(current_state$prior_variance - 
-              prior$prior_variance) < control$paramtol) {
-        if (control$verbose != "none")
-          message("parameter tolerance is met; model fitting is stopped",
+      if (iter > 1) {
+        if (!is.na(current_state$lbf) && 
+            !is.na(control$lbftol) &&
+            lbf < current_state$lbf)
+          warning("prior variance update decreased the likelihood",
                   domain = NA)
-        break
-      }
-      # TO DO: Explain here why we skip the first iteration.
-      if (!is.na(current_state$lbf) && 
-          !is.na(control$lbftol) &&
-          iter > 1 &&
-          lbf - current_state$lbf < control$lbftol) {
-        if (control$verbose != "none")  
-          message("Bayes factor tolerance is met; model fitting is stopped",
-                  domain = NA)
-        break
+        if (!is.na(control$paramtol) &&
+            abs(current_state$prior_variance - 
+                prior$prior_variance) < control$paramtol) {
+          if (control$verbose != "none")
+            message("parameter tolerance is met; model fitting is stopped",
+                    domain = NA)
+          break
+        }
+        if (!is.na(current_state$lbf) && 
+            !is.na(control$lbftol) &&
+            lbf - current_state$lbf < control$lbftol) {
+          if (control$verbose != "none")  
+            message("Bayes factor tolerance is met; model fitting is stopped",
+                    domain = NA)
+          break
+        }
       }
     }
   }
 
   # Compute the posterior statistics one last time.
+  current_state <- list(lbf = lbf)
   post <- compute_posterior_ebnm_normal(dat$bhat,dat$shat,
                                         prior$prior_variance)
   ans <- normalizelogweights(log(prior$prob) + post$lbf)
@@ -415,15 +413,22 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   # prior.
   KL <- compute_kl_ser(dat$bhat,dat$shat,post_mean,post_var,lbf)
 
+  # Update the progress data frame to reflect the new posterior
+  # calculations.
+  if (is.data.frame(progress)) {
+    iter <- iter + 1
+    progress[iter,"lbf"]         <- lbf
+    progress[iter,"prior.var"]   <- prior$prior_variance
+    progress[iter,"d.lbf"]       <- lbf - current_state$lbf
+    progress[iter,"d.prior.var"] <- 0
+    progress <- progress[1:iter,]
+  }
+
   # Prepare the output.
   posterior <- data.frame(lbf  = post$lbf,
                           pip  = pip,
                           mean = post_mean,
                           var  = post_var)
-  if (control$trace)
-    progress <- progress[1:iter,]
-  else
-    progress <- as.numeric(NA)
   return(list(prior     = prior,
               lbf       = lbf,
               KL        = KL,
