@@ -195,8 +195,8 @@ fit_susie_model_core <- function (dat, fit, control) {
     names(progress) <- c("iter","elbo","resid.var","d.b","d.pip")
     progress[,"iter"] <- 1:control$maxiter
     if (control$verbose == "detailed") {
-      cat("iter      ELBO   sigma delta(b)  d(pip) d(sigma)\n") 
-      cat("---- --------- ------- -------- ------- --------\n")
+      cat("iter       ELBO   sigma delta(b)  d(pip) d(sigma)\n") 
+      cat("---- ---------- ------- -------- ------- --------\n")
     }
   }
 
@@ -224,14 +224,23 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     #
     # TO DO: Compute the log-Bayes factor and ELBO.
-    #
-    # See elbo_ss.R and update_each_effect_ss.R in the susieR R package.
-    # See also Sec. B.6 in the Appendix of the Wang et al susie paper.
+    # For this, when I fit each SER I will also compute the K-L
+    # divergence term for that SER.
     # 
-    # For this, I will implement an internal function in
-    # single_effect_regression.R that computes the K-L divergence
-    # term for a SER.
-    # 
+    n     <- dat$n
+    sigma <- fit$residual_variance
+    erss  <- susie_update_residual_variance(dat,fit$ser)
+    elbo  <- -n*log(2*pi*sigma)/2 - n*erss/(2*sigma)
+    for (k in 1:L) {
+      d    <- dat$ss$shat
+      ser  <- fit$ser[[k]]
+      xy   <- ser$dat$bhat/d
+      bk   <- ser$posterior$mean
+      sk   <- ser$posterior$var
+      KL   <- -ser$lbf - (sum((sk + bk^2)/d) - 2*sum(bk*xy))/(2*sigma)
+      elbo <- elbo - KL
+    }
+    fit$elbo <- elbo
 
     # Update the residual variance parameter.
     if (control$estimate_residual_variance)
@@ -240,7 +249,7 @@ fit_susie_model_core <- function (dat, fit, control) {
     # Update the progress data frame.
     if (control$trace | control$verbose == "detailed") {
       pip <- susie_get_pips(fit$ser)
-      progress[iter,"elbo"]        <- 0
+      progress[iter,"elbo"]        <- elbo
       progress[iter,"resid.var"]   <- fit$residual_variance
       progress[iter,"d.b"]         <- max(abs(b - current_state$b))
       progress[iter,"d.pip"]       <- max(abs(pip - current_state$pip))
@@ -250,7 +259,7 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Update the user about the algorithm's process.
     if (control$verbose == "detailed")
-      cat(sprintf("%4d %8.3e %7.4f %8.2e %7.1e %7.2e\n",
+      cat(sprintf("%4d %+8.3e %7.4f %8.2e %7.1e %7.2e\n",
                   progress[iter,"iter"],
                   progress[iter,"elbo"],
                   progress[iter,"resid.var"],
@@ -346,7 +355,8 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   } 
   dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
                               shat = setNames(sigma*d,varnames))
-  ser <- fit_ser_model(ser,dat_ser)
+  # TO DO: Remove return_data = TRUE.
+  ser <- fit_ser_model(ser,dat_ser,return_data = TRUE)
   if (L > 1)
     b <- b + ser$posterior$mean
   return(list(ser = ser,b = b))
