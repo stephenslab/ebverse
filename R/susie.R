@@ -343,18 +343,16 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
 
 # TO DO: Explain here what this function does and how to use it.
 susie_update_residual_variance <- function (dat, ser_list) {
-  n    <- dat$n
-  L    <- length(ser_list)
-  b    <- compute_post_mean_susie(ser_list)
-  bhat <- dat$ss$bhat
-  d    <- dat$ss$shat
-  xy   <- bhat/d
+  n <- dat$n
+  L <- length(ser_list)
+  b <- compute_post_mean_susie(ser_list)
+  d <- dat$ss$shat
+  xy <- dat$ss$bhat/d
   erss <- n*dat$var_y - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
   for (k in 1:L) {
     bk <- ser_list[[k]]$posterior$mean
     sk <- ser_list[[k]]$posterior$var
-    erss <- erss - sum(bk*compute_XtXb(dat,bk)) + 
-                   sum(sk/d) + sum(bk^2/d)
+    erss <- erss - sum(bk*compute_XtXb(dat,bk)) + sum((sk + bk^2)/d)
   }
   return(erss/n)
 }
