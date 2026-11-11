@@ -95,6 +95,8 @@ when X, y are provided instead of bhat, shat.}
   \item{lbf}{Log-Bayes factor comparing the SER model to the
     \dQuote{null} model (b = 0).}
 
+  \item{KL}{TO DO: Explain what the "KL" output is.}
+
   \item{progress}{A data frame containing detailed information about
     the progress on the model fitting.}
 

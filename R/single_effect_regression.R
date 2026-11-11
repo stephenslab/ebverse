@@ -46,6 +46,8 @@
 #'   \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'     \dQuote{null} model (b = 0).}
 #'
+#'   \item{KL}{TO DO: Explain what the "KL" output is.}
+#'
 #'   \item{progress}{A data frame containing detailed information about
 #'     the progress on the model fitting.}
 #' 
@@ -200,7 +202,10 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
 
   # TO DO: 
-  # - Create an example with small n and large J.
+  # - Implement function to conveniently simulate susie data sets
+  #   of different sizes.
+  # - Run benchmarking on different sizes of J and compare with 
+  #   susie(L = 1) and susie_rss(L = 1).
   # - Implement an Rcpp version of this and see if it speeds up 
   #   fit_susie_model() for the small n, large J case.
   # - Add some simple unit tests.
@@ -219,6 +224,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   res <- fit_ser_model_normal_core(dat,fit$prior,fit$lbf,fit$control)
   fit$prior     <- res$prior
   fit$lbf       <- res$lbf
+  fit$KL        <- res$KL
   fit$posterior <- res$posterior
   progress      <- res$progress
 
@@ -230,7 +236,6 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
       fit$progress  <- rbind(fit$progress,progress)
     } else
       fit$progress <- progress
-    rownames(fit$progress) <- NULL
   } else
     fit$progress <- as.numeric(NA)
   if (return_data)
@@ -322,8 +327,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       names(progress) <- c("iter","lbf","prior.var","d.lbf","d.prior.var")
       progress[,"iter"] <- 1:control$maxiter
       if (control$verbose == "detailed") {
-        cat("iter log-Bayes factor  sigma0 d(logBF) d(sigma0)\n")
-        cat("---- ---------------- ------- -------- ---------\n")
+        cat("iter log-Bayes factor   sigma0 d(logBF) d(sigma0)\n")
+        cat("---- ---------------- -------- -------- ---------\n")
       }
     }
     for (iter in 1:control$maxiter) {
@@ -350,6 +355,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
         progress[iter,"prior.var"]   <- prior$prior_variance
         progress[iter,"d.prior.var"] <- prior$prior_variance - 
                                         current_state$prior_variance
+        # TO DO: Explain here why we skip the first iteration
         if (iter == 1)
           progress[iter,"d.lbf"] <- NA
         else
@@ -358,7 +364,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
       # Update the user about the algorithm's process.
       if (control$verbose == "detailed")
-        cat(sprintf("%4d %+16.9e %7.1e %+8.1e %+8.2e\n",
+        cat(sprintf("%4d %+16.9e %08.1e %+8.1e %+8.2e\n",
                     progress[iter,"iter"],
                     progress[iter,"lbf"],
                     progress[iter,"prior.var"],
@@ -380,6 +386,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                   domain = NA)
         break
       }
+      # TO DO: Explain here why we skip the first iteration.
       if (!is.na(current_state$lbf) && 
           !is.na(control$lbftol) &&
           iter > 1 &&
@@ -396,6 +403,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   post <- compute_posterior_ebnm_normal(dat$bhat,dat$shat,
                                         prior$prior_variance)
   ans <- normalizelogweights(log(prior$prob) + post$lbf)
+  lbf <- ans$weight_sum 
   pip <- ans$probs
   b1  <- post$b1
   s1  <- post$s1
@@ -403,18 +411,22 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   post_mean <- pip*b1
   post_var  <- pip*b2 - post_mean^2
 
+  # Compute the Kullback-Leibler divergence between the posterior and
+  # prior.
+  KL <- compute_kl_ser(dat$bhat,dat$shat,post_mean,post_var,lbf)
+
   # Prepare the output.
   posterior <- data.frame(lbf  = post$lbf,
                           pip  = pip,
                           mean = post_mean,
                           var  = post_var)
-  lbf <- ans$weight_sum 
   if (control$trace)
     progress <- progress[1:iter,]
   else
     progress <- as.numeric(NA)
   return(list(prior     = prior,
               lbf       = lbf,
+              KL        = KL,
               posterior = posterior,
               progress  = progress))
 }
@@ -452,3 +464,8 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
   b1 <- bhat*s1/shat
   return(list(lbf = lbf,b1 = b1,s1 = s1))
 }
+
+# TO DO: Explain what this function is for, and how to use it.
+# KL(p_post || p_susie).
+compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
+  -lbf - sum((s1 + b1^2)/shat)/2 + sum(b1*bhat/shat)

@@ -66,6 +66,8 @@ included in the output.}
   \item{elbo}{The value of the ELBO (an approximate marginal
     likelihood) at the current model fit.}
 
+  \item{lbf}{TO DO: Explain what the "lbf" output is.}
+
   \item{progress}{A data frame containing detailed information about
     progress on the model fitting.}
 

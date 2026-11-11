@@ -62,6 +62,8 @@ compute_elbo <- function (ll0, lbf) {
 #'
 #'   \item{elbo}{The value of the ELBO (an approximate marginal
 #'     likelihood) at the current model fit.}
+#'
+#'   \item{lbf}{TO DO: Explain what the "lbf" output is.}
 #' 
 #'   \item{progress}{A data frame containing detailed information about
 #'     progress on the model fitting.}
@@ -191,12 +193,12 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
 # This implements the core SuSiE model fitting algorithm.
 fit_susie_model_core <- function (dat, fit, control) {
   if (control$trace | control$verbose == "detailed") {
-    progress <- as.data.frame(matrix(0,control$maxiter,5))
-    names(progress) <- c("iter","elbo","resid.var","d.b","d.pip")
+    progress <- as.data.frame(matrix(0,control$maxiter,6))
+    names(progress) <- c("iter","elbo","resid.var","d.elbo","d.b","d.pip")
     progress[,"iter"] <- 1:control$maxiter
     if (control$verbose == "detailed") {
-      cat("iter       ELBO   sigma delta(b)  d(pip) d(sigma)\n") 
-      cat("---- ---------- ------- -------- ------- --------\n")
+      cat("iter       ELBO   sigma  d(ELBO) delta(b)  d(pip) d(sigma)\n") 
+      cat("---- ---------- ------- -------- -------- ------- --------\n")
     }
   }
 
@@ -211,6 +213,7 @@ fit_susie_model_core <- function (dat, fit, control) {
     pip <- susie_get_pips(fit$ser)
     current_state <- list(b = b,
                           pip = pip,
+                          elbo = fit$elbo,
                           residual_variance = fit$residual_variance)
 
     # Repeat for each single effect.
@@ -224,33 +227,26 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     #
     # TO DO: Compute the log-Bayes factor and ELBO.
-    # For this, when I fit each SER I will also compute the K-L
-    # divergence term for that SER.
     # 
     n     <- dat$n
     sigma <- fit$residual_variance
-    erss  <- susie_update_residual_variance(dat,fit$ser)
-    elbo  <- -n*log(2*pi*sigma)/2 - n*erss/(2*sigma)
-    for (k in 1:L) {
-      d    <- dat$ss$shat
-      ser  <- fit$ser[[k]]
-      xy   <- ser$dat$bhat/d
-      bk   <- ser$posterior$mean
-      sk   <- ser$posterior$var
-      KL   <- -ser$lbf - (sum((sk + bk^2)/d) - 2*sum(bk*xy))/(2*sigma)
-      elbo <- elbo - KL
-    }
+    erss  <- n*susie_update_residual_variance(dat,fit$ser)
+    elbo  <- -n*log(2*pi*sigma)/2 - erss/(2*sigma)
+    for (k in 1:L)
+      elbo <- elbo - fit$ser[[k]]$KL
     fit$elbo <- elbo
 
     # Update the residual variance parameter.
     if (control$estimate_residual_variance)
-      fit$residual_variance <- susie_update_residual_variance(dat,fit$ser)
+      fit$residual_variance <- erss/dat$n
 
     # Update the progress data frame.
     if (control$trace | control$verbose == "detailed") {
       pip <- susie_get_pips(fit$ser)
       progress[iter,"elbo"]        <- elbo
       progress[iter,"resid.var"]   <- fit$residual_variance
+      progress[iter,"d.elbo"]      <- fit$elbo - current_state$elbo
+      progress[iter,"d.elbo"]      <- fit$elbo - current_state$elbo
       progress[iter,"d.b"]         <- max(abs(b - current_state$b))
       progress[iter,"d.pip"]       <- max(abs(pip - current_state$pip))
       progress[iter,"d.resid.var"] <- fit$residual_variance - 
@@ -259,10 +255,11 @@ fit_susie_model_core <- function (dat, fit, control) {
 
     # Update the user about the algorithm's process.
     if (control$verbose == "detailed")
-      cat(sprintf("%4d %+8.3e %7.4f %8.2e %7.1e %7.2e\n",
+      cat(sprintf("%4d %+8.3e %07.4f %+8.1e %8.2e %7.1e %7.1e\n",
                   progress[iter,"iter"],
                   progress[iter,"elbo"],
                   progress[iter,"resid.var"],
+                  progress[iter,"d.elbo"],
                   progress[iter,"d.b"],
                   progress[iter,"d.pip"],
                   progress[iter,"d.resid.var"]))
@@ -270,7 +267,10 @@ fit_susie_model_core <- function (dat, fit, control) {
     # Check for the stopping criteria and errors.
     if (fit$residual_variance <= 0)
       stop("prior variance is zero or negative",domain = NA)
-    # TO DO: Check for decreases in the ELBO.
+    if (!is.na(current_state$elbo) && 
+        !is.na(control$elbotol) &&
+          current_state$elbo > elbo + control$elbotol)
+        stop("updates decreased the ELBO",domain = NA)
     if (!is.na(control$paramtol) &&
         max(abs(current_state$pip - pip)) < control$paramtol) {
       if (control$verbose != "none")
@@ -279,6 +279,15 @@ fit_susie_model_core <- function (dat, fit, control) {
                 domain = NA)
       break
     }
+    if (!is.na(current_state$elbo) && 
+        !is.na(fit$elbo) &&
+        !is.na(control$elbotol) &&
+        fit$elbo - current_state$elbo < control$elbotol) {
+      if (control$verbose != "none")  
+        message("ELBO tolerance is met; model fitting is stopped",
+                domain = NA)
+        break
+      }
     # TO DO: Check whether the ELBO increases by a smaller amount than
     # the tolerance.
   }
@@ -292,7 +301,6 @@ fit_susie_model_core <- function (dat, fit, control) {
     }
     else 
       fit$progress <- progress
-    rownames(fit$progress) <- NULL
   } else
     fit$progress <- as.numeric(NA)
   return(fit)
@@ -355,10 +363,12 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   } 
   dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
                               shat = setNames(sigma*d,varnames))
-  # TO DO: Remove return_data = TRUE.
-  ser <- fit_ser_model(ser,dat_ser,return_data = TRUE)
+  ser <- fit_ser_model(ser,dat_ser)
+  bk <- ser$posterior$mean
+  sk <- ser$posterior$var
   if (L > 1)
-    b <- b + ser$posterior$mean
+    b <- b + bk
+
   return(list(ser = ser,b = b))
 }
 
