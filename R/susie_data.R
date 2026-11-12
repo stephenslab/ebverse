@@ -87,6 +87,6 @@ compute_XtXb <- function (dat, b) {
 # TO DO: Update this function to accept either a matrix or a vector.
 compute_XtXb.susie_full_data <- function (dat, b) {
   Y <- t(dat$X %*% b) %*% dat$X
-  colnames(Y) <- colnames(X)
+  colnames(Y) <- colnames(dat$X)
   return(drop(Y))
 }

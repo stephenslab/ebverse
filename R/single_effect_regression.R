@@ -430,12 +430,12 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
               progress  = progress))
 }
 
-#' @importFrom stats coef
+#' @importFrom stats variable.names
 #'
 #' @export
 #' 
-variable.names.ser_normal <- function (fit)
-  names(fit$prior$prob)
+variable.names.ser_normal <- function (object, ...)
+  names(object$prior$prob)
 
 # Compute the least-squares estimate and its variance given the data
 # (X, y) and the residual variances (sigma).

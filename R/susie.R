@@ -58,8 +58,12 @@
 #' @examples
 #' # TO DO: Add one or several examples.
 #'
+#' @importFrom Rcpp evalCpp
+#' @importFrom Matrix sparseMatrix
 #' @importFrom utils packageVersion
 #' 
+#' @useDynLib ebverse
+#'
 #' @export
 #' 
 init_susie_model <- 
@@ -126,13 +130,14 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
+  # TO DO NEXT: Implement the "susie_data" functions.
+  #
   # TO DO:
+  # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement some functions for simulating data from susie models.
   # - Test fit_susie_model with L = 1.
-  # - Test *refitting* of a susie model.
-  # - Implement the "susie_data" functions.
   # - Implement both elbo and lbf computations.
   # - Implement a "summary" S3 method.
   # - Implement "global" estimation of parameters in the 
