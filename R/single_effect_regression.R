@@ -46,6 +46,9 @@
 #'   \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'     \dQuote{null} model (b = 0).}
 #'
+#'   \item{KL}{Kullback-Leibler divergence between the posterior
+#'     distribution and the SER prior.}
+#'
 #'   \item{progress}{A data frame containing detailed information about
 #'     the progress on the model fitting.}
 #' 
@@ -163,7 +166,7 @@ init_ser_model_normal <-
   # Initialize the SER model.
   fit <- list(prior     = prior,
               lbf       = as.numeric(NA),
-              kl        = as.numeric(NA),
+              KL        = as.numeric(NA),
               posterior = posterior,
               progress  = as.numeric(NA),
               control   = control)
@@ -223,6 +226,7 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
   res <- fit_ser_model_normal_core(dat,fit$prior,fit$lbf,fit$control)
   fit$prior     <- res$prior
   fit$lbf       <- res$lbf
+  fit$KL        <- res$KL
   fit$posterior <- res$posterior
   progress      <- res$progress
 
@@ -337,11 +341,11 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
       # E step.
       post <- compute_posterior_ebnm_normal(dat$bhat,dat$shat,
                                             prior$prior_variance)
-      ans  <- normalizelogweights(log(prior$prob) + post$lbf)
-      b1   <- post$b1
-      s1   <- post$s1
-      pip  <- ans$probs
-      lbf  <- ans$weight_sum
+      ans <- normalizelogweights(log(prior$prob) + post$lbf)
+      lbf <- ans$weight_sum
+      pip <- ans$probs
+      b1  <- post$b1
+      s1  <- post$s1
 
       # M-step.
       prior$prior_variance <- sum(pip * (b1^2 + s1))
@@ -407,6 +411,9 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
   post_mean <- pip*b1
   post_var  <- pip*b2 - post_mean^2
 
+  # Compute the K-L divergence between the posterior and prior.
+  KL <- compute_kl_ser(dat$bhat,dat$shat,post_mean,post_var,lbf)
+
   # Update the progress data frame to reflect the new posterior
   # calculations.
   if (control$trace) {
@@ -426,6 +433,7 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
                           var  = post_var)
   return(list(prior     = prior,
               lbf       = lbf,
+              KL        = KL,
               posterior = posterior,
               progress  = progress))
 }
@@ -464,7 +472,7 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
   return(list(lbf = lbf,b1 = b1,s1 = s1))
 }
 
-# Compute the Kullback-Leibler divergence term that appears in the
-# ELBO for the SuSiE model.
+# Compute KL(p_post || p_ser), the Kullback-Leibler divergence between
+# the SER posterior and the SER prior.
 compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
   -lbf - sum((s1 + b1^2)/shat)/2 + sum(b1*bhat/shat)

@@ -188,10 +188,6 @@ fit_susie_model_core <- function (dat, fit, control) {
   # Get the number of single effects.
   L <- length(fit$ser) 
 
-  # This is used to store the Kullback-Leibler terms needed to compute
-  # the ELBO.
-  KL <- rep(0,L)
-
   # Iterate the SER updates.
   for (iter in 1:control$maxiter) {
 
@@ -206,12 +202,11 @@ fit_susie_model_core <- function (dat, fit, control) {
     for (k in 1:L) {
       res <- susie_ibss_update(dat,fit$ser[[k]],L,b,fit$residual_variance)
       b <- res$b
-      KL[k] <- res$KL
       fit$ser[[k]] <- res$ser
     }
 
     # Compute the Bayes factor and ELBO.
-    res      <- susie_compute_elbo(dat,fit,KL)
+    res      <- susie_compute_elbo(dat,fit)
     fit$lbf  <- res$lbf
     fit$elbo <- res$elbo
     erss     <- res$erss
@@ -348,11 +343,10 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   ser <- fit_ser_model(ser,dat_ser)
   bk <- ser$posterior$mean
   sk <- ser$posterior$var
-  KL <- compute_kl_ser(dat_ser$bhat,dat_ser$shat,bk,sk,ser$lbf)
   if (L > 1)
     b <- b + bk
 
-  return(list(ser = ser,b = b,KL = KL))
+  return(list(ser = ser,b = b))
 }
 
 # Compute the log-likelihood under the "null" (b = 0) model.
@@ -381,10 +375,11 @@ susie_compute_ebss_without_yy <- function (dat, ser_list) {
 # Return (1) ERSS, (2) approximate log-Bayes factor, (3) ELBO. See
 # the susie_compute_ebss_without_yy function for what we mean by the
 # "ERSS".
-susie_compute_elbo <- function (dat, fit, KL) {
+susie_compute_elbo <- function (dat, fit) {
   sigma <- fit$residual_variance
   llik0 <- compute_null_loglik(dat,sigma)
   erss  <- susie_compute_ebss_without_yy(dat,fit$ser)
+  KL    <- sapply(fit$ser,"[[","KL")
   lbf   <- -erss/(2*sigma) - sum(KL)
   return(list(erss = erss,lbf = lbf,elbo = llik0 + lbf))
 }
