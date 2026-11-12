@@ -38,7 +38,8 @@
 #'   \item{elbo}{The value of the ELBO (an approximate marginal
 #'     likelihood) at the current model fit.}
 #'
-#'   \item{lbf}{TO DO: Explain what the "lbf" output is.}
+#'   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
+#'     to the \dQuote{null} model (b = 0).}
 #' 
 #'   \item{progress}{A data frame containing detailed information about
 #'     progress on the model fitting.}
@@ -349,14 +350,15 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   return(list(ser = ser,b = b,KL = KL))
 }
 
-# TO DO: Explain here what this function is for, and how to use it.
+# Compute the log-likelihood under the "null" (b = 0) model.
 compute_null_loglik <- function (dat, sigma) {
   n <- dat$n
   yy <- (n-1)*dat$var_y
   return(-(yy/sigma + n*log(2*pi*sigma))/2)
 }
 
-# TO DO: Explain here what this function is for, and how to use it.
+# Compute the "expected sum of squares" (ERSS) for the SuSiE model,
+# omitting the crossprod(y) term.
 susie_compute_ebss_without_yy <- function (dat, ser_list) {
   L <- length(ser_list)
   b <- compute_post_mean_susie(ser_list)
@@ -371,16 +373,20 @@ susie_compute_ebss_without_yy <- function (dat, ser_list) {
   return(erss)
 }
 
-# TO DO: Explain here what this function is for, and how to use it.
+# Return (1) ERSS, (2) approximate log-Bayes factor, (3) ELBO. See
+# the susie_compute_ebss_without_yy function for what we mean by the
+# "ERSS".
 susie_compute_elbo <- function (dat, fit, KL) {
   sigma <- fit$residual_variance
-  ll0   <- compute_null_loglik(dat,sigma)
+  llik0 <- compute_null_loglik(dat,sigma)
   erss  <- susie_compute_ebss_without_yy(dat,fit$ser)
   lbf   <- -erss/(2*sigma) - sum(KL)
-  return(list(elbo = ll0 + lbf,lbf = lbf,erss = erss))
+  return(list(erss = erss,lbf = lbf,elbo = llik0 + lbf))
 }
 
-# TO DO: Explain here what this function is for, and how to use it.
+# Output the EM update for the residual variance. See the
+# susie_compute_ebss_without_yy function for an explanation of the
+# "erss" input.
 susie_update_residual_variance <- function (dat, erss) {
   n <- dat$n
   yy <- (n-1)*dat$var_y

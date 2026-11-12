@@ -66,7 +66,8 @@ included in the output.}
   \item{elbo}{The value of the ELBO (an approximate marginal
     likelihood) at the current model fit.}
 
-  \item{lbf}{TO DO: Explain what the "lbf" output is.}
+  \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
+    to the \dQuote{null} model (b = 0).}
 
   \item{progress}{A data frame containing detailed information about
     progress on the model fitting.}
