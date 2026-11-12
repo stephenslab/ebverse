@@ -182,6 +182,10 @@ fit_susie_model_core <- function (dat, fit, control) {
   # Get the number of single effects.
   L <- length(fit$ser) 
 
+  # This is used to store the Kullback-Leibler terms needed to compute
+  # the ELBO.
+  KL <- rep(0,L)
+
   # Iterate the SER updates.
   for (iter in 1:control$maxiter) {
 
@@ -196,20 +200,23 @@ fit_susie_model_core <- function (dat, fit, control) {
     for (k in 1:L) {
       res <- susie_ibss_update(dat,fit$ser[[k]],L,b,fit$residual_variance)
       b <- res$b
+      KL[k] <- res$KL
       fit$ser[[k]] <- res$ser
     }
 
     # Compute the Bayes factor and ELBO.
-    #
-    # TO DO NEXT: Compute the log-Bayes factor (lbf)
-    # 
-    res      <- susie_compute_elbo(dat,fit)
+    res      <- susie_compute_elbo(dat,fit,KL)
+    fit$lbf  <- res$lbf
     fit$elbo <- res$elbo
     erss     <- res$erss
 
     # Update the residual variance parameter.
-    if (control$estimate_residual_variance)
-      fit$residual_variance <- erss/dat$n
+    if (control$estimate_residual_variance) {
+      # TO DO: Move this to a separate function.
+      n <- dat$n
+      yy <- (n-1)*dat$var_y
+      fit$residual_variance <- (yy + erss)/n
+    }
 
     # Update the progress data frame.
     if (is.data.frame(progress)) {
@@ -339,21 +346,27 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   ser <- fit_ser_model(ser,dat_ser)
   bk <- ser$posterior$mean
   sk <- ser$posterior$var
+  KL <- compute_kl_ser(dat_ser$bhat,dat_ser$shat,bk,sk,ser$lbf)
   if (L > 1)
     b <- b + bk
 
-  return(list(ser = ser,b = b))
+  return(list(ser = ser,b = b,KL = KL))
 }
 
 # TO DO: Explain here what this function is for, and how to use it.
-susie_compute_ebss <- function (dat, ser_list) {
+compute_null_loglik <- function (dat, sigma) {
   n <- dat$n
+  yy <- (n-1)*dat$var_y
+  return(-(yy/sigma + n*log(2*pi*sigma))/2)
+}
+
+# TO DO: Explain here what this function is for, and how to use it.
+susie_compute_ebss_without_yy <- function (dat, ser_list) {
   L <- length(ser_list)
   b <- compute_post_mean_susie(ser_list)
   d <- dat$ss$shat
   xy <- dat$ss$bhat/d
-  yy <- (n-1)*dat$var_y
-  erss <- yy - 2*sum(b*xy) + sum(b*compute_XtXb(dat,b)) 
+  erss <- sum(b*compute_XtXb(dat,b)) - 2*sum(b*xy)
   for (k in 1:L) {
     bk   <- ser_list[[k]]$posterior$mean
     sk   <- ser_list[[k]]$posterior$var
@@ -363,13 +376,10 @@ susie_compute_ebss <- function (dat, ser_list) {
 }
 
 # TO DO: Explain here what this function is for, and how to use it.
-susie_compute_elbo <- function (dat, fit) {
-  n     <- dat$n
-  L     <- length(fit$ser)
+susie_compute_elbo <- function (dat, fit, KL) {
   sigma <- fit$residual_variance
-  erss  <- susie_compute_ebss(dat,fit$ser)
-  elbo  <- -n*log(2*pi*sigma)/2 - erss/(2*sigma)
-  for (k in 1:L)
-    elbo <- elbo - fit$ser[[k]]$KL
-  return(list(elbo = elbo,erss = erss))
+  ll0   <- compute_null_loglik(dat,sigma)
+  erss  <- susie_compute_ebss_without_yy(dat,fit$ser)
+  lbf   <- -erss/(2*sigma) - sum(KL)
+  return(list(elbo = ll0 + lbf,lbf = lbf,erss = erss))
 }
