@@ -46,7 +46,7 @@
 #'   \item{lbf}{Log-Bayes factor comparing the SER model to the
 #'     \dQuote{null} model (b = 0).}
 #'
-#'   \item{KL}{Kullback-Leibler divergence between the posterior
+#'   \item{KL}{Kullback-Leibler divergence between the SER posterior
 #'     distribution and the SER prior.}
 #'
 #'   \item{progress}{A data frame containing detailed information about
@@ -475,4 +475,4 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
 # Compute KL(p_post || p_ser), the Kullback-Leibler divergence between
 # the SER posterior and the SER prior.
 compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
-  -lbf - sum((s1 + b1^2)/shat)/2 + sum(b1*bhat/shat)
+  -lbf + sum(b1*bhat/shat) - sum((s1 + b1^2)/shat)/2 
