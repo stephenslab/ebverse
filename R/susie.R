@@ -211,12 +211,8 @@ fit_susie_model_core <- function (dat, fit, control) {
     erss     <- res$erss
 
     # Update the residual variance parameter.
-    if (control$estimate_residual_variance) {
-      # TO DO: Move this to a separate function.
-      n <- dat$n
-      yy <- (n-1)*dat$var_y
-      fit$residual_variance <- (yy + erss)/n
-    }
+    if (control$estimate_residual_variance)
+      fit$residual_variance <- susie_update_residual_variance(dat,erss)
 
     # Update the progress data frame.
     if (is.data.frame(progress)) {
@@ -382,4 +378,11 @@ susie_compute_elbo <- function (dat, fit, KL) {
   erss  <- susie_compute_ebss_without_yy(dat,fit$ser)
   lbf   <- -erss/(2*sigma) - sum(KL)
   return(list(elbo = ll0 + lbf,lbf = lbf,erss = erss))
+}
+
+# TO DO: Explain here what this function is for, and how to use it.
+susie_update_residual_variance <- function (dat, erss) {
+  n <- dat$n
+  yy <- (n-1)*dat$var_y
+  return((yy + erss)/n)
 }
