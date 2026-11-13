@@ -4,16 +4,19 @@
 \alias{susie_data}
 \alias{prepare_susie_full_data}
 \alias{prepare_susie_summary_data}
-\title{Title goes here.}
+\title{Data Objects for SuSiE Models}
 \usage{
-prepare_susie_full_data(X, y)
+prepare_susie_full_data(X, y, standardize = FALSE, intercept = TRUE)
 
 prepare_susie_summary_data(z, R, bhat, shat, n, var_y)
 }
 \arguments{
-\item{X}{Describe input argument "X" here.}
+\item{X}{An n x J matrix containing observations about J candidate
+explanatory variables.}
 
-\item{y}{Describe input argument "y" here.}
+\item{y}{A vector of regression outcomes.}
+
+\item{standardize}{}
 
 \item{z}{Describe input argument "XtX" here.}
 
@@ -27,10 +30,14 @@ prepare_susie_summary_data(z, R, bhat, shat, n, var_y)
 
 \item{var_y}{Describe input argument "var_y" here.}
 }
+\value{
+A \sQuote{susie_data} object.
+}
 \description{
-Description goes here.
-
-Description goes here.
+Functions to prepare various types of data for
+}
+\details{
+Add details here.
 }
 \seealso{
 \link{susie}

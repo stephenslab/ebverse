@@ -1,42 +1,81 @@
 #' @name susie_data
 #'
-#' @title Title goes here.
+#' @title Data Objects for SuSiE Models
 #'
-#' @description Description goes here.
+#' @description Functions to prepare various types of data for 
 #'
-#' @param X Describe input argument "X" here.
+#' @param X An n x J matrix containing observations about J candidate
+#'   explanatory variables.
 #'
-#' @param y Describe input argument "y" here.
+#' @param y A vector of regression outcomes.
 #'
+#' @param standardize
+#' 
+#' @return A \sQuote{susie_data} object.
+#'
+#' @details Add details here.
+#' 
 #' @seealso \link{susie}
 #'
 #' @export
 #'
-prepare_susie_full_data <- function (X, y) {
+prepare_susie_full_data <- function (X, y, standardize = FALSE,
+                                     intercept = TRUE) {
   #
   # NOTES: 
-  # - Be strict about naming things!
   # - I need to do a better job checking the inputs.
-  # - Give messages/warnings to tell user what is going on.
   #
   # TO DO:
+  #
+  # - Add *units* (and throw an error if units are not provided).
   # - Implement variable.names S3 method.
   # - Implement sample.names S3 method.
+  # - Implement a "summary" S3 method.
+  # - Implement standardize = TRUE. (Don't standardize y.)
+  # - Implement intercept = TRUE.
   # - Get this working for both dense and sparse matrices.
   #   For sparse X, the output will be a "susie_full_data_sparse" 
   #   object.
   #
-  dat <- list()
+
+  # Check and process the inputs.  
+  if (!(is.numeric(y) & 
+        length(y) > 1))
+    stop("y should be a numeric vector containing at least 2 data points",
+         domain = NA)
+  if (!(is.numeric(X) &
+        is.matrix(X) &
+        nrow(X) == length(y) &
+        nrow(X) > 1 &
+        ncol(X) > 1))
+    stop("X should be a numeric matrix with at least 2 rows and 2 ",
+         "columns, and nrow(X) should be the same as length(y)",
+         domain = NA)
+
+  # Check the variable and sample names.
+  if (is.null(names(y)) | 
+      is.null(rownames(X)) |
+      is.null(colnames(X)))
+    stop("Elements of y and rows + columns of X need to be named",
+         domain = NA)
+  if (any(names(y) != rownames(X)))
+    stop("Sample names in X and y are not consistent",domain = NA)
+
+  # Prepare the output.
+  n <- nrow(X)
+  J <- ncol(X)
+  dat <- list(n     = n,
+              nvar  = J,
+              X     = X,
+              y     = y,
+              var_y = sum(y^2)/(n-1),
+              ss    = prepare_ser_data(X = X,y = y))
   class(dat) <- c("susie_full_data","susie_data","list")
   return(dat)
 }
 
 #' @rdname susie_data
 #' 
-#' @title Title goes here.
-#'
-#' @description Description goes here.
-#'
 #' @param z Describe input argument "XtX" here.
 #'
 #' @param R Describe input argument "R" here.
@@ -56,12 +95,42 @@ prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
   # NOTES: 
   # - Be strict about naming things.
   # - I need to do a better job checking the inputs.
-  # - Give messages/warnings to tell user what is going on (?).
+  # - Handle situation when n and/or var_y are missing.
+  # - Give messages/warnings to tell user what is going on.
   #
   dat <- list()
   class(dat) <- c("susie_summary_data","susie_data","list")
   return(dat)
 }
+
+#' @title Sample Names
+#'
+#' @description Simple utility for extacting the names of the samples
+#'   from a data object.
+#'
+#' @param dat A data object.
+#'
+#' @return A character vector containing the names of the samples.
+#' 
+#' @export
+#'
+sample.names <- function (dat) {
+  UseMethod("sample.names")
+}
+
+#'
+#' @export 
+#' 
+sample.names.susie_full_data <- function (object, ...)
+  names(object$y)
+
+#'
+#' @importFrom stats variable.names
+#' 
+#' @export  
+#'
+variable.names.susie_full_data <- function (object, ...)
+  colnames(object$X)
 
 #' @title Add Title Here.
 #'
