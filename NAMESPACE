@@ -2,7 +2,9 @@
 
 S3method(compute_XtXb,susie_full_data)
 S3method(fit_ser_model,ser_normal)
+S3method(print,summary.susie.data)
 S3method(sample.names,susie_full_data)
+S3method(summary,susie_full_data)
 S3method(variable.names,ser_normal)
 S3method(variable.names,susie_full_data)
 export(compute_XtXb)

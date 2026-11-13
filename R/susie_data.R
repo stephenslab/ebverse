@@ -27,9 +27,7 @@ prepare_susie_full_data <- function (X, y, standardize = FALSE,
   #
   # TO DO:
   #
-  # - Add *units* (and throw an error if units are not provided).
-  # - Implement variable.names S3 method.
-  # - Implement sample.names S3 method.
+  # - Require *units* (and throw an error if units are not provided).
   # - Implement a "summary" S3 method.
   # - Implement standardize = TRUE. (Don't standardize y.)
   # - Implement intercept = TRUE.
@@ -114,7 +112,7 @@ prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
 #' 
 #' @export
 #'
-sample.names <- function (dat) {
+sample.names <- function (dat, ...) {
   UseMethod("sample.names")
 }
 
@@ -131,6 +129,22 @@ sample.names.susie_full_data <- function (object, ...)
 #'
 variable.names.susie_full_data <- function (object, ...)
   colnames(object$X)
+
+#' 
+#' @export
+#' 
+summary.susie_full_data <- function (object, ...) {
+  print("blah")
+  out <- class("summary.susie.data","list")
+  return(out)
+}
+
+#'
+#' @export
+#' 
+print.summary.susie.data <- function (x, ...) {
+  # TO DO.
+}
 
 #' @title Add Title Here.
 #'

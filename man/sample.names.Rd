@@ -4,7 +4,7 @@
 \alias{sample.names}
 \title{Sample Names}
 \usage{
-sample.names(dat)
+sample.names(dat, ...)
 }
 \arguments{
 \item{dat}{A data object.}
