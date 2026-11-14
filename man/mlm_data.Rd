@@ -6,7 +6,7 @@
 \alias{prepare_mlm_summary_data}
 \title{Data Objects for Multiple Linear Regression Models}
 \usage{
-prepare_mlm_full_data(X, y, standardize = FALSE, intercept = TRUE)
+prepare_mlm_full_data(X, y, standardize = FALSE)
 
 prepare_mlm_summary_data(z, R, bhat, shat, n, var_y)
 }
@@ -16,7 +16,7 @@ explanatory variables.}
 
 \item{y}{A vector of regression outcomes.}
 
-\item{standardize}{}
+\item{standardize}{Describe hte "standardize" input here.}
 
 \item{z}{Describe input argument "XtX" here.}
 

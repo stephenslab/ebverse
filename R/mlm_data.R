@@ -9,16 +9,15 @@
 #'
 #' @param y A vector of regression outcomes.
 #'
-#' @param standardize
-#' 
+#' @param standardize Describe hte "standardize" input here.
+#'
 #' @return An \sQuote{mlm_data} object.
 #'
 #' @details Add details here.
 #' 
 #' @export
 #'
-prepare_mlm_full_data <- function (X, y, standardize = FALSE, 
-                                   intercept = TRUE) {
+prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   #
   # NOTES: 
   # - I need to do a better job checking the inputs.
@@ -28,7 +27,8 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE,
   # - Require *units* (and throw an error if units are not provided).
   # - Implement a "summary" S3 method.
   # - Implement standardize = TRUE. (Don't standardize y.)
-  # - Implement intercept = TRUE.
+  #
+  # TO DO NEXT: Implement standardize = TRUE.
   #
 
   # Check and process the inputs.  
@@ -90,6 +90,8 @@ prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
   # - I need to do a better job checking the inputs.
   # - Handle situation when n and/or var_y are missing.
   # - Give messages/warnings to tell user what is going on.
+  # - See susie_rss.R.
+  # - Assume n is provided, but not necessarily var_y.
   #
   dat <- list()
   class(dat) <- c("mlm_summary_data","mlm_data","list")
@@ -129,6 +131,7 @@ variable.names.mlm_full_data <- function (object, ...)
 #' @export
 #' 
 summary.mlm_full_data <- function (object, ...) {
+  # TO DO NEXT.
   out <- class("summary.mlm.data","list")
   return(out)
 }
@@ -137,7 +140,7 @@ summary.mlm_full_data <- function (object, ...) {
 #' @export
 #' 
 print.summary.mlm.data <- function (x, ...) {
-  # TO DO.
+  # TO DO NEXT.
 }
 
 #' @rdname mlm_data_internal
