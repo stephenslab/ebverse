@@ -1,6 +1,6 @@
-#' @name susie_data
+#' @name mlm_data
 #'
-#' @title Data Objects for SuSiE Models
+#' @title Data Objects for Multiple Linear Regression Models
 #'
 #' @description Functions to prepare various types of data for 
 #'
@@ -11,16 +11,14 @@
 #'
 #' @param standardize
 #' 
-#' @return A \sQuote{susie_data} object.
+#' @return An \sQuote{mlm_data} object.
 #'
 #' @details Add details here.
 #' 
-#' @seealso \link{susie}
-#'
 #' @export
 #'
-prepare_susie_full_data <- function (X, y, standardize = FALSE,
-                                     intercept = TRUE) {
+prepare_mlm_full_data <- function (X, y, standardize = FALSE, 
+                                   intercept = TRUE) {
   #
   # NOTES: 
   # - I need to do a better job checking the inputs.
@@ -31,9 +29,6 @@ prepare_susie_full_data <- function (X, y, standardize = FALSE,
   # - Implement a "summary" S3 method.
   # - Implement standardize = TRUE. (Don't standardize y.)
   # - Implement intercept = TRUE.
-  # - Get this working for both dense and sparse matrices.
-  #   For sparse X, the output will be a "susie_full_data_sparse" 
-  #   object.
   #
 
   # Check and process the inputs.  
@@ -68,11 +63,11 @@ prepare_susie_full_data <- function (X, y, standardize = FALSE,
               y     = y,
               var_y = sum(y^2)/(n-1),
               ss    = prepare_ser_data(X = X,y = y))
-  class(dat) <- c("susie_full_data","susie_data","list")
+  class(dat) <- c("mlm_full_data","mlm_data","list")
   return(dat)
 }
 
-#' @rdname susie_data
+#' @rdname mlm_data
 #' 
 #' @param z Describe input argument "XtX" here.
 #'
@@ -88,7 +83,7 @@ prepare_susie_full_data <- function (X, y, standardize = FALSE,
 #' 
 #' @export
 #' 
-prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
+prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
   #  
   # NOTES: 
   # - Be strict about naming things.
@@ -97,7 +92,7 @@ prepare_susie_summary_data <- function (z, R, bhat, shat, n, var_y) {
   # - Give messages/warnings to tell user what is going on.
   #
   dat <- list()
-  class(dat) <- c("susie_summary_data","susie_data","list")
+  class(dat) <- c("mlm_summary_data","mlm_data","list")
   return(dat)
 }
 
@@ -119,7 +114,7 @@ sample.names <- function (dat, ...) {
 #'
 #' @export 
 #' 
-sample.names.susie_full_data <- function (object, ...)
+sample.names.mlm_full_data <- function (object, ...)
   names(object$y)
 
 #'
@@ -127,34 +122,37 @@ sample.names.susie_full_data <- function (object, ...)
 #' 
 #' @export  
 #'
-variable.names.susie_full_data <- function (object, ...)
+variable.names.mlm_full_data <- function (object, ...)
   colnames(object$X)
 
 #' 
 #' @export
 #' 
-summary.susie_full_data <- function (object, ...) {
-  print("blah")
-  out <- class("summary.susie.data","list")
+summary.mlm_full_data <- function (object, ...) {
+  out <- class("summary.mlm.data","list")
   return(out)
 }
 
 #'
 #' @export
 #' 
-print.summary.susie.data <- function (x, ...) {
+print.summary.mlm.data <- function (x, ...) {
   # TO DO.
 }
 
+#' @rdname mlm_data_internal
+#'
 #' @title Add Title Here.
 #'
 #' @description Add description here.
 #'
 #' @param dat Describe input argument "data" here.
 #'
+#' @param b Describe input argument "b" here.
+#' 
 #' @return Describe the return value here.
 #' 
-#' @seealso \link{susie_data}
+#' @seealso \link{mlm_data}
 #' 
 #' @export
 #'
@@ -167,9 +165,8 @@ compute_XtXb <- function (dat, b) {
 #' 
 #' @export
 #' 
-# TO DO: Update this function to accept either a matrix or a vector.
-compute_XtXb.susie_full_data <- function (dat, b) {
-  Y <- t(dat$X %*% b) %*% dat$X
+compute_XtXb.mlm_full_data <- function (dat, b) {
+  Y <- drop(t(dat$X %*% b) %*% dat$X)
   colnames(Y) <- colnames(dat$X)
   return(drop(Y))
 }
