@@ -17,7 +17,8 @@
 #' 
 #' @export
 #'
-prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
+prepare_mlm_full_data <- function (X, y, intercept = TRUE, 
+                                   standardize = FALSE) {
   #
   # NOTES: 
   # - I need to do a better job checking the inputs.
@@ -27,8 +28,16 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   # - Require *units* (and throw an error if units are not provided).
   # - Implement a "summary" S3 method.
   # - Implement standardize = TRUE. (Don't standardize y.)
+  # - Implement intercept = TRUE.
+  # - Add intercept estimate to data object.
+  # - From glmnet: "The coefficients are always
+  #   returned on the original scale. Default is
+  #   standardize=TRUE. If variables are in the same units
+  #   already, you might not wish to standardize."
   #
-  # TO DO NEXT: Implement standardize = TRUE.
+  # TO DO NEXT: 
+  # - Implement standardize = TRUE.
+  # - Implement intercept = TRUE.
   #
 
   # Check and process the inputs.  
@@ -131,16 +140,26 @@ variable.names.mlm_full_data <- function (object, ...)
 #' @export
 #' 
 summary.mlm_full_data <- function (object, ...) {
-  # TO DO NEXT.
-  out <- class("summary.mlm.data","list")
+  out <- list(n = object$n,nvar = object$nvar)
+  class(out) <- c("summary.mlm.full.data","list")
   return(out)
 }
 
 #'
 #' @export
 #' 
-print.summary.mlm.data <- function (x, ...) {
-  # TO DO NEXT.
+print.summary.mlm.full.data <- function (x, ...) {
+  cat(sprintf(paste("sample-level or individual-level data for %d variables",
+                    "in %d samples\n"),x$n,x$nvar))
+  return(invisible(x))
+}
+
+#'
+#' @export
+#' 
+print.mlm_full_data <- function (x, ...) {
+  print(summary(x))
+  return(invisible(x))
 }
 
 #' @rdname mlm_data_internal
