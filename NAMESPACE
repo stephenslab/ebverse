@@ -3,7 +3,7 @@
 S3method(compute_XtXb,mlm_full_data)
 S3method(fit_ser_model,ser_normal)
 S3method(print,mlm_full_data)
-S3method(print,summary.mlm.full.data)
+S3method(print,summary_mlm_full_data)
 S3method(sample.names,mlm_full_data)
 S3method(summary,mlm_full_data)
 S3method(variable.names,mlm_full_data)

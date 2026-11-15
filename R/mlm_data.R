@@ -141,14 +141,14 @@ variable.names.mlm_full_data <- function (object, ...)
 #' 
 summary.mlm_full_data <- function (object, ...) {
   out <- list(n = object$n,nvar = object$nvar)
-  class(out) <- c("summary.mlm.full.data","list")
+  class(out) <- c("summary_mlm_full_data","list")
   return(out)
 }
 
 #'
 #' @export
 #' 
-print.summary.mlm.full.data <- function (x, ...) {
+print.summary_mlm_full_data <- function (x, ...) {
   cat(sprintf(paste("sample-level or individual-level data for %d variables",
                     "in %d samples\n"),x$n,x$nvar))
   return(invisible(x))
