@@ -53,7 +53,7 @@
 #'   \item{dat}{When \code{return_data = TRUE}, this contains the 
 #'     data that were used to fit the model.}
 #'
-#' @seealso \link{susie_data}, \link{single_effect_regression}
+#' @seealso \link{single_effect_regression}, \link{mlm_data}
 #'
 #' @examples
 #' # TO DO: Add one or several examples.
@@ -110,10 +110,10 @@ init_susie_model <-
 #'   an \sQuote{init_susie_model} function, or an output from a
 #'   previous \code{fit_susie_model} call.
 #'
-#' @param dat An object of class \sQuote{susie_data}, for example the
-#'   output from a call to \code{\link{prepare_susie_full_data}} or
-#'   \code{\link{prepare_susie_summary_data}}. See \link{susie_data}
-#'   for other ways to create \sQuote{susie_data} objects.
+#' @param dat An object of class \sQuote{mlm_data}, for example the
+#'   output from a call to \code{\link{prepare_mlm_full_data}} or
+#'   \code{\link{prepare_mlm_summary_data}}. See \link{mlm_data}
+#'   for other ways to create \sQuote{mlm_data} objects.
 #' 
 #' @param return_data If \code{return_data = TRUE}, the input data are
 #'   included in the output.
@@ -130,16 +130,20 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
-  # TO DO NEXT: Implement the "susie_data" functions.
-  #
   # TO DO:
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement some functions for simulating data from susie models.
   # - Test fit_susie_model with L = 1.
-  # - Implement both elbo and lbf computations.
-  # - Implement a "summary" S3 method.
+  # - Implement a "summary" S3 method for "ser_normal" objects.
+  # - Implement a "summary" S3 method for "susie" objects.
+  # - Implement "coef" S3 method.
+  # - Implement "predict" S3 method.
+  # - Implement a "plot" S3 method (idea: bhat vs. b1 scatterplot).
+  # - Other S3 methods?
+  # - Implement a new mlm_data object for PLINK "pgen" data sets.
+  #   (Idea: specialized packages should be "Suggests".)
   # - Implement "global" estimation of parameters in the 
   #   SER models.
   #
@@ -147,8 +151,8 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # Check and process the inputs.
   if (!inherits(fit,"susie"))
     stop("'fit' should be an object of class 'susie'",domain = NA)
-  if (!inherits(dat,"susie_data"))
-    stop("'dat' should be an object of class 'susie_data'",domain = NA)
+  if (!inherits(dat,"mlm_data"))
+    stop("'dat' should be an object of class 'mlm_data'",domain = NA)
   force(return_data)
   if (missing(dat)) {
     if (is.null(fit$dat))
@@ -269,6 +273,7 @@ fit_susie_model_core <- function (dat, fit, control) {
   }
 
   # Prepare the output.
+  fit$xs <- dat$xs
   if (control$trace) {
     progress <- progress[1:iter,]
     if (is.data.frame(fit$progress)) {

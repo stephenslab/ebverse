@@ -6,7 +6,7 @@
 \alias{prepare_mlm_summary_data}
 \title{Data Objects for Multiple Linear Regression Models}
 \usage{
-prepare_mlm_full_data(X, y, intercept = TRUE, standardize = FALSE)
+prepare_mlm_full_data(X, y, standardize = FALSE)
 
 prepare_mlm_summary_data(z, R, bhat, shat, n, var_y)
 }
@@ -16,7 +16,10 @@ explanatory variables.}
 
 \item{y}{A vector of regression outcomes.}
 
-\item{standardize}{Describe hte "standardize" input here.}
+\item{standardize}{If \code{standardize = TRUE}, columns of X are
+standardized. If variables are in the same units already, you
+might not wish to standardize. Coefficients are always returned
+on the original scale.}
 
 \item{z}{Describe input argument "XtX" here.}
 

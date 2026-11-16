@@ -9,7 +9,10 @@
 #'
 #' @param y A vector of regression outcomes.
 #'
-#' @param standardize Describe hte "standardize" input here.
+#' @param standardize If \code{standardize = TRUE}, columns of X are
+#'   standardized. If variables are in the same units already, you
+#'   might not wish to standardize. Coefficients are always returned
+#'   on the original scale.
 #'
 #' @return An \sQuote{mlm_data} object.
 #'
@@ -17,17 +20,13 @@
 #' 
 #' @export
 #'
-prepare_mlm_full_data <- function (X, y, intercept = TRUE, 
-                                   standardize = FALSE) {
+prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   #
   # NOTES: 
   # - I need to do a better job checking the inputs.
   #
   # TO DO:
   #
-  # - Require *units* (and throw an error if units are not provided).
-  # - Implement a "summary" S3 method.
-  # - Implement standardize = TRUE. (Don't standardize y.)
   # - Implement intercept = TRUE.
   # - Add intercept estimate to data object.
   # - From glmnet: "The coefficients are always
@@ -37,7 +36,6 @@ prepare_mlm_full_data <- function (X, y, intercept = TRUE,
   #
   # TO DO NEXT: 
   # - Implement standardize = TRUE.
-  # - Implement intercept = TRUE.
   #
 
   # Check and process the inputs.  
@@ -58,10 +56,22 @@ prepare_mlm_full_data <- function (X, y, intercept = TRUE,
   if (is.null(names(y)) | 
       is.null(rownames(X)) |
       is.null(colnames(X)))
-    stop("Elements of y and rows + columns of X need to be named",
+    stop("Elements of y, and rows and columns of X, need to be named",
          domain = NA)
   if (any(names(y) != rownames(X)))
     stop("Sample names in X and y are not consistent",domain = NA)
+
+  # For now, automatically center X and y. 
+  # (TO DO: make this an option).
+  # 
+  # Standardize the columns of X, if requested.
+  if (standardize) {
+    X <- scale(X,center = TRUE,scale = TRUE)
+    xs <- attr(X,"scaled:scale")
+  } else {
+    X <- scale(X,center = TRUE,scale = FALSE)
+    xs <- rep(1,J)
+  }
 
   # Prepare the output.
   n <- nrow(X)
@@ -71,7 +81,9 @@ prepare_mlm_full_data <- function (X, y, intercept = TRUE,
               X     = X,
               y     = y,
               var_y = sum(y^2)/(n-1),
-              ss    = prepare_ser_data(X = X,y = y))
+              ss    = prepare_ser_data(X = X,y = y),
+              xs    = xs,
+              standardize = standardize)
   class(dat) <- c("mlm_full_data","mlm_data","list")
   return(dat)
 }
@@ -140,7 +152,9 @@ variable.names.mlm_full_data <- function (object, ...)
 #' @export
 #' 
 summary.mlm_full_data <- function (object, ...) {
-  out <- list(n = object$n,nvar = object$nvar)
+  out <- list(n = object$n,
+              nvar = object$nvar,
+              standardize = object$standardize)
   class(out) <- c("summary_mlm_full_data","list")
   return(out)
 }
@@ -151,6 +165,8 @@ summary.mlm_full_data <- function (object, ...) {
 print.summary_mlm_full_data <- function (x, ...) {
   cat(sprintf(paste("sample-level or individual-level data for %d variables",
                     "in %d samples\n"),x$n,x$nvar))
+  cat(sprintf("variables %d standardized\n",
+              ifelse(x$standardize,"are","are not")))
   return(invisible(x))
 }
 
@@ -184,11 +200,10 @@ compute_XtXb <- function (dat, b) {
   UseMethod("compute_XtXb")
 }
 
+#' @importFrom stats setNames
 #' 
 #' @export
 #' 
-compute_XtXb.mlm_full_data <- function (dat, b) {
-  Y <- drop(t(dat$X %*% b) %*% dat$X)
-  colnames(Y) <- colnames(dat$X)
-  return(drop(Y))
-}
+compute_XtXb.mlm_full_data <- function (dat, b)
+  setNames(drop(t(dat$X %*% b) %*% dat$X),colnames(dat$X))
+

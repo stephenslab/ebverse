@@ -44,10 +44,10 @@ state of a SuSiE model fit, typically the output from running
 an \sQuote{init_susie_model} function, or an output from a
 previous \code{fit_susie_model} call.}
 
-\item{dat}{An object of class \sQuote{susie_data}, for example the
-output from a call to \code{\link{prepare_susie_full_data}} or
-\code{\link{prepare_susie_summary_data}}. See \link{susie_data}
-for other ways to create \sQuote{susie_data} objects.}
+\item{dat}{An object of class \sQuote{mlm_data}, for example the
+output from a call to \code{\link{prepare_mlm_full_data}} or
+\code{\link{prepare_mlm_summary_data}}. See \link{mlm_data}
+for other ways to create \sQuote{mlm_data} objects.}
 
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
@@ -94,5 +94,5 @@ Methods for fitting \dQuote{Sum of Single Effect}
 
 }
 \seealso{
-\link{susie_data}, \link{single_effect_regression}
+\link{single_effect_regression}, \link{mlm_data}
 }
