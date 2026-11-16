@@ -27,15 +27,9 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   #
   # TO DO:
   #
+  # - Define "mlm_data" class in the documentation.
   # - Implement intercept = TRUE.
   # - Add intercept estimate to data object.
-  # - From glmnet: "The coefficients are always
-  #   returned on the original scale. Default is
-  #   standardize=TRUE. If variables are in the same units
-  #   already, you might not wish to standardize."
-  #
-  # TO DO NEXT: 
-  # - Implement standardize = TRUE.
   #
 
   # Check and process the inputs.  
@@ -163,9 +157,9 @@ summary.mlm_full_data <- function (object, ...) {
 #' @export
 #' 
 print.summary_mlm_full_data <- function (x, ...) {
-  cat(sprintf(paste("sample-level or individual-level data for %d variables",
-                    "in %d samples\n"),x$n,x$nvar))
-  cat(sprintf("variables %d standardized\n",
+  cat(sprintf(paste("Sample-level or individual-level data for %d variables",
+                    "in %d samples.\n"),x$n,x$nvar))
+  cat(sprintf("Variables %s standardized.\n",
               ifelse(x$standardize,"are","are not")))
   return(invisible(x))
 }
