@@ -141,15 +141,15 @@ A single effect regression (SER) model is a Bayesian
   single-variable regression models.
 
   The first element of an SER model is a multiple regression
-  model of an outcome \eqn{\bf y},
-  \deqn{{\bf y} = {\bf X}{\bf b} + {\bf e},}
-  where \eqn{{\bf e}} is a vector of independent, normally
-  distributed error terms, \eqn{{\bf e} \sim N(0, \sigma^2 {\bf
-  I})}. The residual variance \eqn{\sigma^2} is assumed to be known.
+  model of an outcome y,
+  \deqn{y = Xb + e,}
+  where \eqn{e} is a vector of independent, normally
+  distributed error terms, \eqn{e \sim N(0, \sigma^2 I)}.
+  The residual variance \eqn{\sigma^2} is assumed to be known.
 
   The second element of a an SER model is an \emph{SER prior} on
-  the coefficients vector \eqn{\bf b}. An SER prior has the
-  property that any \eqn{\bf b} drawn from the prior has exactly
+  the coefficients vector \eqn{b}. An SER prior has the
+  property that any \eqn{b} drawn from the prior has exactly
   one nonzero coefficient. For example, the SER model initialized
   by \code{init_ser_model_normal()} defines a prior in which
   coefficient \eqn{j} is nonzero with prior probability
@@ -167,7 +167,11 @@ A single effect regression (SER) model is a Bayesian
   (ii) initialize the SER model using the \code{init_ser_data}
   function; and (iii) fit the model and compute posterior
   statistics from the fitted model using the \code{fit_ser_data}
-  function.
+  function. 
+
+  \subsection{Design of single effect regression classes}{
+    TO DO.
+  }
 }
 \note{
 This is a \dQuote{lightweight} interface with relatively few
