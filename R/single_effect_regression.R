@@ -120,6 +120,8 @@ init_ser_model <- function (variable.names,
                                          prior_variance = 1),
                             init_method = "null",
                             control = list()) {
+  # TO DO: Implement "init_method" option for posterior means to be
+  # specified manually.
   family <- match.arg(family)
   if (family == "normal")
     fit <- init_ser_model_normal(variable.names,prior,init_method,control)

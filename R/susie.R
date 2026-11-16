@@ -55,6 +55,10 @@
 #'
 #' @seealso \link{single_effect_regression}, \link{mlm_data}
 #'
+#' @details
+#' TO DO: Explain that the special case of L = 1 reduces to
+#' a single effect regression.
+#' 
 #' @examples
 #' # TO DO: Add one or several examples.
 #'
@@ -135,7 +139,6 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement some functions for simulating data from susie models.
-  # - Test fit_susie_model with L = 1.
   # - Implement a "summary" S3 method for "ser_normal" objects.
   # - Implement a "summary" S3 method for "susie" objects.
   # - Implement "coef" S3 method.
@@ -363,7 +366,7 @@ compute_null_loglik <- function (dat, sigma) {
 
 # Compute the "expected sum of squares" (ERSS) for the SuSiE model,
 # omitting the crossprod(y) term.
-susie_compute_ebss_without_yy <- function (dat, ser_list) {
+susie_compute_erss_without_yy <- function (dat, ser_list) {
   L <- length(ser_list)
   b <- compute_post_mean_susie(ser_list)
   d <- dat$ss$shat
@@ -378,19 +381,25 @@ susie_compute_ebss_without_yy <- function (dat, ser_list) {
 }
 
 # Return (1) ERSS, (2) approximate log-Bayes factor, (3) ELBO. See
-# the susie_compute_ebss_without_yy function for what we mean by the
+# the susie_compute_erss_without_yy function for what we mean by the
 # "ERSS".
 susie_compute_elbo <- function (dat, fit) {
+  L     <- length(fit$ser)
   sigma <- fit$residual_variance
   llik0 <- compute_null_loglik(dat,sigma)
-  erss  <- susie_compute_ebss_without_yy(dat,fit$ser)
-  KL    <- sapply(fit$ser,"[[","KL")
-  lbf   <- -erss/(2*sigma) - sum(KL)
+  erss  <- susie_compute_erss_without_yy(dat,fit$ser)
+  if (L == 1) {
+    KL  <- fit$ser[[1]]$KL
+    lbf <- fit$ser[[1]]$lbf
+  } else {
+    KL  <- sapply(fit$ser,"[[","KL")
+    lbf <- -erss/(2*sigma) - sum(KL)
+  }
   return(list(erss = erss,lbf = lbf,elbo = llik0 + lbf))
 }
 
 # Output the EM update for the residual variance. See the
-# susie_compute_ebss_without_yy function for an explanation of the
+# susie_compute_erss_without_yy function for an explanation of the
 # "erss" input.
 susie_update_residual_variance <- function (dat, erss) {
   n <- dat$n

@@ -108,6 +108,11 @@ prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
   # - See susie_rss.R.
   # - Assume n is provided, but not necessarily var_y.
   #
+  # TO DO:
+  # - Check that susie with z-scores produces the same result as
+  #   susie with full data when X is standardized. (I don't think 
+  #   Y needs to be standardized so long as var_y is provided?)
+  #
   dat <- list()
   class(dat) <- c("mlm_summary_data","mlm_data","list")
   return(dat)

@@ -87,6 +87,10 @@ Methods for fitting \dQuote{Sum of Single Effect}
   models. The \sQuote{fit_susie_model} method is the main method
   for fitting SuSiE models and computing posterior statistics.
 }
+\details{
+TO DO: Explain that the special case of L = 1 reduces to
+a single effect regression.
+}
 \examples{
 # TO DO: Add one or several examples.
 
