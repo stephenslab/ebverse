@@ -41,4 +41,8 @@ Functions to prepare various types of data for
 }
 \details{
 Add details here.
+
+  \subsection{Design of MLM data classes}{
+    TO DO. 
+  }
 }

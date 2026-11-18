@@ -25,9 +25,9 @@ init_ser_model_normal(
   control = list()
 )
 
-fit_ser_model(fit, dat, return_data = missing(dat))
+fit_ser_model(fit, dat, return_data = missing(dat), ...)
 
-\method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat))
+\method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat), ...)
 
 ser_normal_control_default()
 
@@ -62,6 +62,8 @@ output from a call to \code{prepare_ser_data}.}
 
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
+
+\item{\dots}{Additional arguments controlling the model fitting.}
 
 \item{bhat}{A vector of least-squares estimates of the coefficients.}
 
@@ -169,14 +171,28 @@ A single effect regression (SER) model is a Bayesian
   statistics from the fitted model using the \code{fit_ser_data}
   function. 
 
-  \subsection{Design of single effect regression classes}{
-    TO DO.
+  \bold{Design of single effect regression classes.} A single
+  effect regression (SER) class requires the following three
+  elements:
+  \enumerate{
+
+  \item A function that initializes the SER model (e.g.,
+    \code{init_ser_model_normal}). It returns an \sQuote{ser}
+    model.
+
+  \item A \sQuote{fit_ser_model} method that takes (at least) two
+    inputs, an \sQuote{ser} model and an \sQuote{ser_data} data
+    set. It returns an updated SER model (object of class
+    \sQuote{ser}).
+
+  \item A \sQuote{variable.names} method that returns the
+    variable names. 
   }
 }
 \note{
-This is a \dQuote{lightweight} interface with relatively few
-  features and few checks; it is mainly used to implement the
-  susie methods.
+This is a lightweight interface with relatively few features
+  and few checks; it is mainly used to implement the susie
+  methods.
 
 In \code{prepare_set_data}, only provide (bhat, shat) or
   (X, y); an error will occur if the wrong combination of data

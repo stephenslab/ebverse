@@ -17,13 +17,14 @@
 #' @return An \sQuote{mlm_data} object.
 #'
 #' @details Add details here.
+#'
+#'   \subsection{Design of MLM data classes}{
+#'     TO DO. 
+#'   }
 #' 
 #' @export
 #'
 prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
-  #
-  # NOTES: 
-  # - I need to do a better job checking the inputs.
   #
   # TO DO:
   #

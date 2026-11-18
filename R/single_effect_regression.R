@@ -103,13 +103,27 @@
 #'   statistics from the fitted model using the \code{fit_ser_data}
 #'   function. 
 #'
-#'   \subsection{Design of single effect regression classes}{
-#'     TO DO.
+#'   \bold{Design of single effect regression classes.} A single
+#'   effect regression (SER) class requires the following three
+#'   elements:
+#'   \enumerate{
+#' 
+#'   \item A function that initializes the SER model (e.g.,
+#'     \code{init_ser_model_normal}). It returns an \sQuote{ser}
+#'     model.
+#' 
+#'   \item A \sQuote{fit_ser_model} method that takes (at least) two
+#'     inputs, an \sQuote{ser} model and an \sQuote{ser_data} data
+#'     set. It returns an updated SER model (object of class
+#'     \sQuote{ser}).
+#'
+#'   \item A \sQuote{variable.names} method that returns the
+#'     variable names. 
 #'   }
 #' 
-#' @note This is a \dQuote{lightweight} interface with relatively few
-#'   features and few checks; it is mainly used to implement the
-#'   susie methods.
+#' @note This is a lightweight interface with relatively few features
+#'   and few checks; it is mainly used to implement the susie
+#'   methods.
 #'
 #' @seealso \link{susie}
 #'
@@ -193,10 +207,12 @@ init_ser_model_normal <-
 #' 
 #' @param return_data If \code{return_data = TRUE}, the input data are
 #'   included in the output.
+#'
+#' @param \dots Additional arguments controlling the model fitting.
 #' 
 #' @export
 #'
-fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
+fit_ser_model <- function (fit, dat, return_data = missing(dat), ...) {
    UseMethod("fit_ser_model")
 }
 
@@ -207,7 +223,8 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat)) {
 #'
 #' @export
 #' 
-fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat)) {
+fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat), 
+                                      ...) {
 
   # TO DO: 
   # - Implement function to conveniently simulate susie data sets
