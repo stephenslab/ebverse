@@ -7,3 +7,6 @@
 [26] plot           predict        print          proj           qr
 [31] residuals      rstandard      rstudent       show           simulate
 [36] slotsFromS3    summary        variable.names vcov
+
+> methods(class="glmnet")
+[1] coef     deviance family   plot     predict  print

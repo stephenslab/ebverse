@@ -34,14 +34,22 @@ on the original scale.}
 \item{var_y}{Describe input argument "var_y" here.}
 }
 \value{
-An \sQuote{mlm_data} object.
+An \sQuote{mlm_data} object. It is a list with the
+  following elements:
+
+  \item{n}{The number of samples.}
+
+  \item{nvar}{The number of variables.}
+
+  \item{Item 2}{Description of item 2.}
 }
 \description{
-Methods for preparing and working with data used to
-  fit multiple linear regression (MLM) models. This is
-  implemented as a modular (\dQuote{object-oriented}) interface,
-  allowing for different types of MLM data (see \sQuote{Details}
-  for specification of MLM data classes).
+Methods for preparing and working with data sets for
+  fitting multiple linear regression (MLM) models. MLM data sets
+  are implemented in a modular (\dQuote{object-oriented})
+  interface, which allows for different types of MLM data (see
+  \sQuote{Details} for a general specification of MLM data
+  classes).
 }
 \details{
 \bold{Design of MLM data classes.}

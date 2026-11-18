@@ -11,8 +11,8 @@
 #'   is the main method for fitting SER models and returning key
 #'   posterior statistics. SER models are implemented as a modular
 #'   (\dQuote{object-oriented}) interface, allowing for different
-#'   types of SER families (see \sQuote{Details} for specification
-#'   of SER classes).
+#'   types of SER families (see \sQuote{Details} for a general
+#'   specification of SER classes).
 #'
 #' @param variable.names The names of the variables in the
 #'   SER model.
@@ -121,7 +121,8 @@
 #'     \sQuote{ser}).
 #'
 #'   \item A \sQuote{variable.names} method that returns the
-#'     variable names. 
+#'     variable names.
+#' 
 #'   }
 #' 
 #' @note This is a lightweight interface with relatively few features

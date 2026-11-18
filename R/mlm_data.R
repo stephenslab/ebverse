@@ -2,11 +2,12 @@
 #'
 #' @title Data Objects for Multiple Linear Regression Models
 #'
-#' @description Methods for preparing and working with data used to
-#'   fit multiple linear regression (MLM) models. This is
-#'   implemented as a modular (\dQuote{object-oriented}) interface,
-#'   allowing for different types of MLM data (see \sQuote{Details}
-#'   for specification of MLM data classes).
+#' @description Methods for preparing and working with data sets for
+#'   fitting multiple linear regression (MLM) models. MLM data sets
+#'   are implemented in a modular (\dQuote{object-oriented})
+#'   interface, which allows for different types of MLM data (see
+#'   \sQuote{Details} for a general specification of MLM data
+#'   classes).
 #'
 #' @param X An n x J matrix containing observations about J candidate
 #'   explanatory variables.
@@ -18,8 +19,15 @@
 #'   might not wish to standardize. Coefficients are always returned
 #'   on the original scale.
 #'
-#' @return An \sQuote{mlm_data} object.
+#' @return An \sQuote{mlm_data} object. It is a list with the
+#'   following elements:
 #'
+#'   \item{n}{The number of samples.}
+#'
+#'   \item{nvar}
+#'
+#'   \item{Item 2}{Description of item 2.}
+#' 
 #' @details \bold{Design of MLM data classes.}
 #'   An \dQuote{MLM data} class has at a minimum the following elements:
 #'   \enumerate{
@@ -28,15 +36,17 @@
 #'   \code{prepare_mlm_full_data}). It should return an object of
 #'   class \sQuote{mlm_data}.
 #'
-#'   \item 
+#'   \item Blah blah blah.
 #' 
 #'   }
+#'
+#'   Blah blah blah.
 #' 
 #' @export
 #'
 prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
-  #
-  # TO DO:
+  # 
+  # TO DO:  
   #
   # - Define "mlm_data" class in the documentation.
   # - Implement intercept = TRUE.
@@ -56,7 +66,7 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
     stop("X should be a numeric matrix with at least 2 rows and 2 ",
          "columns, and nrow(X) should be the same as length(y)",
          domain = NA)
-
+    
   # Check the variable and sample names.
   if (is.null(names(y)) | 
       is.null(rownames(X)) |
@@ -65,30 +75,30 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
          domain = NA)
   if (any(names(y) != rownames(X)))
     stop("Sample names in X and y are not consistent",domain = NA)
+    
+# For now, automatically center X and y. 
+# (TO DO: make this an option).
+# 
+# Standardize the columns of X, if requested.
+if (standardize) {
+  X <- scale(X,center = TRUE,scale = TRUE)
+  xs <- attr(X,"scaled:scale")
+} else {
+  X <- scale(X,center = TRUE,scale = FALSE)
+  xs <- rep(1,J)
+}
 
-  # For now, automatically center X and y. 
-  # (TO DO: make this an option).
-  # 
-  # Standardize the columns of X, if requested.
-  if (standardize) {
-    X <- scale(X,center = TRUE,scale = TRUE)
-    xs <- attr(X,"scaled:scale")
-  } else {
-    X <- scale(X,center = TRUE,scale = FALSE)
-    xs <- rep(1,J)
-  }
-
-  # Prepare the output.
-  n <- nrow(X)
-  J <- ncol(X)
-  dat <- list(n     = n,
-              nvar  = J,
-              X     = X,
-              y     = y,
-              var_y = sum(y^2)/(n-1),
-              ss    = prepare_ser_data(X = X,y = y),
-              xs    = xs,
-              standardize = standardize)
+# Prepare the output.
+n <- nrow(X)
+J <- ncol(X)
+dat <- list(n     = n,
+            nvar  = J,
+            X     = X,
+            y     = y,
+            var_y = sum(y^2)/(n-1),
+            ss    = prepare_ser_data(X = X,y = y),
+            xs    = xs,
+            standardize = standardize)
   class(dat) <- c("mlm_full_data","mlm_data","list")
   return(dat)
 }
@@ -173,7 +183,7 @@ print.mlm_full_data <- function (x, ...) {
   return(invisible(x))
 }
 
-#' @rdname mlm_data_internal
+#' @name mlm_data_internal
 #'
 #' @title Add Title Here.
 #'

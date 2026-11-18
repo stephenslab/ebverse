@@ -7,3 +7,18 @@ navbar:
   right:
     - text: "Source"
       href: https://github.com/stephenslab/ebverse
+
+reference:
+- contents:
+  - single_effect_regression
+  - mlm_data
+  - susie
+  - sample.names
+  - mlm_data_internal
+
+template:
+  bootstrap: 5
+
+url: https://github.com/stephenslab/ebverse
+
+

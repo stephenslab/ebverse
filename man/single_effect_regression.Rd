@@ -135,8 +135,8 @@ Methods for fitting single effect regression (SER)
   is the main method for fitting SER models and returning key
   posterior statistics. SER models are implemented as a modular
   (\dQuote{object-oriented}) interface, allowing for different
-  types of SER families (see \sQuote{Details} for specification
-  of SER classes).
+  types of SER families (see \sQuote{Details} for a general
+  specification of SER classes).
 }
 \details{
 A single effect regression (SER) model is a Bayesian
