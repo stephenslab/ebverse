@@ -129,25 +129,10 @@ prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
   return(dat)
 }
 
-#' @title Sample Names
-#'
-#' @description Simple utility for extacting the names of the samples
-#'   from a data object.
-#'
-#' @param dat A data object.
-#'
-#' @return A character vector containing the names of the samples.
-#' 
-#' @export
-#'
-sample.names <- function (dat, ...) {
-  UseMethod("sample.names")
-}
-
 #'
 #' @export 
 #' 
-sample.names.mlm_full_data <- function (object, ...)
+sample.names.mlm_full_data <- function (dat, ...)
   names(object$y)
 
 #'
