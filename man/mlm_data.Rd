@@ -46,7 +46,7 @@ An \sQuote{mlm_data} object. It is a list with the
     (has a mean of zero).}
 
   \item{ss}{An \sQuote{ser_data} object giving summary statistics
-    (at a residual variance of 1). See
+    (assuming a residual variance of 1). See
     \code{\link{prepare_ser_data}} for details.}
 
   \item{xs}{Scaling factors applied to the variables (e.g., columns
