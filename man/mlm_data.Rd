@@ -21,7 +21,7 @@ standardized. If variables are in the same units already, you
 might not wish to standardize. Coefficients are always returned
 on the original scale.}
 
-\item{z}{Describe input argument "XtX" here.}
+\item{z}{Describe input argument "z" here.}
 
 \item{R}{Describe input argument "R" here.}
 
@@ -37,12 +37,22 @@ on the original scale.}
 An \sQuote{mlm_data} object.
 }
 \description{
-Functions to prepare various types of data for
+Methods for preparing and working with data used to
+  fit multiple linear regression (MLM) models. This is
+  implemented as a modular (\dQuote{object-oriented}) interface,
+  allowing for different types of MLM data (see \sQuote{Details}
+  for specification of MLM data classes).
 }
 \details{
-Add details here.
+\bold{Design of MLM data classes.}
+  An \dQuote{MLM data} class has at a minimum the following elements:
+  \enumerate{
 
-  \subsection{Design of MLM data classes}{
-    TO DO. 
+  \item A function that creates the MLM data object (e.g.,
+  \code{prepare_mlm_full_data}). It should return an object of
+  class \sQuote{mlm_data}.
+
+  \item 
+
   }
 }

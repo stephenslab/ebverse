@@ -37,19 +37,19 @@ prepare_ser_data(bhat, shat, X, y, residual_variance = 1)
 \item{variable.names}{The names of the variables in the
 SER model.}
 
-\item{family}{The SER family. See \dQuote{details} for more
+\item{family}{The SER family. See \dQuote{Details} for more
 information.}
 
 \item{prior}{An object, possibly a list, specifying the SER
 prior. The exact form of this input will depend on which SER
-model is used. See \sQuote{details} for further information.}
+model is used. See \sQuote{Details} for further information.}
 
 \item{init_method}{Posterior statistics need to be in SER model
 fits at all times, even if they are just initial guesses. This
 argument specifies how the initial guess is obtained.}
 
 \item{control}{An object, possibly a list, specifying settings that
-affect the model fitting. See \sQuote{details} for further
+affect the model fitting. See \sQuote{Details} for further
 information.}
 
 \item{fit}{An object of class \sQuote{ser} that captures the state
@@ -122,7 +122,7 @@ when X, y are provided instead of bhat, shat.}
 \code{prepare_ser_data} returns a data frame with two
   columns: \sQuote{bhat}, the least-squares estimates of the
   coefficients; \sQuote{shat}, the variances of these
-  estimates. See \sQuote{details} for precise definitions of
+  estimates. See \sQuote{Details} for precise definitions of
   these terms.
 }
 \description{
@@ -130,10 +130,13 @@ Methods for fitting single effect regression (SER)
   models and computing posterior statistics from summary
   data. Typically the model fitting involves estimating
   parameters in the prior (\dQuote{hyperparameters}) by
-  maximizing the likelihood, but potentially other 
-  parameters could be estimated as well. The \sQuote{fit_ser_model}
-  method is the main method for fitting SER models and
-  returning key posterior statistics.
+  maximizing the likelihood, but potentially other parameters
+  could be estimated as well. The \sQuote{fit_ser_model} method
+  is the main method for fitting SER models and returning key
+  posterior statistics. SER models are implemented as a modular
+  (\dQuote{object-oriented}) interface, allowing for different
+  types of SER families (see \sQuote{Details} for specification
+  of SER classes).
 }
 \details{
 A single effect regression (SER) model is a Bayesian
@@ -171,9 +174,9 @@ A single effect regression (SER) model is a Bayesian
   statistics from the fitted model using the \code{fit_ser_data}
   function. 
 
-  \bold{Design of single effect regression classes.} A single
-  effect regression (SER) class requires the following three
-  elements:
+  \bold{Design of single effect regression classes.} A
+  \dQuote{single effect regression} (SER) class has at a minimum
+  the following three elements:
   \enumerate{
 
   \item A function that initializes the SER model (e.g.,

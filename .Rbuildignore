@@ -1,2 +1,4 @@
 ^\.gitignore$
 ^NOTES\.txt$
+^_pkgdown\.yml$
+^docs$

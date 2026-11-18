@@ -2,7 +2,11 @@
 #'
 #' @title Data Objects for Multiple Linear Regression Models
 #'
-#' @description Functions to prepare various types of data for 
+#' @description Methods for preparing and working with data used to
+#'   fit multiple linear regression (MLM) models. This is
+#'   implemented as a modular (\dQuote{object-oriented}) interface,
+#'   allowing for different types of MLM data (see \sQuote{Details}
+#'   for specification of MLM data classes).
 #'
 #' @param X An n x J matrix containing observations about J candidate
 #'   explanatory variables.
@@ -16,10 +20,16 @@
 #'
 #' @return An \sQuote{mlm_data} object.
 #'
-#' @details Add details here.
+#' @details \bold{Design of MLM data classes.}
+#'   An \dQuote{MLM data} class has at a minimum the following elements:
+#'   \enumerate{
 #'
-#'   \subsection{Design of MLM data classes}{
-#'     TO DO. 
+#'   \item A function that creates the MLM data object (e.g.,
+#'   \code{prepare_mlm_full_data}). It should return an object of
+#'   class \sQuote{mlm_data}.
+#'
+#'   \item 
+#' 
 #'   }
 #' 
 #' @export
@@ -85,7 +95,7 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
 
 #' @rdname mlm_data
 #' 
-#' @param z Describe input argument "XtX" here.
+#' @param z Describe input argument "z" here.
 #'
 #' @param R Describe input argument "R" here.
 #'
@@ -184,7 +194,7 @@ print.mlm_full_data <- function (x, ...) {
 #'
 #' @description Add description here.
 #'
-#' @param dat Describe input argument "data" here.
+#' @param dat Describe input argument "dat" here.
 #'
 #' @param b Describe input argument "b" here.
 #' 

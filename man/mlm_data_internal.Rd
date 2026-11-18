@@ -7,7 +7,7 @@
 compute_XtXb(dat, b)
 }
 \arguments{
-\item{dat}{Describe input argument "data" here.}
+\item{dat}{Describe input argument "dat" here.}
 
 \item{b}{Describe input argument "b" here.}
 }

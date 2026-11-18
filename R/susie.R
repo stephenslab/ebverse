@@ -22,7 +22,7 @@
 #'   parameter.
 #'
 #' @param control An object, possibly a list, specifying settings that
-#'   affect the model fitting. See \sQuote{details} for further
+#'   affect the model fitting. See \sQuote{Details} for more
 #'   information.
 #'  
 #' @return \code{init_susie_model} and \code{fit_susie_model} return
