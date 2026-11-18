@@ -35,7 +35,7 @@
 #' @return \code{init_ser_model} and \code{fit_ser_model} return
 #'   objects of class \sQuote{ser} storing key posterior statistics
 #'   for all variables and the state of the SER model fit. It is a
-#'   list with the following elements:
+#'   list with the following elements (and possibly others):
 #'
 #'   \item{prior}{Data structure specifying the prior. This may
 #'     include hyperparameters that change during model fitting.}
