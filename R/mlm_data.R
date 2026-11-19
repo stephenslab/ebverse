@@ -127,7 +127,7 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
               X     = X,
               y     = y,
               var_y = sum(y^2)/(n-1),
-              ss    = prepare_ser_data(X = X,y = y),
+              ss    = prepare_ser_data(X = X,y = y,residual_variance = 1),
               xs    = xs,
               standardize = standardize)
   class(dat) <- c("mlm_full_data","mlm_data","list")
