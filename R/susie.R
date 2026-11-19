@@ -141,7 +141,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   of the inputs.
   # 
   # TO DO NEXT: Implement various S3 methods: coef, plot, predict,
-  #  summary, print logLik, residuals, variable.names
+  # summary, print, residuals
   # 
   # TO DO:
   # - Run R CMD check --as-cran.
@@ -150,10 +150,6 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Implement some functions for simulating data from susie models.
   # - Implement a "summary" S3 method for "ser_normal" objects.
   # - Implement a "summary" S3 method for "susie" objects.
-  # - Implement "coef" S3 method.
-  # - Implement "predict" S3 method.
-  # - Implement a "plot" S3 method (idea: bhat vs. b1 scatterplot).
-  # - Other S3 methods?
   # - Implement a new mlm_data object for PLINK "pgen" data sets.
   #   (Idea: specialized packages should be "Suggests".)
   # - Implement "global" estimation of parameters in the 
@@ -323,6 +319,30 @@ susie_control_default <- function()
 #' 
 variable.names.susie <- function (object, ...)
   rownames(object$ss)
+
+#' @title Add Title Here.
+#' 
+#' @param object
+#' 
+#' @export
+#' 
+summary.susie <- function (object, ...) {
+  #
+  # TO DO.
+  # 
+  # What things do we want to return?
+  # See summary.lm for some ideas.
+  #
+}
+
+#'
+#' @importFrom stats residuals
+#'
+#' @export
+#' 
+residuals.susie <- function () {
+  # TO DO.
+}
 
 # Compute the posterior inclusion probabilities (PIPs) given the
 # single effect regression PIPs.
