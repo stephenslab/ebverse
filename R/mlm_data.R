@@ -117,6 +117,7 @@ if (standardize) {
   X <- scale(X,center = TRUE,scale = FALSE)
   xs <- rep(1,J)
 }
+names(xs) <- colnames(X)
 
 # Prepare the output.
 n <- nrow(X)
@@ -135,21 +136,25 @@ dat <- list(n     = n,
 
 #' @rdname mlm_data
 #' 
-#' @param z Describe input argument "z" here.
+#' @param z A vector of z-scores (not yet implemented).
 #'
-#' @param R Describe input argument "R" here.
+#' @param R A J x J correlation matrix.
 #'
-#' @param bhat Describe input argument "bhat" here.
+#' @param bhat A vector of length J containing least-squares estimates
+#'   of the coefficients (e.g., estimated using \code{\link[stats]{lm}}).
 #'
-#' @param shat Describe input argument "shat" here.
+#' @param sehat A vector of length J containing the standard errors
+#'   of the least-squares estimates.
 #' 
-#' @param n Describe input argument "n" here.
+#' @param n The number of samples.
 #'
-#' @param var_y Describe input argument "var_y" here.
-#' 
+#' @param var_y This should be equal to \code{sum(y^2)/(n-1)}.
+#'   If y has a mean of zero, this should be the same as
+#'   \code{var(y)}.
+#'
 #' @export
 #' 
-prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
+prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
   #  
   # NOTES: 
   # - Be strict about naming things.
@@ -164,7 +169,33 @@ prepare_mlm_summary_data <- function (z, R, bhat, shat, n, var_y) {
   #   susie with full data when X is standardized. (I don't think 
   #   Y needs to be standardized so long as var_y is provided?)
   #
-  dat <- list()
+  if (!missing(z))
+    stop("z-scores are not yet implemented")
+  
+  # Check and process the inputs.  
+  if (!(is.numeric(bhat) & 
+        length(bhat) > 1 & 
+        is.numeric(sehat) & 
+        length(bhat) == length(sehat)))
+    stop("bhat and sehat should be vectors of the same length")
+  if (is.null(names(bhat)) | 
+      is.null(names(sehat)))
+    stop("bhat and sehat should have named elements")
+  if (any(names(bhat) != names(sehat)))
+    stop("variable names in bhat and sehat do not match")
+  J <- length(bhat)
+  if (any(sehat) <= 0)
+    stop("standard errors sehat should be positive")
+  if (n < 2)
+    stop("sample size (n) should be 2 or greater")
+  if (var_y <= 0)
+    stop("var_y should be positive")
+  
+  # Prepare the output.
+  dat <- list(n     = n,
+              nvar  = J,
+              var_y = var_y,
+              xs    = setNames(rep(1,J),XXX))
   class(dat) <- c("mlm_summary_data","mlm_data","list")
   return(dat)
 }
@@ -183,6 +214,12 @@ sample.names.mlm_full_data <- function (dat, ...)
 variable.names.mlm_full_data <- function (object, ...)
   colnames(object$X)
 
+#'
+#' @export
+#'
+variable.names.mlm_summary_data <- function (object, ...)
+  rownames(object$ss)
+
 #' 
 #' @export
 #' 
@@ -197,12 +234,31 @@ summary.mlm_full_data <- function (object, ...) {
 #'
 #' @export
 #' 
+summary.mlm_summary_data <- function (object, ...) {
+  out <- list(n = object$n,nvar = object$nvar)
+  class(out) <- c("summary_mlm_summary_data","list")
+  return(out)
+}
+
+#'
+#' @export
+#' 
 print.summary_mlm_full_data <- function (x, ...) {
-  cat(sprintf(paste("Sample-level or individual-level data for %d variables",
-                    "in %d samples.\n"),x$n,x$nvar))
+  cat(sprintf("Individual-level data for %d variables in %d samples.\n",
+              x$n,x$nvar))
   cat(sprintf("Variables %s standardized.\n",
               ifelse(x$standardize,"are","are not")))
   return(invisible(x))
+}
+
+#'
+#' @export
+#' 
+print.summary_mlm_summary_data <- function (x, ...) {
+  cat(sprintf("Summary data for %d variables.\n",x$nvar))
+  cat(sprintf("Sample size (n) is %d.\n",x$n))
+  return(invisible(x))
+ 
 }
 
 #'
@@ -213,20 +269,30 @@ print.mlm_full_data <- function (x, ...) {
   return(invisible(x))
 }
 
+#'
+#' @export
+#' 
+print.mlm_summary_data <- function (x, ...) {
+  print(summary(x))
+  return(invisible(x))
+}
+
 #' @name mlm_data_internal
 #'
-#' @title Add Title Here.
+#' @title Internal Methods for MLM Data Objects.
 #'
-#' @description Add description here.
+#' @description Here we document some of the non-user-facing methods
+#'   needed to implement the MLM data classes.
 #'
-#' @param dat Describe input argument "dat" here.
+#' @param dat An \sQuote{mlm_data} object
 #'
-#' @param b Describe input argument "b" here.
+#' @param b A numeric vector of length J, where J is the number of
+#'   variables in the MLM data object.
 #' 
-#' @return Describe the return value here.
+#' @return \code{compute_XtXb} returns a numeric vector of length J.
 #' 
 #' @seealso \link{mlm_data}
-#' 
+#'
 #' @export
 #'
 #' @keywords internal
@@ -240,5 +306,10 @@ compute_XtXb <- function (dat, b) {
 #' @export
 #' 
 compute_XtXb.mlm_full_data <- function (dat, b)
-  setNames(drop(t(dat$X %*% b) %*% dat$X),colnames(dat$X))
+  setNames(drop(t(dat$X %*% b) %*% dat$X),variable.names(dat))
 
+#'
+#' @export
+#'
+compute_XtXb.mlm_summary_data <- function (dat, b)
+  setNames(drop(dat$XtX %*% b),variable.names(dat))

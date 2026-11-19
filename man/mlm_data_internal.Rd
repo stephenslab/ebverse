@@ -3,20 +3,22 @@
 \name{mlm_data_internal}
 \alias{mlm_data_internal}
 \alias{compute_XtXb}
-\title{Add Title Here.}
+\title{Internal Methods for MLM Data Objects.}
 \usage{
 compute_XtXb(dat, b)
 }
 \arguments{
-\item{dat}{Describe input argument "dat" here.}
+\item{dat}{An \sQuote{mlm_data} object}
 
-\item{b}{Describe input argument "b" here.}
+\item{b}{A numeric vector of length J, where J is the number of
+variables in the MLM data object.}
 }
 \value{
-Describe the return value here.
+\code{compute_XtXb} returns a numeric vector of length J.
 }
 \description{
-Add description here.
+Here we document some of the non-user-facing methods
+  needed to implement the MLM data classes.
 }
 \seealso{
 \link{mlm_data}

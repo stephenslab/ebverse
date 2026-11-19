@@ -290,9 +290,12 @@ ser_normal_control_default <- function()
 
 #' @rdname single_effect_regression
 #' 
-#' @param bhat A vector of least-squares estimates of the coefficients.
+#' @param bhat A numeric vector containing least-squares estimates of
+#'   the coefficients.
 #'
-#' @param shat A vector of variances of the least-squares estimates.
+#' @param shat A numeric vector containing the variances of the
+#'   least-squares estimates. (Note that these are variances, not
+#'   standard deviations or standard errors.)
 #'
 #' @param X A matrix of with rows corresponding to observations
 #'   (samples) and columns corresponding to candidate explanatory

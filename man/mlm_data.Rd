@@ -8,7 +8,7 @@
 \usage{
 prepare_mlm_full_data(X, y, standardize = FALSE)
 
-prepare_mlm_summary_data(z, R, bhat, shat, n, var_y)
+prepare_mlm_summary_data(z, R, bhat, sehat, n, var_y)
 }
 \arguments{
 \item{X}{An n x J matrix containing observations about J candidate
@@ -21,17 +21,21 @@ standardized. If variables are in the same units already, you
 might not wish to standardize. Coefficients are always returned
 on the original scale.}
 
-\item{z}{Describe input argument "z" here.}
+\item{z}{A vector of z-scores (not yet implemented).}
 
-\item{R}{Describe input argument "R" here.}
+\item{R}{A J x J correlation matrix.}
 
-\item{bhat}{Describe input argument "bhat" here.}
+\item{bhat}{A vector of length J containing least-squares estimates
+of the coefficients (e.g., estimated using \code{\link[stats]{lm}}).}
 
-\item{shat}{Describe input argument "shat" here.}
+\item{sehat}{A vector of length J containing the standard errors
+of the least-squares estimates.}
 
-\item{n}{Describe input argument "n" here.}
+\item{n}{The number of samples.}
 
-\item{var_y}{Describe input argument "var_y" here.}
+\item{var_y}{This should be equal to \code{sum(y^2)/(n-1)}.
+If y has a mean of zero, this should be the same as
+\code{var(y)}.}
 }
 \value{
 An \sQuote{mlm_data} object. It is a list with the

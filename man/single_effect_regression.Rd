@@ -65,9 +65,12 @@ included in the output.}
 
 \item{\dots}{Additional arguments controlling the model fitting.}
 
-\item{bhat}{A vector of least-squares estimates of the coefficients.}
+\item{bhat}{A numeric vector containing least-squares estimates of
+the coefficients.}
 
-\item{shat}{A vector of variances of the least-squares estimates.}
+\item{shat}{A numeric vector containing the variances of the
+least-squares estimates. (Note that these are variances, not
+standard deviations or standard errors.)}
 
 \item{X}{A matrix of with rows corresponding to observations
 (samples) and columns corresponding to candidate explanatory
