@@ -182,8 +182,8 @@ init_ser_model_normal <-
   posterior <- data.frame(lbf  = 0,
                           pip  = prior$prob,
                           mean = 0,
-                          var  = prior$prior_variance)
-  rownames(posterior) <- variable.names
+                          var  = prior$prior_variance,
+                          row.names = variable.names)
   if (init_method == "random")
     posterior$mean <- rnorm(nvar,0,sqrt(prior$prior_variance))
 
@@ -340,8 +340,9 @@ prepare_ser_data <- function (bhat, shat, X, y, residual_variance) {
   if (is.null(names(bhat)) | is.null(names(shat)))
     stop("variables must be named by providing names for bhat and shat, or ",
          "column names for X",domain = NA)
-  dat <- data.frame(bhat = bhat,shat = shat)
-  rownames(dat) <- names(bhat)
+  dat <- data.frame(bhat = bhat,
+                    shat = shat,
+                    row.names = names(bhat))
   class(dat) <- c("ser_data","data.frame")
   attr(dat,"residual_variance") <- residual_variance
   return(dat)

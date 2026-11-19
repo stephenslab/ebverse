@@ -152,6 +152,8 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
 #'   If y has a mean of zero, this should be the same as
 #'   \code{var(y)}.
 #'
+#' @importFrom stats setNames
+#' 
 #' @export
 #' 
 prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
@@ -243,6 +245,7 @@ sample.names.mlm_full_data <- function (dat, ...)
 variable.names.mlm_full_data <- function (object, ...)
   colnames(object$X)
 
+#' @importFrom stats variable.names
 #'
 #' @export
 #'

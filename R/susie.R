@@ -96,8 +96,14 @@ init_susie_model <-
   if (is.null(names(ser)))
     names(ser) <- paste0("L",1:L)
   control <- modifyList(susie_control_default(),control,keep.null = TRUE)
+  J <- length(variable.names)
+  ss <- data.frame(bhat = rep(as.numeric(NA),J),
+                   shat = rep(as.numeric(NA),J),
+                   xs   = rep(as.numeric(NA),J),
+                   row.names = variable.names)
   fit <- list(elbo              = as.numeric(NA),
               lbf               = as.numeric(NA),
+              ss                = ss,
               ser               = ser,
               residual_variance = residual_variance,
               progress          = as.numeric(NA),
@@ -134,8 +140,8 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
-  # TO DO NEXT: Implement various S3 methods (e.g., summary, 
-  #   coef, predict, variable.names).
+  # TO DO NEXT: Implement various S3 methods: coef, plot, predict,
+  #  summary, print logLik, residuals, variable.names
   # 
   # TO DO:
   # - Run R CMD check --as-cran.
@@ -281,7 +287,10 @@ fit_susie_model_core <- function (dat, fit, control) {
   }
 
   # Prepare the output.
-  fit$xs <- dat$xs
+  fit$ss <- data.frame(bhat = dat$ss$bhat,
+                       shat = dat$ss$shat,
+                       xs   = dat$xs,
+                       row.names = variable.names(dat))
   if (control$trace) {
     progress <- progress[1:iter,]
     if (is.data.frame(fit$progress)) {
@@ -307,6 +316,13 @@ susie_control_default <- function()
        version  = "R",
        trace    = TRUE,
        verbose  = "detailed")
+
+#' @importFrom stats variable.names
+#'
+#' @export
+#' 
+variable.names.susie <- function (object, ...)
+  rownames(object$ss)
 
 # Compute the posterior inclusion probabilities (PIPs) given the
 # single effect regression PIPs.
