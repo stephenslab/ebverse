@@ -1,4 +1,5 @@
 ^\.gitignore$
 ^NOTES\.txt$
 ^_pkgdown\.yml$
+^README\.md$
 ^docs$
