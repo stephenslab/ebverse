@@ -106,30 +106,30 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   if (any(names(y) != rownames(X)))
     stop("Sample names in X and y are not consistent",domain = NA)
     
-# For now, automatically center X and y. 
-# (TO DO: make this an option).
-# 
-# Standardize the columns of X, if requested.
-if (standardize) {
-  X <- scale(X,center = TRUE,scale = TRUE)
-  xs <- attr(X,"scaled:scale")
-} else {
-  X <- scale(X,center = TRUE,scale = FALSE)
-  xs <- rep(1,J)
-}
-names(xs) <- colnames(X)
+  # For now, automatically center X and y. 
+  # (TO DO: make this an option).
+  # 
+  # Standardize the columns of X, if requested.
+  if (standardize) {
+    X <- scale(X,center = TRUE,scale = TRUE)
+    xs <- attr(X,"scaled:scale")
+  } else {
+    X <- scale(X,center = TRUE,scale = FALSE)
+    xs <- rep(1,J)
+  }
+  names(xs) <- colnames(X)
 
-# Prepare the output.
-n <- nrow(X)
-J <- ncol(X)
-dat <- list(n     = n,
-            nvar  = J,
-            X     = X,
-            y     = y,
-            var_y = sum(y^2)/(n-1),
-            ss    = prepare_ser_data(X = X,y = y),
-            xs    = xs,
-            standardize = standardize)
+  # Prepare the output.
+  n <- nrow(X)
+  J <- ncol(X)
+  dat <- list(n     = n,
+              nvar  = J,
+              X     = X,
+              y     = y,
+              var_y = sum(y^2)/(n-1),
+              ss    = prepare_ser_data(X = X,y = y),
+              xs    = xs,
+              standardize = standardize)
   class(dat) <- c("mlm_full_data","mlm_data","list")
   return(dat)
 }
@@ -184,18 +184,39 @@ prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
   if (any(names(bhat) != names(sehat)))
     stop("variable names in bhat and sehat do not match")
   J <- length(bhat)
-  if (any(sehat) <= 0)
+  if (any(sehat <= 0))
     stop("standard errors sehat should be positive")
   if (n < 2)
     stop("sample size (n) should be 2 or greater")
   if (var_y <= 0)
     stop("var_y should be positive")
-  
+  if (!(is.matrix(R) & 
+        NROW(R) == J & 
+        NCOL(R) == J))
+    stop("R should be a J x J symmetric matrix, J = number of variables")
+  if (is.null(rownames(R)) | 
+      is.null(colnames(R)))
+    stop("Row and columns of R should be named")
+  if (any(rownames(R) != names(bhat)) |
+      any(colnames(R) != names(bhat)))
+    stop("row and column names in R do not match bhat, shat")
+
+  # See Lemma 1 of the susie-rss paper (Zou et al 2022 PLoS 
+  # Genetics).
+  z     <- bhat/sehat
+  sigma <- var_y*(n-1)/(z^2 + n - 2)
+  d     <- sqrt(sigma)/sehat
+  XtX   <- t(R * d) * d
+  XtX   <- (XtX + t(XtX))/2
+  ss    <- prepare_ser_data(bhat = bhat,shat = 1/d^2,residual_variance = 1)
+
   # Prepare the output.
   dat <- list(n     = n,
               nvar  = J,
+              XtX   = XtX,
               var_y = var_y,
-              xs    = setNames(rep(1,J),XXX))
+              ss    = ss,
+              xs    = setNames(rep(1,J),names(bhat)))
   class(dat) <- c("mlm_summary_data","mlm_data","list")
   return(dat)
 }
@@ -256,9 +277,8 @@ print.summary_mlm_full_data <- function (x, ...) {
 #' 
 print.summary_mlm_summary_data <- function (x, ...) {
   cat(sprintf("Summary data for %d variables.\n",x$nvar))
-  cat(sprintf("Sample size (n) is %d.\n",x$n))
+  cat(sprintf("The sample size is %d.\n",x$n))
   return(invisible(x))
- 
 }
 
 #'

@@ -305,7 +305,8 @@ ser_normal_control_default <- function()
 #' 
 #' @param residual_variance The residual variance parameter which is
 #'   used to compute the the outputted statistics. This is only used
-#'   when X, y are provided instead of bhat, shat.
+#'   when X, y are provided, but a residual variance setting should
+#'   still be declared even if it is not actually used.
 #'
 #' @note In \code{prepare_set_data}, only provide (bhat, shat) or
 #'   (X, y); an error will occur if the wrong combination of data
@@ -319,7 +320,7 @@ ser_normal_control_default <- function()
 #'   
 #' @export
 #' 
-prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
+prepare_ser_data <- function (bhat, shat, X, y, residual_variance) {
   if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
         (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
     stop("Either {bhat, shat} or {X, y} should be provided ",
@@ -331,8 +332,7 @@ prepare_ser_data <- function (bhat, shat, X, y, residual_variance = 1) {
     res  <- compute_lse(X,y,residual_variance)
     bhat <- res$bhat
     shat <- res$shat
-  } else
-    residual_variance <- as.numeric(NA)
+  }
   if (length(bhat) != length(shat))
     stop("bhat and s should be the same length",domain = NA)
   if (length(bhat) < 2 | length(shat) < 2)

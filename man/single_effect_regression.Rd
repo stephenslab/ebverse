@@ -31,7 +31,7 @@ fit_ser_model(fit, dat, return_data = missing(dat), ...)
 
 ser_normal_control_default()
 
-prepare_ser_data(bhat, shat, X, y, residual_variance = 1)
+prepare_ser_data(bhat, shat, X, y, residual_variance)
 }
 \arguments{
 \item{variable.names}{The names of the variables in the
@@ -80,7 +80,8 @@ variables.}
 
 \item{residual_variance}{The residual variance parameter which is
 used to compute the the outputted statistics. This is only used
-when X, y are provided instead of bhat, shat.}
+when X, y are provided, but a residual variance setting should
+still be declared even if it is not actually used.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return

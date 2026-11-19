@@ -134,6 +134,9 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
+  # TO DO NEXT: Implement various S3 methods (e.g., summary, 
+  #   coef, predict, variable.names).
+  # 
   # TO DO:
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
@@ -349,7 +352,8 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
     bhat <- bhat - d*r
   } 
   dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
-                              shat = setNames(sigma*d,varnames))
+                              shat = setNames(sigma*d,varnames),
+                              residual_variance = 1)
   ser <- fit_ser_model(ser,dat_ser)
   bk <- ser$posterior$mean
   sk <- ser$posterior$var
