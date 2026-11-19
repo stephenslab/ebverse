@@ -43,14 +43,16 @@ An \sQuote{mlm_data} object. It is a list with the
 
   \item{var_y}{This is \code{var_y = sum(y^2)/(n-1)}.
     It will be equal to \code{var(y)} if y is centered
-    (has a mean of zero).}
+    (i.e., has a mean of zero).}
 
   \item{ss}{An \sQuote{ser_data} object giving summary statistics
-    (assuming a residual variance of 1). See
+    derived from the MLM data (summary statistics are obtained
+    under the assumption that the residual variance is 1). See
     \code{\link{prepare_ser_data}} for details.}
 
   \item{xs}{Scaling factors applied to the variables (e.g., columns
-    of X).}
+    of X). If no scaling is applied, this should be a vector of
+    ones.}
 }
 \description{
 Methods for preparing and working with data sets for
@@ -77,12 +79,20 @@ Methods for preparing and working with data sets for
   \enumerate{
 
   \item A function that creates the MLM data object (e.g.,
-  \code{prepare_mlm_full_data}). It should return an object of
-  class \sQuote{mlm_data}.
+    \code{prepare_mlm_full_data}). It should return an object of
+    class \sQuote{mlm_data}.
 
-  \item Blah blah blah.
+  \item A \sQuote{sample.names} method that returns the sample
+    names.
 
+  \item A \sQuote{variable.names} method that returns the variable
+    names.
+
+  \item Print and summary methods that output a summary of the
+    data.
+
+  \item A compute_XtXb method that returns the matrix-vector
+    product \code{drop(crossprod(X) \%*\% b)} for a vector
+    \code{b} of length J.
   }
-
-  Blah blah blah.
 }
