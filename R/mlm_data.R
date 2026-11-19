@@ -202,7 +202,15 @@ prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
     stop("row and column names in R do not match bhat, shat")
 
   # See Lemma 1 of the susie-rss paper (Zou et al 2022 PLoS 
-  # Genetics).
+  # Genetics). 
+  #
+  # TO DO: Move this code into one or more helper functions. Note
+  # that use of "n-2" instead of "n" for calculating the residual
+  # variances (sigma).
+  #
+  # TO DO: Replace n - 2 by "df.residual" (with default setting
+  # df.residual = n - 2).
+  #
   z     <- bhat/sehat
   sigma <- var_y*(n-1)/(z^2 + n - 2)
   d     <- sqrt(sigma)/sehat
@@ -326,10 +334,12 @@ compute_XtXb <- function (dat, b) {
 #' @export
 #' 
 compute_XtXb.mlm_full_data <- function (dat, b)
-  setNames(drop(t(dat$X %*% b) %*% dat$X),variable.names(dat))
+  setNames(drop(t(dat$X %*% b) %*% dat$X),
+           variable.names(dat))
 
 #'
 #' @export
 #'
 compute_XtXb.mlm_summary_data <- function (dat, b)
-  setNames(drop(dat$XtX %*% b),variable.names(dat))
+  setNames(drop(dat$XtX %*% b),
+           variable.names(dat))
