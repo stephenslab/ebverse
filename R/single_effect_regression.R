@@ -471,6 +471,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 
 #' @rdname single_effect_regression
 #'
+#' @param fit An object of class \sQuote{ser}.
+#' 
 #' @importFrom stats variable.names
 #'
 #' @export

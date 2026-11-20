@@ -342,6 +342,8 @@ summary.susie <- function (object, ...) {
 
 #' @rdname susie
 #'
+#' @param x An object of class \sQuote{susie}.
+#' 
 #' @export
 #' 
 print.susie <- function (x, ...) {

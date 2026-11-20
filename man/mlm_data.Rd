@@ -66,6 +66,14 @@ If y has a mean of zero, this should be the same as
 
 \item{df.residual}{The residual degrees of freedom from estimation
 of the coefficients, e.g., using \code{\link[stats]{lm}}.}
+
+\item{dat}{An object of class \sQuote{mlm_data}.}
+
+\item{\dots}{Other arguments.}
+
+\item{object}{An object of class \sQuote{mlm_data}.}
+
+\item{x}{An object of class \sQuote{mlm_data}.}
 }
 \value{
 An \sQuote{mlm_data} object. It is a list with the

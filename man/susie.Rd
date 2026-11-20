@@ -80,6 +80,8 @@ included in the output.}
 
 \item{\dots}{Other arguments.}
 
+\item{x}{An object of class \sQuote{susie}.}
+
 \item{newdata}{Document "newdata" input argument here.}
 
 \item{font_size}{Specifies the font size for the plot.}

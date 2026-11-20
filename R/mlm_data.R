@@ -228,12 +228,18 @@ prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y,
 
 #' @rdname mlm_data
 #' 
+#' @param dat An object of class \sQuote{mlm_data}.
+#'
+#' @param \dots Other arguments.
+#' 
 #' @export 
 #' 
 sample.names.mlm_full_data <- function (dat, ...)
-  names(object$y)
+  names(dat$y)
 
 #' @rdname mlm_data
+#'
+#' @param object An object of class \sQuote{mlm_data}.
 #' 
 #' @importFrom stats variable.names
 #' 
@@ -274,6 +280,8 @@ summary.mlm_summary_data <- function (object, ...) {
 }
 
 #' @rdname mlm_data
+#' 
+#' @param x An object of class \sQuote{mlm_data}.
 #' 
 #' @export
 #' 
