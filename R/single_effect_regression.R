@@ -301,8 +301,8 @@ fit_ser_model <- function (fit, dat, return_data = missing(dat), ...) {
 #'
 #' @export
 #' 
-fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat), 
-                                      ...) {
+fit_ser_model.ser_normal <- function (fit, dat, 
+                                      return_data = missing(dat), ...) {
 
   # TO DO: 
   # - Implement function to conveniently simulate susie data sets

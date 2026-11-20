@@ -10,3 +10,28 @@
 
 > methods(class="glmnet")
 [1] coef     deviance family   plot     predict  print
+
+> names(summary(lm(...)))
+ [1] "call"          "terms"         "residuals"     "coefficients"
+ [5] "aliased"       "sigma"         "df"            "r.squared"
+ [9] "adj.r.squared" "fstatistic"    "cov.unscaled"
+
+> print(summary(lm(...)))
+Call:
+lm(formula = lm.D9)
+
+Residuals:
+    Min      1Q  Median      3Q     Max
+-1.0710 -0.4937  0.0685  0.2462  1.3690
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)    5.032      0.220   22.85  9.5e-15 ***
+groupTrt      -0.371      0.311   -1.19     0.25
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.696 on 18 degrees of freedom
+Multiple R-squared:  0.0731,	Adjusted R-squared:  0.0216
+F-statistic: 1.42 on 1 and 18 DF,  p-value: 0.249
+

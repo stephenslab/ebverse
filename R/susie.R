@@ -138,13 +138,10 @@ init_susie_model <-
 #'
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
-  # NOTES: 
-  # - This is a function that is intended to be part of the main
-  #   user interface and so there should be more careful checking
-  #   of the inputs.
-  # 
-  # TO DO NEXT: Implement S3 methods: summary, print.
-  # Then run R CMD check.
+  # TO DO NEXT: 
+  # - Implement S3 methods summary and print for ser_model objects.
+  # - Implement S3 methods summary and print for susie objects.
+  # - Then run R CMD check.
   # 
   # TO DO:
   # - Implement predict method.
@@ -154,6 +151,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # - Implement some functions for simulating data from susie models.
   # - Implement a "summary" S3 method for "ser_normal" objects.
   # - Implement a "summary" S3 method for "susie" objects.
+  # - Research efficient storage of genotype data (e.g., "pgen").
   # - Implement a new mlm_data object for PLINK "pgen" data sets.
   #   (Idea: specialized packages should be "Suggests".)
   # - Implement "global" estimation of parameters in the 
