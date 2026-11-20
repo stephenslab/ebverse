@@ -32,7 +32,7 @@
 #'
 #'   \item{ser}{The L single effect regression models which define the
 #'     SuSiE posterior distribution.}
-#' 
+#'
 #'   \item{residual_variance}{The residual variance parameter.}
 #'
 #'   \item{elbo}{The value of the ELBO (an approximate marginal
@@ -41,6 +41,12 @@
 #'   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
 #'     to the \dQuote{null} model (b = 0).}
 #' 
+#'   \item{ss}{The MLM summary statistics used in fitting the model.
+#'     This is always returned even if \code{return_data = FALSE}.}
+#' 
+#'   \item{dat}{When \code{return_data = TRUE}, this contains the 
+#'     data that were used to fit the model.}
+#'
 #'   \item{progress}{A data frame containing detailed information about
 #'     progress on the model fitting.}
 #'
@@ -48,10 +54,7 @@
 #'     model fitting is performed.}
 #' 
 #'   \item{version}{The version of the ebverse R package that was
-#'     used to generate this object}
-#' 
-#'   \item{dat}{When \code{return_data = TRUE}, this contains the 
-#'     data that were used to fit the model.}
+#'     used to generate this object.}
 #'
 #' @seealso \link{single_effect_regression}, \link{mlm_data}
 #'
@@ -140,10 +143,11 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   user interface and so there should be more careful checking
   #   of the inputs.
   # 
-  # TO DO NEXT: Implement various S3 methods: coef, plot, predict,
-  # summary, print, residuals
+  # TO DO NEXT: Implement S3 methods: summary, print.
+  # Then run R CMD check.
   # 
   # TO DO:
+  # - Implement predict method.
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
@@ -176,9 +180,6 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   fit <- fit_susie_model_core(dat,fit,fit$control)
 
   # Prepare the output
-  #
-  # TO DO (e.g., add names to any outputs).
-  #
   if (return_data)
     fit$dat <- dat
   else
@@ -313,6 +314,10 @@ susie_control_default <- function()
        trace    = TRUE,
        verbose  = "detailed")
 
+#' @rdname susie
+#'
+#' @param \dots Other arguments.
+#' 
 #' @importFrom stats variable.names
 #'
 #' @export
@@ -320,7 +325,7 @@ susie_control_default <- function()
 variable.names.susie <- function (object, ...)
   rownames(object$ss)
 
-#' @title Add Title Here.
+#' @rdname susie
 #' 
 #' @param object
 #' 
@@ -335,13 +340,85 @@ summary.susie <- function (object, ...) {
   #
 }
 
+#' @rdname susie
 #'
+#' @export
+#' 
+print.susie <- function (x, ...) {
+  print(summary(x))
+  return(invisible(x))
+}
+
+#' @rdname susie
+#' 
+#' @export
+#' 
+print.summary_susie <- function (x, ...) {
+
+}
+
+#' @rdname susie
+#'
+#' @importFrom stats coef
+#'
+#' @export
+#'
+coef.susie <- function (object, ...)
+  compute_post_mean_susie(object$ser)
+
+#' @rdname susie
+#' 
 #' @importFrom stats residuals
 #'
 #' @export
 #' 
-residuals.susie <- function () {
-  # TO DO.
+residuals.susie <- function (object, ...) {
+  out <- do.call(cbind,lapply(object$ser,function (x) x$dat$bhat))
+  rownames(out) <- variable.names(object)
+  colnames(out) <- names(object$ser)
+  return(out)
+}
+
+#' @rdname susie
+#'
+#' @param newdata Document "newdata" input argument here.
+#' 
+#' @importFrom stats predict
+#'
+#' @export
+#' 
+predict.susie = function (object, newdata, ...) {
+  stop("susie 'predict' method is not yet implemented")
+}
+
+#' @rdname susie
+#'
+#' @param font_size Specifies the font size for the plot.
+#' 
+#' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 aes
+#' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 geom_abline
+#' @importFrom ggplot2 xlim
+#' @importFrom ggplot2 ylim
+#' @importFrom ggplot2 labs
+#' @importFrom cowplot theme_cowplot
+#' 
+#' @export
+#' 
+plot.susie <- function (x, font_size = 12, ...) {
+  dat <- data.frame(bhat = x$ss$bhat,susie = coef(x))
+  xmin <- min(c(dat$bhat,dat$susie))
+  xmax <- max(c(dat$bhat,dat$susie))
+  return(ggplot(dat,aes(x = .data$bhat,y = .data$susie)) +
+         geom_point() +
+         geom_abline(intercept = 0,slope = 1,color = "magenta",
+                     linetype = "dotted") +
+         xlim(xmin,xmax) +
+         ylim(xmin,xmax) +
+         labs(x = "least squares estimate",y = "susie estimate") +
+         theme_cowplot(font_size))
 }
 
 # Compute the posterior inclusion probabilities (PIPs) given the
@@ -390,7 +467,7 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
                               shat = setNames(sigma*d,varnames),
                               residual_variance = 1)
-  ser <- fit_ser_model(ser,dat_ser)
+  ser <- fit_ser_model(ser,dat_ser,return_data = TRUE)
   bk <- ser$posterior$mean
   sk <- ser$posterior$var
   if (L > 1)

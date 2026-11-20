@@ -5,6 +5,14 @@
 \alias{init_susie_model}
 \alias{fit_susie_model}
 \alias{susie_control_default}
+\alias{variable.names.susie}
+\alias{summary.susie}
+\alias{print.susie}
+\alias{print.summary_susie}
+\alias{coef.susie}
+\alias{residuals.susie}
+\alias{predict.susie}
+\alias{plot.susie}
 \title{Fitting Sum of Single Effect (SuSiE) Models}
 \usage{
 init_susie_model(
@@ -19,6 +27,22 @@ init_susie_model(
 fit_susie_model(fit, dat, return_data = missing(dat))
 
 susie_control_default()
+
+\method{variable.names}{susie}(object, ...)
+
+\method{summary}{susie}(object, ...)
+
+\method{print}{susie}(x, ...)
+
+\method{print}{summary_susie}(x, ...)
+
+\method{coef}{susie}(object, ...)
+
+\method{residuals}{susie}(object, ...)
+
+\method{predict}{susie}(object, newdata, ...)
+
+\method{plot}{susie}(x, font_size = 12, ...)
 }
 \arguments{
 \item{variable.names}{The names of the variables in the SuSiE
@@ -51,6 +75,14 @@ for other ways to create \sQuote{mlm_data} objects.}
 
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
+
+\item{object}{}
+
+\item{\dots}{Other arguments.}
+
+\item{newdata}{Document "newdata" input argument here.}
+
+\item{font_size}{Specifies the font size for the plot.}
 }
 \value{
 \code{init_susie_model} and \code{fit_susie_model} return
@@ -69,6 +101,12 @@ included in the output.}
   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
     to the \dQuote{null} model (b = 0).}
 
+  \item{ss}{The MLM summary statistics used in fitting the model.
+    This is always returned even if \code{return_data = FALSE}.}
+
+  \item{dat}{When \code{return_data = TRUE}, this contains the 
+    data that were used to fit the model.}
+
   \item{progress}{A data frame containing detailed information about
     progress on the model fitting.}
 
@@ -76,10 +114,7 @@ included in the output.}
     model fitting is performed.}
 
   \item{version}{The version of the ebverse R package that was
-    used to generate this object}
-
-  \item{dat}{When \code{return_data = TRUE}, this contains the 
-    data that were used to fit the model.}
+    used to generate this object.}
 }
 \description{
 Methods for fitting \dQuote{Sum of Single Effect}

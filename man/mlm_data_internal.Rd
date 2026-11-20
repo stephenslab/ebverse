@@ -3,9 +3,15 @@
 \name{mlm_data_internal}
 \alias{mlm_data_internal}
 \alias{compute_XtXb}
+\alias{compute_XtXb.mlm_full_data}
+\alias{compute_XtXb.mlm_summary_data}
 \title{Internal Methods for MLM Data Objects.}
 \usage{
 compute_XtXb(dat, b)
+
+\method{compute_XtXb}{mlm_full_data}(dat, b)
+
+\method{compute_XtXb}{mlm_summary_data}(dat, b)
 }
 \arguments{
 \item{dat}{An \sQuote{mlm_data} object}

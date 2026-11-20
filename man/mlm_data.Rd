@@ -4,11 +4,38 @@
 \alias{mlm_data}
 \alias{prepare_mlm_full_data}
 \alias{prepare_mlm_summary_data}
+\alias{sample.names.mlm_full_data}
+\alias{variable.names.mlm_full_data}
+\alias{variable.names.mlm_summary_data}
+\alias{summary.mlm_full_data}
+\alias{summary.mlm_summary_data}
+\alias{print.summary_mlm_full_data}
+\alias{print.summary_mlm_summary_data}
+\alias{print.mlm_full_data}
+\alias{print.mlm_summary_data}
 \title{Data Objects for Multiple Linear Regression Models}
 \usage{
 prepare_mlm_full_data(X, y, standardize = FALSE)
 
-prepare_mlm_summary_data(z, R, bhat, sehat, n, var_y)
+prepare_mlm_summary_data(z, R, bhat, sehat, n, var_y, df.residual = n - 2)
+
+\method{sample.names}{mlm_full_data}(dat, ...)
+
+\method{variable.names}{mlm_full_data}(object, ...)
+
+\method{variable.names}{mlm_summary_data}(object, ...)
+
+\method{summary}{mlm_full_data}(object, ...)
+
+\method{summary}{mlm_summary_data}(object, ...)
+
+\method{print}{summary_mlm_full_data}(x, ...)
+
+\method{print}{summary_mlm_summary_data}(x, ...)
+
+\method{print}{mlm_full_data}(x, ...)
+
+\method{print}{mlm_summary_data}(x, ...)
 }
 \arguments{
 \item{X}{An n x J matrix containing observations about J candidate
@@ -36,6 +63,9 @@ of the least-squares estimates.}
 \item{var_y}{This should be equal to \code{sum(y^2)/(n-1)}.
 If y has a mean of zero, this should be the same as
 \code{var(y)}.}
+
+\item{df.residual}{The residual degrees of freedom from estimation
+of the coefficients, e.g., using \code{\link[stats]{lm}}.}
 }
 \value{
 An \sQuote{mlm_data} object. It is a list with the

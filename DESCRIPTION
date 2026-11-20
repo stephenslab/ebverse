@@ -1,8 +1,8 @@
 Encoding: UTF-8
 Type: Package
 Package: ebverse
-Version: 0.1-97
-Date: 2026-11-19
+Version: 0.1-98
+Date: 2026-11-20
 Title: Empirical Bayes Linear Models in R
 Authors@R: c(person("Peter","Carbonetto",role=c("aut","cre"),
                     email="peter.carbonetto@gmail.com"),
@@ -18,7 +18,10 @@ Imports:
     Matrix,
     utils,
     stats,
-    Rcpp (>= 1.1.0)
+    Rcpp (>= 1.1.0),
+    rlang,
+    ggplot2,
+    cowplot
 Suggests: glmnet
 LinkingTo: 
     Rcpp,

@@ -4,10 +4,11 @@
 \alias{single_effect_regression}
 \alias{init_ser_model}
 \alias{init_ser_model_normal}
+\alias{prepare_ser_data}
+\alias{ser_normal_control_default}
 \alias{fit_ser_model}
 \alias{fit_ser_model.ser_normal}
-\alias{ser_normal_control_default}
-\alias{prepare_ser_data}
+\alias{variable.names.ser_normal}
 \title{Fitting Single Effect Regression Models}
 \usage{
 init_ser_model(
@@ -25,13 +26,15 @@ init_ser_model_normal(
   control = list()
 )
 
+prepare_ser_data(bhat, shat, X, y, residual_variance)
+
+ser_normal_control_default()
+
 fit_ser_model(fit, dat, return_data = missing(dat), ...)
 
 \method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat), ...)
 
-ser_normal_control_default()
-
-prepare_ser_data(bhat, shat, X, y, residual_variance)
+\method{variable.names}{ser_normal}(object, ...)
 }
 \arguments{
 \item{variable.names}{The names of the variables in the
@@ -52,19 +55,6 @@ argument specifies how the initial guess is obtained.}
 affect the model fitting. See \sQuote{Details} for further
 information.}
 
-\item{fit}{An object of class \sQuote{ser} that captures the state
-of an SER model fit, typically the output from running an
-\sQuote{init_ser_model} function, or an output from a previous
-\code{fit_ser_model} call.}
-
-\item{dat}{An object of class \sQuote{ser_data}, such as the
-output from a call to \code{prepare_ser_data}.}
-
-\item{return_data}{If \code{return_data = TRUE}, the input data are
-included in the output.}
-
-\item{\dots}{Additional arguments controlling the model fitting.}
-
 \item{bhat}{A numeric vector containing least-squares estimates of
 the coefficients.}
 
@@ -82,6 +72,19 @@ variables.}
 used to compute the the outputted statistics. This is only used
 when X, y are provided, but a residual variance setting should
 still be declared even if it is not actually used.}
+
+\item{fit}{An object of class \sQuote{ser} that captures the state
+of an SER model fit, typically the output from running an
+\sQuote{init_ser_model} function, or an output from a previous
+\code{fit_ser_model} call.}
+
+\item{dat}{An object of class \sQuote{ser_data}, such as the
+output from a call to \code{prepare_ser_data}.}
+
+\item{return_data}{If \code{return_data = TRUE}, the input data are
+included in the output.}
+
+\item{\dots}{Additional arguments controlling the model fitting.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return

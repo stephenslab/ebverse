@@ -203,6 +203,80 @@ init_ser_model_normal <-
 }
 
 #' @rdname single_effect_regression
+#' 
+#' @param bhat A numeric vector containing least-squares estimates of
+#'   the coefficients.
+#'
+#' @param shat A numeric vector containing the variances of the
+#'   least-squares estimates. (Note that these are variances, not
+#'   standard deviations or standard errors.)
+#'
+#' @param X A matrix of with rows corresponding to observations
+#'   (samples) and columns corresponding to candidate explanatory
+#'   variables.
+#'
+#' @param y A vector of regression outcomes.
+#' 
+#' @param residual_variance The residual variance parameter which is
+#'   used to compute the the outputted statistics. This is only used
+#'   when X, y are provided, but a residual variance setting should
+#'   still be declared even if it is not actually used.
+#'
+#' @note In \code{prepare_set_data}, only provide (bhat, shat) or
+#'   (X, y); an error will occur if the wrong combination of data
+#'   are provided.
+#' 
+#' @return \code{prepare_ser_data} returns a data frame with two
+#'   columns: \sQuote{bhat}, the least-squares estimates of the
+#'   coefficients; \sQuote{shat}, the variances of these
+#'   estimates. See \sQuote{Details} for precise definitions of
+#'   these terms.
+#'   
+#' @export
+#' 
+prepare_ser_data <- function (bhat, shat, X, y, residual_variance) {
+  if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
+        (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
+    stop("Either {bhat, shat} or {X, y} should be provided ",
+         "(and not both)",domain = NA)
+  if (missing(bhat) & missing(shat)) {
+    J <- ncol(X)
+    if (length(residual_variance) != 1)
+      stop("residual_variance should be a single number",domain = NA)
+    res  <- compute_lse(X,y,residual_variance)
+    bhat <- res$bhat
+    shat <- res$shat
+  }
+  if (length(bhat) != length(shat))
+    stop("bhat and s should be the same length",domain = NA)
+  if (length(bhat) < 2 | length(shat) < 2)
+    stop("bhat and s should have at least two entries",domain = NA)
+  if (is.null(names(bhat)) | is.null(names(shat)))
+    stop("variables must be named by providing names for bhat and shat, or ",
+         "column names for X",domain = NA)
+  dat <- data.frame(bhat = bhat,
+                    shat = shat,
+                    row.names = names(bhat))
+  class(dat) <- c("ser_data","data.frame")
+  attr(dat,"residual_variance") <- residual_variance
+  return(dat)
+}
+
+#' @rdname single_effect_regression
+#' 
+#' @export
+#' 
+ser_normal_control_default <- function()
+  list(estimate_prior_variance = TRUE,
+       global_prior_variance = FALSE,
+       paramtol = 1e-6,
+       lbftol   = as.numeric(NA),
+       maxiter  = 10,
+       version  = "R",
+       trace    = TRUE,
+       verbose  = "none")
+
+#' @rdname single_effect_regression
 #'
 #' @param fit An object of class \sQuote{ser} that captures the state
 #'   of an SER model fit, typically the output from running an
@@ -272,80 +346,6 @@ fit_ser_model.ser_normal <- function (fit, dat, return_data = missing(dat),
   else
     fit["dat"] <- NULL
   return(fit)
-}
-
-#' @rdname single_effect_regression
-#' 
-#' @export
-#' 
-ser_normal_control_default <- function()
-  list(estimate_prior_variance = TRUE,
-       global_prior_variance = FALSE,
-       paramtol = 1e-6,
-       lbftol   = as.numeric(NA),
-       maxiter  = 10,
-       version  = "R",
-       trace    = TRUE,
-       verbose  = "none")
-
-#' @rdname single_effect_regression
-#' 
-#' @param bhat A numeric vector containing least-squares estimates of
-#'   the coefficients.
-#'
-#' @param shat A numeric vector containing the variances of the
-#'   least-squares estimates. (Note that these are variances, not
-#'   standard deviations or standard errors.)
-#'
-#' @param X A matrix of with rows corresponding to observations
-#'   (samples) and columns corresponding to candidate explanatory
-#'   variables.
-#'
-#' @param y A vector of regression outcomes.
-#' 
-#' @param residual_variance The residual variance parameter which is
-#'   used to compute the the outputted statistics. This is only used
-#'   when X, y are provided, but a residual variance setting should
-#'   still be declared even if it is not actually used.
-#'
-#' @note In \code{prepare_set_data}, only provide (bhat, shat) or
-#'   (X, y); an error will occur if the wrong combination of data
-#'   are provided.
-#' 
-#' @return \code{prepare_ser_data} returns a data frame with two
-#'   columns: \sQuote{bhat}, the least-squares estimates of the
-#'   coefficients; \sQuote{shat}, the variances of these
-#'   estimates. See \sQuote{Details} for precise definitions of
-#'   these terms.
-#'   
-#' @export
-#' 
-prepare_ser_data <- function (bhat, shat, X, y, residual_variance) {
-  if (!((missing(X) & missing(y) & !missing(bhat) & !missing(shat)) |
-        (!missing(X) & !missing(y) & missing(bhat) & missing(shat))))
-    stop("Either {bhat, shat} or {X, y} should be provided ",
-         "(and not both)",domain = NA)
-  if (missing(bhat) & missing(shat)) {
-    J <- ncol(X)
-    if (length(residual_variance) != 1)
-      stop("residual_variance should be a single number",domain = NA)
-    res  <- compute_lse(X,y,residual_variance)
-    bhat <- res$bhat
-    shat <- res$shat
-  }
-  if (length(bhat) != length(shat))
-    stop("bhat and s should be the same length",domain = NA)
-  if (length(bhat) < 2 | length(shat) < 2)
-    stop("bhat and s should have at least two entries",domain = NA)
-  if (is.null(names(bhat)) | is.null(names(shat)))
-    stop("variables must be named by providing names for bhat and shat, or ",
-         "column names for X",domain = NA)
-  dat <- data.frame(bhat = bhat,
-                    shat = shat,
-                    row.names = names(bhat))
-  class(dat) <- c("ser_data","data.frame")
-  attr(dat,"residual_variance") <- residual_variance
-  return(dat)
 }
 
 # This implements the core model fitting algorithm for the single
@@ -469,6 +469,8 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
               progress  = progress))
 }
 
+#' @rdname single_effect_regression
+#'
 #' @importFrom stats variable.names
 #'
 #' @export

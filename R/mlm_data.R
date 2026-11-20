@@ -77,8 +77,6 @@
 prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   # 
   # TO DO:  
-  #
-  # - Define "mlm_data" class in the documentation.
   # - Implement intercept = TRUE.
   # - Add intercept estimate to data object.
   #
@@ -111,8 +109,9 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
   # 
   # Standardize the columns of X, if requested.
   if (standardize) {
-    X <- scale(X,center = TRUE,scale = TRUE)
-    xs <- attr(X,"scaled:scale")
+    stop("standardize = TRUE is not yet implemented")
+    # X <- scale(X,center = TRUE,scale = TRUE)
+    # xs <- attr(X,"scaled:scale")
   } else {
     X <- scale(X,center = TRUE,scale = FALSE)
     xs <- rep(1,J)
@@ -152,15 +151,18 @@ prepare_mlm_full_data <- function (X, y, standardize = FALSE) {
 #'   If y has a mean of zero, this should be the same as
 #'   \code{var(y)}.
 #'
+#' @param df.residual The residual degrees of freedom from estimation
+#'   of the coefficients, e.g., using \code{\link[stats]{lm}}.
+#'
 #' @importFrom stats setNames
 #' 
 #' @export
 #' 
-prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
+prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y,
+                                      df.residual = n - 2) {
   #  
   # NOTES: 
   # - Be strict about naming things.
-  # - I need to do a better job checking the inputs.
   # - Handle situation when n and/or var_y are missing.
   # - Give messages/warnings to tell user what is going on.
   # - See susie_rss.R.
@@ -205,20 +207,13 @@ prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
 
   # See Lemma 1 of the susie-rss paper (Zou et al 2022 PLoS 
   # Genetics). 
-  #
-  # TO DO: Move this code into one or more helper functions. Note
-  # that use of "n-2" instead of "n" for calculating the residual
-  # variances (sigma).
-  #
-  # TO DO: Replace n - 2 by "df.residual" (with default setting
-  # df.residual = n - 2).
-  #
-  z     <- bhat/sehat
-  sigma <- var_y*(n-1)/(z^2 + n - 2)
-  d     <- sqrt(sigma)/sehat
-  XtX   <- t(R * d) * d
+  z     <- bhat/sehat                      # z-scores
+  sigma <- var_y*(n-1)/(z^2 + df.residual) # residual variances
+  d     <- sqrt(sigma)/sehat               # cov2cor scaling
+  shat  <- 1/d^2                           # bhat variances
+  XtX   <- t(R * d) * d                     
   XtX   <- (XtX + t(XtX))/2
-  ss    <- prepare_ser_data(bhat = bhat,shat = 1/d^2,residual_variance = 1)
+  ss    <- prepare_ser_data(bhat = bhat,shat = shat,residual_variance = 1)
 
   # Prepare the output.
   dat <- list(n     = n,
@@ -231,13 +226,15 @@ prepare_mlm_summary_data <- function (z, R, bhat, sehat, n, var_y) {
   return(dat)
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export 
 #' 
 sample.names.mlm_full_data <- function (dat, ...)
   names(object$y)
 
-#'
+#' @rdname mlm_data
+#' 
 #' @importFrom stats variable.names
 #' 
 #' @export  
@@ -245,6 +242,8 @@ sample.names.mlm_full_data <- function (dat, ...)
 variable.names.mlm_full_data <- function (object, ...)
   colnames(object$X)
 
+#' @rdname mlm_data
+#'
 #' @importFrom stats variable.names
 #'
 #' @export
@@ -252,6 +251,7 @@ variable.names.mlm_full_data <- function (object, ...)
 variable.names.mlm_summary_data <- function (object, ...)
   rownames(object$ss)
 
+#' @rdname mlm_data
 #' 
 #' @export
 #' 
@@ -263,7 +263,8 @@ summary.mlm_full_data <- function (object, ...) {
   return(out)
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export
 #' 
 summary.mlm_summary_data <- function (object, ...) {
@@ -272,7 +273,8 @@ summary.mlm_summary_data <- function (object, ...) {
   return(out)
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export
 #' 
 print.summary_mlm_full_data <- function (x, ...) {
@@ -283,7 +285,8 @@ print.summary_mlm_full_data <- function (x, ...) {
   return(invisible(x))
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export
 #' 
 print.summary_mlm_summary_data <- function (x, ...) {
@@ -292,7 +295,8 @@ print.summary_mlm_summary_data <- function (x, ...) {
   return(invisible(x))
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export
 #' 
 print.mlm_full_data <- function (x, ...) {
@@ -300,7 +304,8 @@ print.mlm_full_data <- function (x, ...) {
   return(invisible(x))
 }
 
-#'
+#' @rdname mlm_data
+#' 
 #' @export
 #' 
 print.mlm_summary_data <- function (x, ...) {
@@ -332,6 +337,8 @@ compute_XtXb <- function (dat, b) {
   UseMethod("compute_XtXb")
 }
 
+#' @rdname mlm_data_internal
+#' 
 #' @importFrom stats setNames
 #' 
 #' @export
@@ -340,7 +347,8 @@ compute_XtXb.mlm_full_data <- function (dat, b)
   setNames(drop(t(dat$X %*% b) %*% dat$X),
            variable.names(dat))
 
-#'
+#' @rdname mlm_data_internal
+#' 
 #' @export
 #'
 compute_XtXb.mlm_summary_data <- function (dat, b)
