@@ -390,6 +390,11 @@ residuals.susie <- function (object, ...) {
 #' @export
 #' 
 predict.susie = function (object, newdata, ...) {
+  #
+  # TO DO: I need to think about the design of the predict method and
+  # what we actually want to predict (consider the case when we only
+  # have summary data).
+  #
   stop("susie 'predict' method is not yet implemented")
 }
 
@@ -462,9 +467,9 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   d        <- dat$ss$shat
   varnames <- variable.names(ser)
   if (L > 1) {
-    b    <- b - ser$posterior$mean
-    r    <- compute_XtXb(dat,b)
-    bhat <- bhat - d*r
+    bk   <- ser$posterior$mean
+    b    <- b - bk
+    bhat <- bhat - d*compute_XtXb(dat,b)
   } 
   dat_ser <- prepare_ser_data(bhat = setNames(bhat,varnames),
                               shat = setNames(sigma*d,varnames),
