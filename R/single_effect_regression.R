@@ -480,6 +480,45 @@ fit_ser_model_normal_core <- function (dat, prior, lbf, control) {
 variable.names.ser_normal <- function (object, ...)
   names(object$prior$prob)
 
+#' @rdname single_effect_regression
+#'
+#' @export
+#' 
+summary.ser_normal <- function (object, ...) {
+  out <- list(nvar = length(object$prior$prob),
+              lbf  = object$lbf,
+              prior_variance = object$prior$prior_variance)
+  class(out) <- c("summary_ser_normal","list")
+  return(out)
+}
+
+#' @rdname single_effect_regression
+#'
+#' @param x An object of class \sQuote{ser}.
+#' 
+#' @export
+#' 
+print.ser_model <- function (x, ...) {
+  print(summary(x))
+  return(invisible(x))
+}
+
+#' @rdname single_effect_regression
+#' 
+#' @param x An object of class \sQuote{ser}.
+#' 
+#' @export
+#' 
+print.summary_ser_normal <- function (x, ...) {
+  cat(sprintf("Single effect regression (SER) model for %d variables.\n",
+              x$nvar))
+  cat("Prior on coefficients is i.i.d. normal with zero mean and ")
+  cat(sprintf("s.d. %0.3f.\n",x$prior_variance))
+  if (!is.na(x$lbf))
+    cat(sprintf("The SER Bayes factor is %0.3f.\n",x$lbf))
+  return(invisible(x))
+}
+
 # Compute the least-squares estimate and its variance given the data
 # (X, y) and the residual variances (sigma).
 compute_lse <- function (X, y, sigma) {

@@ -9,6 +9,9 @@
 \alias{fit_ser_model}
 \alias{fit_ser_model.ser_normal}
 \alias{variable.names.ser_normal}
+\alias{summary.ser_normal}
+\alias{print.ser_model}
+\alias{print.summary_ser_normal}
 \title{Fitting Single Effect Regression Models}
 \usage{
 init_ser_model(
@@ -35,6 +38,12 @@ fit_ser_model(fit, dat, return_data = missing(dat), ...)
 \method{fit_ser_model}{ser_normal}(fit, dat, return_data = missing(dat), ...)
 
 \method{variable.names}{ser_normal}(object, ...)
+
+\method{summary}{ser_normal}(object, ...)
+
+\method{print}{ser_model}(x, ...)
+
+\method{print}{summary_ser_normal}(x, ...)
 }
 \arguments{
 \item{variable.names}{The names of the variables in the
@@ -82,6 +91,8 @@ output from a call to \code{prepare_ser_data}.}
 included in the output.}
 
 \item{\dots}{Additional arguments controlling the model fitting.}
+
+\item{x}{An object of class \sQuote{ser}.}
 }
 \value{
 \code{init_ser_model} and \code{fit_ser_model} return
