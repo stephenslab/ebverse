@@ -30,7 +30,7 @@ susie_control_default()
 
 \method{variable.names}{susie}(object, ...)
 
-\method{summary}{susie}(object, ...)
+\method{summary}{susie}(object, dat, ...)
 
 \method{print}{susie}(x, ...)
 

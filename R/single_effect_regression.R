@@ -513,9 +513,9 @@ print.summary_ser_normal <- function (x, ...) {
   cat(sprintf("Single effect regression (SER) model for %d variables.\n",
               x$nvar))
   cat("Prior on coefficients is i.i.d. normal with zero mean and ")
-  cat(sprintf("s.d. %0.3f.\n",x$prior_variance))
+  cat(sprintf("variance %0.3f.\n",x$prior_variance))
   if (!is.na(x$lbf))
-    cat(sprintf("The SER Bayes factor is %0.3f.\n",x$lbf))
+    cat(sprintf("SER (log) Bayes factor is %0.3f.\n",x$lbf))
   return(invisible(x))
 }
 

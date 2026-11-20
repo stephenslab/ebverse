@@ -329,13 +329,29 @@ variable.names.susie <- function (object, ...)
 #' 
 #' @export
 #' 
-summary.susie <- function (object, ...) {
+summary.susie <- function (object, dat, ...) {
   #
   # TO DO.
   # 
-  # What things do we want to return?
-  # See summary.lm for some ideas.
+  # Things to return:
+  # - number of SERs (L)
+  # - ELBO
+  # - (approximate) log Bayes factor
+  # - residual variance
+  # - PIPs
+  # - fitted values
+  # - posterior means
+  # - posterior variances?
+  # - credible sets (with purity, optionally)
   #
+  # See summary.lm and susieR for some ideas.
+  #
+  out <- list(nvar              = nrow(object$ss),
+              elbo              = object$elbo,
+              lbf               = object$lbf,
+              residual_variance = object$residual_variance)
+  class(out) <- c("summary_susie","list")
+  return(out)
 }
 
 #' @rdname susie
@@ -354,7 +370,13 @@ print.susie <- function (x, ...) {
 #' @export
 #' 
 print.summary_susie <- function (x, ...) {
-
+  cat(sprintf("SuSiE model for %d variables.\n",x$nvar))
+  cat(sprintf("residual variance is %0.4f.\n",x$residual_variance))
+  if (!is.na(x$lbf))
+    cat(sprintf("(log) Bayes factor is %0.4f.\n",x$lbf))
+  if (!is.na(x$elbo))
+    cat(sprintf("ELBO is %0.4f.\n",x$elbo))
+  return(invisible(x))
 }
 
 #' @rdname susie
