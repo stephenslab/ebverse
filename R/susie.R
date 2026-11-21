@@ -339,6 +339,7 @@ summary.susie <- function (object, dat, ...) {
   #
   # TO DO:
   # - Output credible sets (optionally with purity)
+  # - Add info about model fitting (no. of iterations).
   # - Describe the outputs in the roxygen2 docs.
   #
   # See summary.lm and susieR for some ideas.
@@ -352,7 +353,8 @@ summary.susie <- function (object, dat, ...) {
               residual_variance = object$residual_variance,
               fitted_values     = object$fitted_values,
               posterior         = data.frame(pip = pip,mean = b,
-                                    row.names = variable.names(object)))
+                                    row.names = variable.names(object)),
+              sets              = as.numeric(NA))
   class(out) <- c("summary_susie","list")
   return(out)
 }
