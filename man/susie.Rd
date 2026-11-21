@@ -109,6 +109,8 @@ included in the output.}
   \item{dat}{When \code{return_data = TRUE}, this contains the 
     data that were used to fit the model.}
 
+  \item{fitted_values}{The fitted values of \code{dat$ss$bhat}.}
+
   \item{progress}{A data frame containing detailed information about
     progress on the model fitting.}
 

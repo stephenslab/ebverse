@@ -47,6 +47,8 @@
 #'   \item{dat}{When \code{return_data = TRUE}, this contains the 
 #'     data that were used to fit the model.}
 #'
+#'   \item{fitted_values}{The fitted values of \code{dat$ss$bhat}.}
+#' 
 #'   \item{progress}{A data frame containing detailed information about
 #'     progress on the model fitting.}
 #'
@@ -109,6 +111,7 @@ init_susie_model <-
               ss                = ss,
               ser               = ser,
               residual_variance = residual_variance,
+              fitted_values     = as.numeric(NA),
               progress          = as.numeric(NA),
               control           = control)
   fit$version <- packageVersion("ebverse")
@@ -286,6 +289,9 @@ fit_susie_model_core <- function (dat, fit, control) {
                        shat = dat$ss$shat,
                        xs   = dat$xs,
                        row.names = variable.names(dat))
+  b <- compute_post_mean_susie(fit$ser)
+  fit$fitted_values <- dat$ss$shat * compute_XtXb(dat,b)
+  names(fit$fitted_values) <- variable.names(dat)
   if (control$trace) {
     progress <- progress[1:iter,]
     if (is.data.frame(fit$progress)) {
@@ -331,25 +337,22 @@ variable.names.susie <- function (object, ...)
 #' 
 summary.susie <- function (object, dat, ...) {
   #
-  # TO DO.
-  # 
-  # Things to return:
-  # - number of SERs (L)
-  # - ELBO
-  # - (approximate) log Bayes factor
-  # - residual variance
-  # - PIPs
-  # - fitted values
-  # - posterior means
-  # - posterior variances?
-  # - credible sets (with purity, optionally)
+  # TO DO:
+  # - Output credible sets (optionally with purity)
+  # - Describe the outputs in the roxygen2 docs.
   #
   # See summary.lm and susieR for some ideas.
   #
+  pip <- susie_get_pips(object$ser)
+  b   <- compute_post_mean_susie(object$ser)
   out <- list(nvar              = nrow(object$ss),
+              L                 = length(object$ser),
               elbo              = object$elbo,
               lbf               = object$lbf,
-              residual_variance = object$residual_variance)
+              residual_variance = object$residual_variance,
+              fitted_values     = object$fitted_values,
+              posterior         = data.frame(pip = pip,mean = b,
+                                    row.names = variable.names(object)))
   class(out) <- c("summary_susie","list")
   return(out)
 }
@@ -435,6 +438,9 @@ predict.susie = function (object, newdata, ...) {
 #' @export
 #' 
 plot.susie <- function (x, font_size = 12, ...) {
+  #
+  # TO DO: Modify this plot to show a (very) simple PIP plot.
+  # 
   dat <- data.frame(bhat = x$ss$bhat,susie = coef(x))
   xmin <- min(c(dat$bhat,dat$susie))
   xmax <- max(c(dat$bhat,dat$susie))
