@@ -338,8 +338,7 @@ variable.names.susie <- function (object, ...)
 summary.susie <- function (object, dat, ...) {
   #
   # TO DO:
-  # - Output credible sets (optionally with purity)
-  # - Add info about model fitting (no. of iterations).
+  # - Output credible sets (do not output purity).
   # - Describe the outputs in the roxygen2 docs.
   #
   # See summary.lm and susieR for some ideas.
@@ -351,6 +350,9 @@ summary.susie <- function (object, dat, ...) {
               elbo              = object$elbo,
               lbf               = object$lbf,
               residual_variance = object$residual_variance,
+              numiter           = ifelse(is.data.frame(object$progress),
+                                         nrow(object$progress),
+                                         as.numeric(NA)),
               fitted_values     = object$fitted_values,
               posterior         = data.frame(pip = pip,mean = b,
                                     row.names = variable.names(object)),
@@ -381,6 +383,10 @@ print.summary_susie <- function (x, ...) {
     cat(sprintf("(log) Bayes factor is %0.4f.\n",x$lbf))
   if (!is.na(x$elbo))
     cat(sprintf("ELBO is %0.4f.\n",x$elbo))
+  if (!is.na(x$numiter)) {
+    cat(sprintf("%d iterations ",x$numiter))
+    cat("of the IBSS algorithm were completed.\n")
+  }
   return(invisible(x))
 }
 
