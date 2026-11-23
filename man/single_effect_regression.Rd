@@ -82,7 +82,10 @@ used to compute the the outputted statistics. This is only used
 when X, y are provided, but a residual variance setting should
 still be declared even if it is not actually used.}
 
-\item{fit}{An object of class \sQuote{ser}.}
+\item{fit}{An object of class \sQuote{ser} that captures the state
+of an SER model fit, typically the output from running an
+\sQuote{init_ser_model} function, or an output from a previous
+\code{fit_ser_model} call.}
 
 \item{dat}{An object of class \sQuote{ser_data}, such as the
 output from a call to \code{prepare_ser_data}.}
@@ -91,6 +94,8 @@ output from a call to \code{prepare_ser_data}.}
 included in the output.}
 
 \item{\dots}{Additional arguments controlling the model fitting.}
+
+\item{object}{An object of class \sQuote{ser}.}
 
 \item{x}{An object of class \sQuote{ser}.}
 }

@@ -76,7 +76,7 @@ for other ways to create \sQuote{mlm_data} objects.}
 \item{return_data}{If \code{return_data = TRUE}, the input data are
 included in the output.}
 
-\item{object}{}
+\item{object}{An object of class \dQuote{susie}.}
 
 \item{\dots}{Other arguments.}
 

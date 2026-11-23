@@ -141,22 +141,16 @@ init_susie_model <-
 #'
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
-  # TO DO NEXT: 
-  # - Then run R CMD check.
-  # 
   # TO DO:
-  # - Implement predict method.
+  # - Implement a predict method.
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
   # - Implement some functions for simulating data from susie models.
-  # - Implement a "summary" S3 method for "ser_normal" objects.
-  # - Implement a "summary" S3 method for "susie" objects.
   # - Research efficient storage of genotype data (e.g., "pgen").
   # - Implement a new mlm_data object for PLINK "pgen" data sets.
   #   (Idea: specialized packages should be "Suggests".)
-  # - Implement "global" estimation of parameters in the 
-  #   SER models.
+  # - Implement "global" estimation of parameters in the SER models.
   #
 
   # Check and process the inputs.
@@ -318,6 +312,8 @@ susie_control_default <- function()
 
 #' @rdname susie
 #'
+#' @param object An object of class \dQuote{susie}.
+#' 
 #' @param \dots Other arguments.
 #' 
 #' @importFrom stats variable.names
@@ -328,8 +324,6 @@ variable.names.susie <- function (object, ...)
   rownames(object$ss)
 
 #' @rdname susie
-#' 
-#' @param object
 #' 
 #' @param coverage A number between 0 and 1 specifying the target
 #'   coverage level for the credible sets.
