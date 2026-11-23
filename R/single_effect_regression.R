@@ -142,8 +142,10 @@ init_ser_model <- function (variable.names,
                                          prior_variance = 1),
                             init_method = "null",
                             control = list()) {
+  #
   # TO DO: Implement "init_method" option for posterior means to be
   # specified manually.
+  #
   family <- match.arg(family)
   if (family == "normal")
     fit <- init_ser_model_normal(variable.names,prior,init_method,control)
@@ -550,3 +552,10 @@ compute_posterior_ebnm_normal <- function (bhat, shat, s0) {
 # the SER posterior and the SER prior.
 compute_kl_ser <- function (bhat, shat, b1, s1, lbf)
   -lbf + sum(b1*bhat/shat) - sum((s1 + b1^2)/shat)/2 
+
+# Returns a CS at a given coverage level given the PIPs.
+get_cs <- function (pip, coverage) {
+  i <- order(pip,decreasing = TRUE)
+  n <- which(cumsum(pip[i]) > coverage)[1]
+  return(i[1:n])
+}

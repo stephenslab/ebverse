@@ -30,11 +30,11 @@ susie_control_default()
 
 \method{variable.names}{susie}(object, ...)
 
-\method{summary}{susie}(object, dat, ...)
+\method{summary}{susie}(object, coverage = 0.95, ...)
 
 \method{print}{susie}(x, ...)
 
-\method{print}{summary_susie}(x, ...)
+\method{print}{summary_susie}(x, coverage = 0.95, ...)
 
 \method{coef}{susie}(object, ...)
 
@@ -79,6 +79,9 @@ included in the output.}
 \item{object}{}
 
 \item{\dots}{Other arguments.}
+
+\item{coverage}{A number between 0 and 1 specifying the target
+coverage level for the credible sets.}
 
 \item{x}{An object of class \sQuote{susie}.}
 

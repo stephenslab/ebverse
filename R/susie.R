@@ -142,8 +142,6 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO NEXT: 
-  # - Implement S3 methods summary and print for ser_model objects.
-  # - Implement S3 methods summary and print for susie objects.
   # - Then run R CMD check.
   # 
   # TO DO:
@@ -333,13 +331,14 @@ variable.names.susie <- function (object, ...)
 #' 
 #' @param object
 #' 
+#' @param coverage A number between 0 and 1 specifying the target
+#'   coverage level for the credible sets.
+#' 
 #' @export
 #' 
-summary.susie <- function (object, dat, ...) {
+summary.susie <- function (object, coverage = 0.95, ...) {
   #
-  # TO DO:
-  # - Output credible sets (do not output purity).
-  # - Describe the outputs in the roxygen2 docs.
+  # TO DO: Describe the "summary" outputs in the roxygen2 docs.
   #
   # See summary.lm and susieR for some ideas.
   #
@@ -356,7 +355,7 @@ summary.susie <- function (object, dat, ...) {
               fitted_values     = object$fitted_values,
               posterior         = data.frame(pip = pip,mean = b,
                                     row.names = variable.names(object)),
-              sets              = as.numeric(NA))
+              credible_sets     = susie_get_credible_sets(object,coverage))
   class(out) <- c("summary_susie","list")
   return(out)
 }
@@ -373,16 +372,24 @@ print.susie <- function (x, ...) {
 }
 
 #' @rdname susie
-#' 
+#'
 #' @export
 #' 
-print.summary_susie <- function (x, ...) {
-  cat(sprintf("SuSiE model for %d variables.\n",x$nvar))
+print.summary_susie <- function (x, coverage = 0.95, ...) {
+  cat(sprintf("SuSiE model for %d variables with %d single effects.\n",
+              x$nvar,x$L))
   cat(sprintf("residual variance is %0.4f.\n",x$residual_variance))
   if (!is.na(x$lbf))
     cat(sprintf("(log) Bayes factor is %0.4f.\n",x$lbf))
   if (!is.na(x$elbo))
     cat(sprintf("ELBO is %0.4f.\n",x$elbo))
+  cs_sizes <- sapply(x$credible_sets,length)
+  cat(sprintf("The smallest %0.0f%% CS has %d %s; ",
+              100*attr(x$credible_sets,"target_coverage"),
+              min(cs_sizes),
+              ifelse(min(cs_sizes) == 1,"variable","variables")))
+  cat(sprintf("the largest has %d %s.\n",max(cs_sizes),
+              ifelse(max(cs_sizes) == 1,"variable","variables")))
   if (!is.na(x$numiter)) {
     cat(sprintf("%d iterations ",x$numiter))
     cat("of the IBSS algorithm were completed.\n")
@@ -513,7 +520,6 @@ susie_ibss_update <- function (dat, ser, L, b, sigma) {
   sk <- ser$posterior$var
   if (L > 1)
     b <- b + bk
-
   return(list(ser = ser,b = b))
 }
 
@@ -565,4 +571,19 @@ susie_update_residual_variance <- function (dat, erss) {
   n <- dat$n
   yy <- (n-1)*dat$var_y
   return((yy + erss)/n)
+}
+
+# Returns L credible set, one for each single effect.
+susie_get_credible_sets <- function (fit, coverage) {
+  var_names <- variable.names(fit)
+  L <- length(fit$ser)
+  out <- vector("list",L)
+  names(out) <- names(fit$ser)
+  for (k in 1:L) {
+    cs <- get_cs(fit$ser[[k]]$posterior$pip,coverage)
+    names(cs) <- var_names[cs]
+    out[[k]] <- cs
+  }  
+  attr(out,"target_coverage") <- coverage
+  return(out)
 }
