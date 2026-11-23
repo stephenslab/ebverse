@@ -42,7 +42,7 @@
 #'
 #'   \item{posterior}{A data frame with one row per variable and the
 #'     following columns: \sQuote{lbf}, the log-Bayes factor;
-#'     \sQuote{PIP}, the posterior inclusion probability; \sQuote{mean},
+#'     \sQuote{pip}, the posterior inclusion probability; \sQuote{mean},
 #'     the posterior mean of the regression coefficient; \sQuote{var},
 #'     the posterior variance of the regression coefficient.}
 #'

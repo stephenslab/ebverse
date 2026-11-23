@@ -58,6 +58,36 @@
 #'   \item{version}{The version of the ebverse R package that was
 #'     used to generate this object.}
 #'
+#' The susie \sQuote{summary} method returns a list with the following
+#' elements:
+#'
+#'   \item{nvar}{The number of variables.}
+#'
+#'   \item{L}{The number of single effects.}
+#'
+#'   \item{elbo}{The value of the ELBO (an approximate marginal
+#'     likelihood) at the current model fit.}
+#'
+#'   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
+#'     to the \dQuote{null} model (b = 0).}
+#' 
+#'   \item{residual_variance}{The residual variance parameter.}
+#'
+#'   \item{numiter}{The number of iterations of the IBSS model
+#'     fitting algorithm performed.}
+#'
+#'   \item{fitted_values}{The fitted values of \code{dat$ss$bhat}.}
+#' 
+#'   \item{posterior}{A data frame with one row per variable and the
+#'     following columns: \sQuote{pip}, the posterior inclusion
+#'     probability; and \sQuote{mean}, the posterior mean of the
+#'     regression coefficient.}
+#'
+#'   \item{credible_sets}{Credible sets estimated from the SuSiE model
+#'     fit. For each SER, the CS is a set of variables such that the
+#'     sum of the PIPs is equal to or greater than the specified
+#'     target coverage.}
+#' 
 #' @seealso \link{single_effect_regression}, \link{mlm_data}
 #'
 #' @details
@@ -331,11 +361,6 @@ variable.names.susie <- function (object, ...)
 #' @export
 #' 
 summary.susie <- function (object, coverage = 0.95, ...) {
-  #
-  # TO DO: Describe the "summary" outputs in the roxygen2 docs.
-  #
-  # See summary.lm and susieR for some ideas.
-  #
   pip <- susie_get_pips(object$ser)
   b   <- compute_post_mean_susie(object$ser)
   out <- list(nvar              = nrow(object$ss),
