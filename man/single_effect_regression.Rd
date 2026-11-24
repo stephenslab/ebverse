@@ -10,7 +10,7 @@
 \alias{fit_ser_model.ser_normal}
 \alias{variable.names.ser_normal}
 \alias{summary.ser_normal}
-\alias{print.ser_model}
+\alias{print.ser_normal}
 \alias{print.summary_ser_normal}
 \title{Fitting Single Effect Regression Models}
 \usage{
@@ -41,7 +41,7 @@ fit_ser_model(fit, dat, return_data = missing(dat), ...)
 
 \method{summary}{ser_normal}(object, ...)
 
-\method{print}{ser_model}(x, ...)
+\method{print}{ser_normal}(x, ...)
 
 \method{print}{summary_ser_normal}(x, ...)
 }

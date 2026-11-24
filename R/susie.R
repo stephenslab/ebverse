@@ -173,6 +173,9 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
   # - Implement a predict method.
+  # - Implement a residuals method.
+  # - Add residuals to summary method (see lm).
+  # - Add r.squared (see lm) or similar (e.g., pve) to summary method.
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
@@ -361,6 +364,9 @@ variable.names.susie <- function (object, ...)
 #' @export
 #' 
 summary.susie <- function (object, coverage = 0.95, ...) {
+  #
+  # TO DO: Add SER Bayes factors to summary.
+  #
   pip <- susie_get_pips(object$ser)
   b   <- compute_post_mean_susie(object$ser)
   out <- list(nvar              = nrow(object$ss),
@@ -395,6 +401,9 @@ print.susie <- function (x, ...) {
 #' @export
 #' 
 print.summary_susie <- function (x, coverage = 0.95, ...) {
+  #
+  # TO DO: Add SER Bayes factors to this summary.
+  #
   cat(sprintf("SuSiE model for %d variables with %d single effects.\n",
               x$nvar,x$L))
   cat(sprintf("residual variance is %0.4f.\n",x$residual_variance))
@@ -473,7 +482,7 @@ predict.susie = function (object, newdata, ...) {
 #' 
 plot.susie <- function (x, font_size = 12, ...) {
   #
-  # TO DO: Modify this plot to show a (very) simple PIP plot.
+  # TO DO NEXT: Modify this plot to show a (very) simple PIP plot.
   # 
   dat <- data.frame(bhat = x$ss$bhat,susie = coef(x))
   xmin <- min(c(dat$bhat,dat$susie))

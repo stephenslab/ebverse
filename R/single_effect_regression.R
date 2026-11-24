@@ -500,7 +500,7 @@ summary.ser_normal <- function (object, ...) {
 #' 
 #' @export
 #' 
-print.ser_model <- function (x, ...) {
+print.ser_normal <- function (x, ...) {
   print(summary(x))
   return(invisible(x))
 }

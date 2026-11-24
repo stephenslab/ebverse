@@ -34,4 +34,3 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 Residual standard error: 0.696 on 18 degrees of freedom
 Multiple R-squared:  0.0731,	Adjusted R-squared:  0.0216
 F-statistic: 1.42 on 1 and 18 DF,  p-value: 0.249
-
