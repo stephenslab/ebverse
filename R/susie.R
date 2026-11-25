@@ -172,6 +172,11 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
+  # - Implement a function to load PLINK data into R, then calls 
+  #   prepare_mlm_full_data(). Need to find an R package to help with 
+  #   this.
+  # - Implement a function to load the results of a PLINK association
+  #   analysis into R, then calls prepare_mlm_summary_data().
   # - Implement a predict method.
   # - Implement a residuals method.
   # - Add residuals to summary method (see lm).
@@ -205,7 +210,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # Fit the SuSiE model and compute the posterior statistics.
   fit <- fit_susie_model_core(dat,fit,fit$control)
 
-  # Prepare the output
+  # Prepare the output.
   if (return_data)
     fit$dat <- dat
   else
