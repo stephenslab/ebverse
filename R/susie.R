@@ -172,6 +172,7 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
+  # - Document the "control" argument in "Details".
   # - Implement some benchmarking experiments to compare running time
   #   of susieR (old and new versions) and ebverse on a variety
   #   of data sets, both individual-level and summary.
@@ -180,6 +181,8 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   this.
   # - Implement a function to load the results of a PLINK association
   #   analysis into R, then calls prepare_mlm_summary_data().
+  # - Start to develop a mr.ash implementation (start with writing up 
+  #   the model and posterior computations in the Overleaf).
   # - Implement a predict method.
   # - Implement a residuals method.
   # - Add residuals to summary method (see lm).
