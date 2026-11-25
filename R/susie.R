@@ -172,6 +172,9 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
+  # - Implement some benchmarking experiments to compare running time
+  #   of susieR (old and new versions) and ebverse on a variety
+  #   of data sets, both individual-level and summary.
   # - Implement a function to load PLINK data into R, then calls 
   #   prepare_mlm_full_data(). Need to find an R package to help with 
   #   this.
