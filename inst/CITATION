@@ -1,0 +1,31 @@
+bibentry(bibtype = "Article",
+  title   = paste("A simple new approach to variable selection in",
+                  "regression, with application to genetic fine",
+                  "mapping"),
+  author  = c(person(given = "Gao",family = "Wang"),
+              person(given = "Abhishek",family = "Sarkar"),
+              person(given = "Peter",family = "Carbonetto"),
+              person(given = "Matthew",family = "Stephens")),
+  journal = "Journal of the Royal Statistical Society, Series B",
+  year    = "2020",
+  volume  = "82",
+  pages   = "1273--1300",
+  doi     = "10.1101/501114",
+  header  = "For the susie methods, please cite:"
+)
+
+bibentry(bibtype = "Article",
+  title   = paste('Fine-mapping from summary data with the',
+                  '"Sum of Single Effects" model'),
+  author  = c(person(given = "Yuxin",family = "Zou"),
+              person(given = "Peter",family = "Carbonetto"),
+              person(given = "Gao",family = "Wang"),
+              person(given = "Matthew",family = "Stephens")),
+  journal = "PLoS Genetics",
+  year    = "2022",
+  volume  = "18",
+  number  = "5",
+  pages   = "e1010299",
+  doi     = "10.1371/journal.pgen.1010299",
+  header  = "For the susie methods with summary data, please also cite:"
+)
