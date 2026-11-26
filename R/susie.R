@@ -172,13 +172,13 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
+  # - Add inst/CITATION.
   # - Document the "control" argument in "Details".
   # - Implement some benchmarking experiments to compare running time
   #   of susieR (old and new versions) and ebverse on a variety
   #   of data sets, both individual-level and summary.
   # - Implement a function to load PLINK data into R, then calls 
-  #   prepare_mlm_full_data(). Need to find an R package to help with 
-  #   this.
+  #   prepare_mlm_full_data(). See the snpStats package.
   # - Implement a function to load the results of a PLINK association
   #   analysis into R, then calls prepare_mlm_summary_data().
   # - Start to develop a mr.ash implementation (start with writing up 
