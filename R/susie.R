@@ -40,7 +40,7 @@
 #'
 #'   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
 #'     to the \dQuote{null} model (b = 0).}
-#' 
+#'
 #'   \item{ss}{The MLM summary statistics used in fitting the model.
 #'     This is always returned even if \code{return_data = FALSE}.}
 #' 
@@ -70,6 +70,9 @@
 #'
 #'   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
 #'     to the \dQuote{null} model (b = 0).}
+#' 
+#'   \item{ser_lbf}{Log-Bayes factors for each of the single effect
+#'     regressions.}
 #' 
 #'   \item{residual_variance}{The residual variance parameter.}
 #'
@@ -174,6 +177,7 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   # TO DO:
   # - Add inst/CITATION.
   # - Document the "control" argument in "Details".
+  # - Better document the "progress" and "verbose" outputs.
   # - Implement some benchmarking experiments to compare running time
   #   of susieR (old and new versions) and ebverse on a variety
   #   of data sets, both individual-level and summary.
@@ -375,15 +379,13 @@ variable.names.susie <- function (object, ...)
 #' @export
 #' 
 summary.susie <- function (object, coverage = 0.95, ...) {
-  #
-  # TO DO: Add SER Bayes factors to summary.
-  #
   pip <- susie_get_pips(object$ser)
   b   <- compute_post_mean_susie(object$ser)
   out <- list(nvar              = nrow(object$ss),
               L                 = length(object$ser),
               elbo              = object$elbo,
               lbf               = object$lbf,
+              ser_lbf           = sapply(object$ser,"[[","lbf"),
               residual_variance = object$residual_variance,
               numiter           = ifelse(is.data.frame(object$progress),
                                          nrow(object$progress),
@@ -412,23 +414,27 @@ print.susie <- function (x, ...) {
 #' @export
 #' 
 print.summary_susie <- function (x, coverage = 0.95, ...) {
-  #
-  # TO DO: Add SER Bayes factors to this summary.
-  #
-  cat(sprintf("SuSiE model for %d variables with %d single effects.\n",
-              x$nvar,x$L))
+  L <- x$L
+  cs <- x$credible_sets
+  cat(sprintf("SuSiE model for %d variables with L=%d single %s.\n",
+              x$nvar,L,ifelse(L == 1,"effect","effects")))
   cat(sprintf("residual variance is %0.4f.\n",x$residual_variance))
   if (!is.na(x$lbf))
     cat(sprintf("(log) Bayes factor is %0.4f.\n",x$lbf))
   if (!is.na(x$elbo))
     cat(sprintf("ELBO is %0.4f.\n",x$elbo))
-  cs_sizes <- sapply(x$credible_sets,length)
-  cat(sprintf("The smallest %0.0f%% CS has %d %s; ",
-              100*attr(x$credible_sets,"target_coverage"),
-              min(cs_sizes),
-              ifelse(min(cs_sizes) == 1,"variable","variables")))
-  cat(sprintf("the largest has %d %s.\n",max(cs_sizes),
-              ifelse(max(cs_sizes) == 1,"variable","variables")))
+  cs_sizes <- sapply(cs,length)
+  if (L == 1) {
+    cat(sprintf("The %0.0f%% CS contains %d %s.\n",
+                100*attr(cs,"target_coverage"),cs_sizes,
+                ifelse(cs_sizes == 1,"variable","variables")))
+  } else {
+    cat(sprintf("The smallest %0.0f%% CS has %d %s; ",
+                100*attr(cs,"target_coverage"),min(cs_sizes),
+                ifelse(min(cs_sizes) == 1,"variable","variables")))
+    cat(sprintf("the largest has %d %s.\n",max(cs_sizes),
+                ifelse(max(cs_sizes) == 1,"variable","variables")))
+  }
   if (!is.na(x$numiter)) {
     cat(sprintf("%d iterations ",x$numiter))
     cat("of the IBSS algorithm were completed.\n")

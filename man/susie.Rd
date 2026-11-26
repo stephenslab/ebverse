@@ -136,6 +136,9 @@ elements:
   \item{lbf}{Approximate log-Bayes factor comparing the SuSiE model
     to the \dQuote{null} model (b = 0).}
 
+  \item{ser_lbf}{Log-Bayes factors for each of the single effect
+    regressions.}
+
   \item{residual_variance}{The residual variance parameter.}
 
   \item{numiter}{The number of iterations of the IBSS model
