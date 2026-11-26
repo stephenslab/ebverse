@@ -96,6 +96,18 @@
 #' @details
 #' TO DO: Explain that the special case of L = 1 reduces to
 #' a single effect regression.
+#'
+#' @references
+#'
+#' Wang G, Sarkar A, Carbonetto P, Stephens M (2020). \dQuote{A simple
+#' new approach to variable selection in regression, with application
+#' to genetic fine mapping.} \emph{Journal of the Royal Statistical
+#' Society, Series B}, \bold{82}, 1273-1300.
+#'
+#' Zou Y, Carbonetto P, Wang G, Stephens M (2022).
+#' \dQuote{Fine-mapping from summary data with the \sQuote{Sum of
+#' Single Effects} model.} \emph{PLoS Genetics}, \bold{18}(5),
+#' e1010299.
 #' 
 #' @examples
 #' # TO DO: Add one or several examples.

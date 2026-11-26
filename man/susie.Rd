@@ -172,6 +172,17 @@ a single effect regression.
 # TO DO: Add example(s) here.
 
 }
+\references{
+Wang G, Sarkar A, Carbonetto P, Stephens M (2020). \dQuote{A simple
+new approach to variable selection in regression, with application
+to genetic fine mapping.} \emph{Journal of the Royal Statistical
+Society, Series B}, \bold{82}, 1273-1300.
+
+Zou Y, Carbonetto P, Wang G, Stephens M (2022).
+\dQuote{Fine-mapping from summary data with the \sQuote{Sum of
+Single Effects} model.} \emph{PLoS Genetics}, \bold{18}(5),
+e1010299.
+}
 \seealso{
 \link{single_effect_regression}, \link{mlm_data}
 }
