@@ -4,8 +4,10 @@
 #'
 #' @description Methods for fitting \dQuote{Sum of Single Effect}
 #'   (SuSiE) models and computing posterior statistics from SuSiE
-#'   models. The \sQuote{fit_susie_model} method is the main method
-#'   for fitting SuSiE models and computing posterior statistics.
+#'   models. \sQuote{fit_susie_model} is the main function for
+#'   fitting SuSiE models. Use the \sQuote{summary} method to get
+#'   key posterior statistics such as posterior inclusion
+#'   probabilities (PIPs) from the fitted model.
 #'
 #' @param variable.names The names of the variables in the SuSiE
 #'   model.
@@ -187,9 +189,18 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
+  # - Create vignette, First phase in development of the "ebverse".
+  # - Update the pkgdown site.
   # - Email Gao Wang about being an "external advisor".
-  # - Document the "control" argument in "Details".
-  # - Document (in detail) the "progress" and "verbose" outputs.
+  # - Fill out "Details", including: (i) a section defining the
+  #   SuSiE model, (ii) a section on "Design of the SuSiE 
+  #   model fitting and analysis interface", and (iii) a section
+  #   on the "control" input argument.
+  # - Create a function to perform model selection or model
+  #   comparison by calling susie with different settings of L, 
+  #   e.g., compare_susie_models().
+  # - Document (in detail) the "progress" and "verbose" outputs
+  #   both for fit_susie_model() and fit_ser_model().
   # - Implement some benchmarking experiments to compare running time
   #   of susieR (old and new versions) and ebverse on a variety
   #   of data sets, both individual-level and summary.
@@ -201,11 +212,12 @@ fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #   the model and posterior computations in the Overleaf).
   # - Implement a predict method.
   # - Implement a residuals method.
-  # - Add residuals to summary method (see lm).
+  # - Add residuals to summary method? (see lm)
   # - Add r.squared (see lm) or similar (e.g., pve) to summary method.
   # - Run R CMD check --as-cran.
   # - Write a function to simulate different X matrices---
   #   see https://github.com/stephenslab/dsc-linreg.
+  #   (Use a coalescent simulator?)
   # - Implement some functions for simulating data from susie models.
   # - Research efficient storage of genotype data (e.g., "pgen").
   # - Implement a new mlm_data object for PLINK "pgen" data sets.

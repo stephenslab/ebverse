@@ -60,9 +60,8 @@ model is used. See \sQuote{Details} for further information.}
 fits at all times, even if they are just initial guesses. This
 argument specifies how the initial guess is obtained.}
 
-\item{control}{An object, possibly a list, specifying settings that
-affect the model fitting. See \sQuote{Details} for further
-information.}
+\item{control}{A list specifying settings that control the model
+fitting. See \sQuote{Details} for further information.}
 
 \item{bhat}{A numeric vector containing least-squares estimates of
 the coefficients.}
@@ -212,6 +211,45 @@ A single effect regression (SER) model is a Bayesian
     variable names.
 
   }
+
+The \code{control} argument is a list in which named components
+will override the default model fitting settings, typically defined
+by a separate function. For example, for the \sQuote{ser_normal}
+family the default settings are defined in
+\code{ser_normal_control_default()}. The exact model-fitting
+options will be different for each SER family, and may include:
+\describe{
+
+\item{\code{estimate_prior_variance}}{When
+  \code{estimate_prior_variance = TRUE}, the prior variance
+  parameter is estimated.}
+
+\item{\code{global_prior_variance}}{When
+  \code{global_prior_variance = TRUE}, the prior variance parameters
+  are shared with other SERs for which this setting is also
+  \code{TRUE}.}
+
+\item{\code{trace}}{When \code{trace = TRUE}, progress on the model
+  fitting is recorded and returned.}
+
+\item{\code{verbose}}{When \code{verbose = TRUE}, progress on the model
+  fitting is outputted to the console.}
+
+\item{\code{version}}{The implementation of the model fitting algorithm
+  to use. Should be \dQuote{R} or \dQuote{Rcpp}.}
+
+\item{\code{paramtol}}{When this is not \code{NA}, stop the model
+  fitting if the change in the prior variance parameter between two
+  successive iterations is less than this value.}
+
+\item{\code{lbftol}}{When this is not \code{NA}, stop the model
+  fitting if the change in the log-Bayes factor between two success
+  iterations is less than this value.}
+
+\item{\code{maxiter}}{Terminate the model fitting after reaching
+  this many iterations.}
+
+}
 }
 \note{
 This is a lightweight interface with relatively few features

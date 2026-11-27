@@ -159,8 +159,10 @@ elements:
 \description{
 Methods for fitting \dQuote{Sum of Single Effect}
   (SuSiE) models and computing posterior statistics from SuSiE
-  models. The \sQuote{fit_susie_model} method is the main method
-  for fitting SuSiE models and computing posterior statistics.
+  models. \sQuote{fit_susie_model} is the main function for
+  fitting SuSiE models. Use the \sQuote{summary} method to get
+  key posterior statistics such as posterior inclusion
+  probabilities (PIPs) from the fitted model.
 }
 \details{
 TO DO: Explain that the special case of L = 1 reduces to
