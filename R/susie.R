@@ -187,9 +187,9 @@ init_susie_model <-
 fit_susie_model <- function (fit, dat, return_data = missing(dat)) {
   #
   # TO DO:
-  # - Add inst/CITATION.
+  # - Email Gao Wang about being an "external advisor".
   # - Document the "control" argument in "Details".
-  # - Better document the "progress" and "verbose" outputs.
+  # - Document (in detail) the "progress" and "verbose" outputs.
   # - Implement some benchmarking experiments to compare running time
   #   of susieR (old and new versions) and ebverse on a variety
   #   of data sets, both individual-level and summary.
