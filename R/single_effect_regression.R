@@ -262,7 +262,7 @@ init_ser_model_normal <-
 #'   when X, y are provided, but a residual variance setting should
 #'   still be declared even if it is not actually used.
 #'
-#' @note In \code{prepare_set_data}, only provide (bhat, shat) or
+#' @note In \code{prepare_ser_data}, only provide (bhat, shat) or
 #'   (X, y); an error will occur if the wrong combination of data
 #'   are provided.
 #' 
